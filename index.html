@@ -1,1031 +1,233 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0a0d14">
-    <title>Detector de Polaridade | Ferramenta de Áudio</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-dark: #0a0d14;
-            --bg-card: #12161f;
-            --bg-card-hover: #1a1f2a;
-            --border: #2a2f3a;
-            --primary: #00e1ff;
-            --primary-dark: #00b8d4;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --text-muted: #5a6a7a;
-            --gradient: linear-gradient(135deg, #00e1ff 0%, #00b8d4 50%, #0099b0 100%);
-        }
-
-        body {
-            font-family: 'Segoe UI', 'Exo 2', system-ui, -apple-system, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.5;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(ellipse at 20% 0%, rgba(0, 225, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 100%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .app {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .icon-box {
-            width: 56px;
-            height: 56px;
-            background: var(--gradient);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 30px rgba(0, 225, 255, 0.3);
-        }
-
-        .icon-box svg {
-            width: 32px;
-            height: 32px;
-            stroke: var(--bg-dark);
-            stroke-width: 1.5;
-        }
-
-        .title-area h1 {
-            font-size: 28px;
-            font-weight: 700;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .title-area p {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .badge {
-            background: rgba(0, 225, 255, 0.1);
-            border: 1px solid rgba(0, 225, 255, 0.3);
-            padding: 6px 12px;
-            border-radius: 40px;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-
-        @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr;
+    <title>AudioBase Tools - Polaridade Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ab-dark': '#0d1117',
+                        'ab-card': '#161b22',
+                        'ab-border': '#30363d',
+                        'ab-cyan': '#06b6d4',
+                    }
+                }
             }
         }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            border-color: rgba(0, 225, 255, 0.3);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .card-header h3 {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .card-header p {
-            color: var(--text-secondary);
-            font-size: 13px;
-        }
-
-        .card-body {
-            padding: 24px;
-        }
-
-        .info-box {
-            background: rgba(0, 225, 255, 0.05);
-            border: 1px solid rgba(0, 225, 255, 0.2);
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 12px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .mic-selector {
-            margin-bottom: 20px;
-        }
-
-        .mic-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .mic-select-wrapper {
-            display: flex;
-            gap: 10px;
-        }
-
-        select {
-            flex: 1;
-            background: var(--bg-card-hover);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px 16px;
-            color: var(--text-primary);
-            font-size: 14px;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        select:focus {
-            border-color: var(--primary);
-        }
-
-        .refresh-btn {
-            background: var(--bg-card-hover);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .refresh-btn:hover {
-            border-color: var(--primary);
-            background: rgba(0, 225, 255, 0.1);
-        }
-
-        .touch-test {
-            background: var(--bg-card-hover);
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 12px;
-        }
-
-        .touch-meter {
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 8px 0;
-        }
-
-        .touch-meter-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--gradient);
-            transition: width 0.05s ease;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            background: none;
-        }
-
-        .btn-primary {
-            background: var(--gradient);
-            color: var(--bg-dark);
-            box-shadow: 0 0 20px rgba(0, 225, 255, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 30px rgba(0, 225, 255, 0.5);
-        }
-
-        .btn-secondary {
-            background: var(--bg-card-hover);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--primary);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .slider-container {
-            margin-top: 20px;
-        }
-
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            -webkit-appearance: none;
-            background: var(--border);
-            border-radius: 3px;
-            outline: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            background: var(--primary);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 10px var(--primary);
-        }
-
-        .result-area {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .signal-meter {
-            margin-bottom: 30px;
-        }
-
-        .signal-bar {
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 8px;
-            position: relative;
-        }
-
-        .signal-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--gradient);
-            transition: width 0.1s ease;
-        }
-
-        .polarity-indicator {
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            border: 8px solid var(--border);
-        }
-
-        .polarity-indicator.positive {
-            border-color: var(--success);
-            box-shadow: 0 0 40px rgba(34, 197, 94, 0.3);
-        }
-
-        .polarity-indicator.negative {
-            border-color: var(--error);
-            box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
-        }
-
-        .polarity-indicator.waiting {
-            border-color: var(--text-muted);
-        }
-
-        .polarity-icon {
-            font-size: 64px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .polarity-text {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .status-badge {
-            background: var(--bg-card-hover);
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .loading-dots {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 16px;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-            animation: pulse 1s infinite;
-        }
-
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.3; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1); }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        footer {
-            margin-top: 40px;
-            text-align: center;
-            padding: 20px;
-            color: var(--text-muted);
-            font-size: 12px;
-        }
-
-        .warning-box {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 12px;
-            padding: 10px 16px;
-            margin-top: 16px;
-            font-size: 12px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
+    </script>
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        .active-ring-pos { border-color: #22c55e !important; box-shadow: 0 0 40px rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.05); }
+        .active-ring-neg { border-color: #ef4444 !important; box-shadow: 0 0 40px rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); }
+        
+        /* Estilização do Slider de Sensibilidade */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #30363d; border-radius: 3px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #06b6d4; cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(6, 182, 212, 0.4); }
     </style>
 </head>
-<body>
-    <div class="app">
-        <div class="header">
-            <div class="logo-area">
-                <div class="icon-box">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>
-                    </svg>
+<body class="min-h-screen p-4 md:p-10 flex flex-col items-center">
+
+    <div class="max-w-5xl w-full">
+        <header class="flex items-center justify-between mb-8 pb-4 border-b border-ab-border">
+            <div class="flex items-center gap-4">
+                <div class="p-2.5 bg-ab-cyan/10 rounded-xl text-ab-cyan">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                 </div>
-                <div class="title-area">
-                    <h1>Polaridade (High)</h1>
-                    <p>Drivers e Tweeters • Modo Trigger com Pausa</p>
+                <div>
+                    <h1 class="text-2xl font-extrabold text-white tracking-tight text-ab-cyan">Polaridade (High)</h1>
+                    <p class="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-bold">Professional Audio Analysis</p>
                 </div>
             </div>
-            <div class="badge">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                </svg>
-                Detector em Tempo Real
-            </div>
-        </div>
+            <div id="phaseIndicator" class="px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-orange-400 border border-slate-700">FASE: INVERTIDA (HW CORRECTION)</div>
+        </header>
 
-        <div class="grid">
-            <div class="card">
-                <div class="card-header">
-                    <h3>Configuração</h3>
-                    <p>Detector de Polaridade para Alta Frequência</p>
+        <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border shadow-xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-semibold text-white">Configuração</h2>
+                    <button onclick="togglePhase()" class="text-[10px] font-bold text-slate-400 hover:text-white transition uppercase tracking-widest border border-ab-border px-3 py-1 rounded-lg">Alternar Ø</button>
                 </div>
-                <div class="card-body">
-                    <div class="info-box">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="4" y="2" width="16" height="20" rx="2"/>
-                            <circle cx="12" cy="14" r="4"/>
-                        </svg>
-                        <p>Utilize o "Teste do Toque" abaixo para encontrar o microfone correto do seu celular antes de medir.</p>
+
+                <div class="space-y-8">
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                            Microfone de Captura
+                        </label>
+                        <select id="micSelect" class="w-full bg-ab-dark border border-ab-border p-4 rounded-2xl text-sm outline-none focus:border-ab-cyan/50 transition appearance-none cursor-pointer"></select>
                     </div>
 
-                    <div class="mic-selector">
-                        <div class="mic-label">
-                            <span>Selecione o Microfone</span>
-                            <span class="badge" style="font-size: 10px;">Teste do Toque</span>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                                Sensibilidade do Gatilho
+                            </label>
+                            <span id="sensValue" class="text-xs font-mono text-ab-cyan font-bold">0.25</span>
                         </div>
-                        <div class="mic-select-wrapper">
-                            <select id="micSelect"></select>
-                            <button class="refresh-btn" id="refreshMicBtn" title="Atualizar dispositivos">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                                    <path d="M21 3v5h-5"/>
-                                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                                    <path d="M8 16H3v5"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="touch-test">
-                            <div style="font-size: 12px; margin-bottom: 8px;">Dê toquinhos no celular para achar onde o sinal sobe mais:</div>
-                            <div class="touch-meter">
-                                <div class="touch-meter-fill" id="touchMeterFill"></div>
-                            </div>
+                        <input type="range" id="sensSlider" min="0.05" max="0.80" step="0.01" value="0.25" class="w-full" oninput="updateSens(this.value)">
+                        <div class="flex justify-between text-[9px] text-slate-600 font-bold uppercase">
+                            <span>Mais Sensível</span>
+                            <span>Menos Sensível</span>
                         </div>
                     </div>
 
-                    <div class="btn-group">
-                        <button class="btn btn-primary" id="playSignalBtn">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <polygon points="5 3 19 12 5 21 5 3"/>
-                            </svg>
-                            Tocar (Celular)
-                        </button>
-                        <button class="btn btn-secondary" id="downloadSignalBtn">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" x2="12" y1="15" y2="3"/>
-                            </svg>
-                            Baixar Faixa
-                        </button>
-                    </div>
-
-                    <button class="btn btn-primary" id="activateDetectorBtn" style="width: 100%; margin-bottom: 20px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                            <line x1="12" x2="12" y1="19" y2="22"/>
-                        </svg>
-                        Ativar Detector
+                    <button id="btnAction" onclick="toggleApp()" class="w-full bg-ab-cyan hover:bg-cyan-500 text-ab-dark font-black py-5 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-3 group">
+                        <div id="iconAction" class="transition-transform group-active:scale-90">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        </div>
+                        <span id="textAction" class="uppercase tracking-[0.2em] text-xs">Ativar Scanner</span>
                     </button>
+                </div>
+            </section>
 
-                    <div class="slider-container">
-                        <div class="slider-label">
-                            <span>Sensibilidade (Trigger)</span>
-                            <span id="sensitivityValue">25%</span>
-                        </div>
-                        <input type="range" id="sensitivitySlider" min="5" max="80" value="25" step="1">
-                        <div style="font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 4px;">
-                            Aumente se tiver muito ruído de fundo
-                        </div>
+            <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border shadow-xl flex flex-col items-center justify-between min-h-[450px]">
+                <div class="w-full mb-4">
+                    <h2 class="text-lg font-semibold text-white">Análise de Fase</h2>
+                    <p class="text-[10px] text-slate-500 italic">Posicione o microfone a 5cm do driver</p>
+                </div>
+
+                <div id="statusCircle" class="w-64 h-64 rounded-full border-[14px] border-ab-dark flex items-center justify-center transition-all duration-200 ease-out relative">
+                    <div id="contentDefault" class="text-center">
+                        <div class="text-6xl font-black text-slate-800" id="mainSymbol">--</div>
                     </div>
-
-                    <div class="warning-box">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                        </svg>
-                        <span>O microfone NÃO reproduzirá áudio. O detector apenas escuta.</span>
+                    <div id="resLabel" class="hidden text-center animate-in fade-in zoom-in duration-300">
+                        <span id="symbol" class="text-8xl font-black block leading-none"></span>
+                        <span id="desc" class="text-[11px] font-black uppercase tracking-[0.3em] mt-2 block"></span>
                     </div>
                 </div>
-            </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h3>Resultado</h3>
-                </div>
-                <div class="card-body">
-                    <div class="result-area">
-                        <div class="signal-meter">
-                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                                <span>Nível de Sinal</span>
-                                <span id="signalPercent">0%</span>
-                            </div>
-                            <div class="signal-bar">
-                                <div class="signal-bar-fill" id="signalFill"></div>
-                            </div>
-                        </div>
-
-                        <div class="polarity-indicator waiting" id="polarityIndicator">
-                            <div class="polarity-icon" id="polarityIcon">?</div>
-                            <div class="polarity-text" id="polarityText">Aguardando</div>
-                        </div>
-
-                        <div id="statusArea">
-                            <div class="status-badge" id="statusText">⚡ Clique em "Ativar Detector" para começar</div>
-                        </div>
-
-                        <div class="loading-dots hidden" id="loadingDots">
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                        </div>
+                <div class="w-full px-4 mb-4">
+                    <div class="flex justify-between text-[10px] mb-2 font-black text-slate-500 uppercase tracking-widest">
+                        <span>Input Level</span>
+                        <span id="rmsNum">0%</span>
+                    </div>
+                    <div class="w-full bg-ab-dark h-2.5 rounded-full overflow-hidden p-[2px] border border-ab-border">
+                        <div id="levelBar" class="bg-gradient-to-r from-cyan-600 to-ab-cyan h-full w-0 transition-all duration-75"></div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
 
-        <footer>
-            <p>Detector de Polaridade • Coloque o microfone próximo ao alto-falante (tweeter/driver) e toque o sinal</p>
+        <footer class="mt-10 text-center space-y-2">
+            <p class="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Desenvolvido para João José - Especialista em Áudio</p>
         </footer>
     </div>
 
     <script>
-        // Elementos DOM
-        const micSelect = document.getElementById('micSelect');
-        const refreshMicBtn = document.getElementById('refreshMicBtn');
-        const playSignalBtn = document.getElementById('playSignalBtn');
-        const downloadSignalBtn = document.getElementById('downloadSignalBtn');
-        const activateDetectorBtn = document.getElementById('activateDetectorBtn');
-        const sensitivitySlider = document.getElementById('sensitivitySlider');
-        const sensitivityValue = document.getElementById('sensitivityValue');
-        const touchMeterFill = document.getElementById('touchMeterFill');
-        const signalFill = document.getElementById('signalFill');
-        const signalPercent = document.getElementById('signalPercent');
-        const polarityIndicator = document.getElementById('polarityIndicator');
-        const polarityIcon = document.getElementById('polarityIcon');
-        const polarityText = document.getElementById('polarityText');
-        const statusText = document.getElementById('statusText');
-        const loadingDots = document.getElementById('loadingDots');
+        let audioCtx, analyzer, source, dataArray;
+        let running = false;
+        let phaseInverted = true; // Mantendo sua correção de hardware ativa por padrão
+        let threshold = 0.25;
+        let timeout;
 
-        // Variáveis de estado
-        let mediaStream = null;
-        let audioContext = null;
-        let sourceNode = null;
-        let analyserNode = null;
-        let isDetecting = false;
-        let animationId = null;
-        let touchTestAnimationId = null;
-        let testOscillator = null;
-
-        // Configuração
-        let sensitivity = 0.25; // 0-1
-        let lastTriggerTime = 0;
-        let triggerCooldown = 500; // ms
-
-        // Inicialização
-        async function initMicrophones() {
-            try {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const audioInputs = devices.filter(device => device.kind === 'audioinput');
-                
-                micSelect.innerHTML = '';
-                if (audioInputs.length === 0) {
-                    micSelect.innerHTML = '<option>Nenhum microfone encontrado</option>';
-                    return;
-                }
-                
-                audioInputs.forEach((device, index) => {
-                    const option = document.createElement('option');
-                    option.value = device.deviceId;
-                    option.textContent = device.label || `Microfone ${index + 1}`;
-                    micSelect.appendChild(option);
-                });
-            } catch (err) {
-                console.error('Erro ao listar microfones:', err);
-                micSelect.innerHTML = '<option>Permita acesso ao microfone</option>';
-            }
+        function updateSens(val) {
+            threshold = parseFloat(val);
+            document.getElementById('sensValue').innerText = val;
         }
 
-        // Solicitar permissão de microfone (apenas escuta, sem saída)
-        async function requestMicrophonePermission() {
+        function togglePhase() {
+            phaseInverted = !phaseInverted;
+            const ind = document.getElementById('phaseIndicator');
+            ind.innerText = phaseInverted ? 'FASE: INVERTIDA (HW CORRECTION)' : 'FASE: NORMAL';
+            ind.className = phaseInverted ? 'px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-orange-400 border border-slate-700' : 'px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-ab-cyan border border-slate-700';
+        }
+
+        async function initMics() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                if (mediaStream) {
-                    mediaStream.getTracks().forEach(track => track.stop());
-                }
-                mediaStream = stream;
-                await initMicrophones();
-                return true;
-            } catch (err) {
-                console.error('Erro ao acessar microfone:', err);
-                statusText.textContent = '❌ Permissão de microfone negada';
-                return false;
-            }
+                stream.getTracks().forEach(t => t.stop());
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const select = document.getElementById('micSelect');
+                devices.filter(d => d.kind === 'audioinput').forEach(d => {
+                    select.add(new Option(d.label || `Entrada ${select.length + 1}`, d.deviceId));
+                });
+            } catch (e) { console.error("Erro mic:", e); }
         }
 
-        // Iniciar captura de áudio (SOMENTE ESCUTA, NÃO REPRODUZ)
-        async function startAudioCapture() {
-            if (audioContext && audioContext.state !== 'closed') {
-                await audioContext.close();
-            }
-            
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            analyserNode = audioContext.createAnalyser();
-            analyserNode.fftSize = 256;
-            analyserNode.smoothingTimeConstant = 0.3;
-            
-            const deviceId = micSelect.value;
-            let stream;
-            
+        async function toggleApp() {
+            if (running) return location.reload();
+
             try {
-                if (deviceId && deviceId !== 'Nenhum microfone encontrado') {
-                    stream = await navigator.mediaDevices.getUserMedia({
-                        audio: { deviceId: { exact: deviceId } }
-                    });
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: { deviceId: document.getElementById('micSelect').value, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+                });
+
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyzer = audioCtx.createAnalyser();
+                source = audioCtx.createMediaStreamSource(stream);
+                analyzer.fftSize = 2048;
+                dataArray = new Float32Array(analyzer.fftSize);
+                source.connect(analyzer);
+
+                running = true;
+                document.getElementById('textAction').innerText = "Encerrar Análise";
+                document.getElementById('btnAction').classList.replace('bg-ab-cyan', 'bg-red-600');
+                document.getElementById('btnAction').classList.add('text-white');
+                document.getElementById('iconAction').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="6" y="6" width="12" height="12" /></svg>';
+                
+                process();
+            } catch (e) { alert("Erro ao acessar microfone."); }
+        }
+
+        function process() {
+            if (!running) return;
+            analyzer.getFloatTimeDomainData(dataArray);
+
+            let maxV = 0, maxI = 0, sum = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                sum += dataArray[i] * dataArray[i];
+                if (Math.abs(dataArray[i]) > maxV) {
+                    maxV = Math.abs(dataArray[i]);
+                    maxI = i;
+                }
+            }
+
+            const rms = Math.sqrt(sum / dataArray.length);
+            document.getElementById('levelBar').style.width = Math.min(rms * 600, 100) + "%";
+            document.getElementById('rmsNum').innerText = Math.floor(Math.min(rms * 600, 100)) + "%";
+
+            // Detecção baseada no Threshold do Slider
+            if (maxV > threshold) {
+                clearTimeout(timeout);
+                let peak = dataArray[maxI];
+                if (phaseInverted) peak = peak * -1;
+
+                const circle = document.getElementById('statusCircle');
+                const def = document.getElementById('contentDefault');
+                const res = document.getElementById('resLabel');
+                const sym = document.getElementById('symbol');
+                const dsc = document.getElementById('desc');
+
+                def.classList.add('hidden');
+                res.classList.remove('hidden');
+
+                if (peak > 0) {
+                    circle.className = "w-64 h-64 rounded-full border-[14px] flex items-center justify-center transition-all duration-75 active-ring-pos";
+                    sym.innerText = "+"; sym.className = "text-8xl font-black block text-green-500 drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]";
+                    dsc.innerText = "Fase Correta"; dsc.className = "text-[11px] font-black uppercase tracking-[0.3em] text-green-500 mt-2 block";
                 } else {
-                    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    circle.className = "w-64 h-64 rounded-full border-[14px] flex items-center justify-center transition-all duration-75 active-ring-neg";
+                    sym.innerText = "-"; sym.className = "text-8xl font-black block text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]";
+                    dsc.innerText = "Fase Invertida"; dsc.className = "text-[11px] font-black uppercase tracking-[0.3em] text-red-500 mt-2 block";
                 }
-                
-                if (mediaStream) {
-                    mediaStream.getTracks().forEach(track => track.stop());
-                }
-                mediaStream = stream;
-                sourceNode = audioContext.createMediaStreamSource(stream);
-                sourceNode.connect(analyserNode);
-                
-                // IMPORTANTE: NÃO conectar analyserNode ao destination!
-                // Isso evita que o microfone seja reproduzido nas caixas de som
-                
-                return true;
-            } catch (err) {
-                console.error('Erro ao iniciar captura:', err);
-                return false;
+
+                timeout = setTimeout(() => {
+                    circle.className = "w-64 h-64 rounded-full border-[14px] border-ab-dark flex items-center justify-center transition-all duration-500";
+                    def.classList.remove('hidden');
+                    res.classList.add('hidden');
+                }, 1500);
             }
+            requestAnimationFrame(process);
         }
 
-        // Teste do toque - analisa nível de áudio (apenas visual, sem saída)
-        function startTouchTest() {
-            if (!analyserNode) return;
-            
-            const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
-            
-            function updateTouchMeter() {
-                if (!analyserNode) return;
-                analyserNode.getByteTimeDomainData(dataArray);
-                
-                let maxSample = 0;
-                for (let i = 0; i < dataArray.length; i++) {
-                    const v = (dataArray[i] - 128) / 128;
-                    maxSample = Math.max(maxSample, Math.abs(v));
-                }
-                
-                const percent = Math.min(100, maxSample * 100);
-                touchMeterFill.style.width = percent + '%';
-                
-                touchTestAnimationId = requestAnimationFrame(updateTouchMeter);
-            }
-            
-            if (touchTestAnimationId) cancelAnimationFrame(touchTestAnimationId);
-            updateTouchMeter();
-        }
-
-        function stopTouchTest() {
-            if (touchTestAnimationId) {
-                cancelAnimationFrame(touchTestAnimationId);
-                touchTestAnimationId = null;
-            }
-        }
-
-        // Detector de polaridade
-        function startPolarityDetection() {
-            if (!analyserNode) return;
-            
-            const bufferLength = analyserNode.fftSize;
-            const dataArray = new Float32Array(bufferLength);
-            
-            function detectPolarity() {
-                if (!isDetecting || !analyserNode) return;
-                
-                analyserNode.getFloatTimeDomainData(dataArray);
-                
-                // Calcular nível de sinal (amplitude RMS simplificada)
-                let sumSquares = 0;
-                for (let i = 0; i < bufferLength; i++) {
-                    sumSquares += dataArray[i] * dataArray[i];
-                }
-                const rms = Math.sqrt(sumSquares / bufferLength);
-                const signalLevel = Math.min(100, (rms / sensitivity) * 100);
-                
-                signalFill.style.width = signalLevel + '%';
-                signalPercent.textContent = Math.round(signalLevel) + '%';
-                
-                // Detectar picos para polaridade
-                if (rms > sensitivity * 0.7) {
-                    const now = Date.now();
-                    if (now - lastTriggerTime > triggerCooldown) {
-                        lastTriggerTime = now;
-                        
-                        // Analisar forma de onda para determinar polaridade
-                        let positivePeak = 0;
-                        let negativePeak = 0;
-                        
-                        for (let i = 0; i < Math.min(bufferLength, 150); i++) {
-                            if (dataArray[i] > positivePeak) positivePeak = dataArray[i];
-                            if (dataArray[i] < negativePeak) negativePeak = dataArray[i];
-                        }
-                        
-                        const isPositive = Math.abs(positivePeak) > Math.abs(negativePeak);
-                        
-                        if (isPositive) {
-                            polarityIndicator.className = 'polarity-indicator positive';
-                            polarityIcon.innerHTML = '✓';
-                            polarityText.textContent = 'POSITIVA';
-                            statusText.innerHTML = '✅ Polaridade Positiva - Conexão correta';
-                        } else {
-                            polarityIndicator.className = 'polarity-indicator negative';
-                            polarityIcon.innerHTML = '✗';
-                            polarityText.textContent = 'NEGATIVA';
-                            statusText.innerHTML = '⚠️ Polaridade Negativa - Inverta a conexão do alto-falante';
-                        }
-                    }
-                }
-                
-                animationId = requestAnimationFrame(detectPolarity);
-            }
-            
-            if (animationId) cancelAnimationFrame(animationId);
-            detectPolarity();
-        }
-
-        // Gerar sinal de teste (apenas para teste, não interfere na captura)
-        function playTestSignal() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-            
-            if (testOscillator) {
-                try {
-                    testOscillator.stop();
-                    testOscillator.disconnect();
-                } catch(e) {}
-            }
-            
-            testOscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            testOscillator.type = 'sine';
-            testOscillator.frequency.value = 2500; // 2.5kHz para tweeters
-            
-            gainNode.gain.value = 0.5;
-            
-            testOscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            testOscillator.start();
-            
-            // Para após 2 segundos
-            setTimeout(() => {
-                if (testOscillator) {
-                    try {
-                        testOscillator.stop();
-                        testOscillator.disconnect();
-                    } catch(e) {}
-                }
-            }, 2000);
-            
-            statusText.innerHTML = '🔊 Tocando sinal de teste (2.5kHz) - Aproxime o microfone do alto-falante';
-            setTimeout(() => {
-                if (isDetecting) {
-                    statusText.innerHTML = '🎤 Detector ativo - Aguardando sinal do alto-falante';
-                } else {
-                    statusText.innerHTML = '⚡ Clique em "Ativar Detector" para começar';
-                }
-            }, 2500);
-        }
-
-        // Baixar faixa de teste
-        function downloadTestTrack() {
-            const tempContext = new (window.AudioContext || window.webkitAudioContext)();
-            const duration = 10;
-            const sampleRate = 44100;
-            const numSamples = duration * sampleRate;
-            const buffer = tempContext.createBuffer(1, numSamples, sampleRate);
-            const channel = buffer.getChannelData(0);
-            
-            const frequency = 2500;
-            for (let i = 0; i < numSamples; i++) {
-                const t = i / sampleRate;
-                const envelope = (Math.floor(t * 2) % 2) === 0 ? 0.8 : 0;
-                channel[i] = Math.sin(2 * Math.PI * frequency * t) * envelope;
-            }
-            
-            const wavBlob = bufferToWav(buffer);
-            const url = URL.createObjectURL(wavBlob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'teste_polaridade_tweeter.wav';
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            statusText.innerHTML = '📥 Faixa baixada! Coloque no pendrive e toque no carro.';
-            setTimeout(() => {
-                if (isDetecting) {
-                    statusText.innerHTML = '🎤 Detector ativo - Aguardando sinal';
-                } else {
-                    statusText.innerHTML = '⚡ Clique em "Ativar Detector" para começar';
-                }
-            }, 3000);
-        }
-        
-        function bufferToWav(buffer) {
-            const numChannels = 1;
-            const sampleRate = buffer.sampleRate;
-            const format = 1;
-            const bitDepth = 16;
-            
-            const samples = buffer.getChannelData(0);
-            const wavData = new Int16Array(samples.length);
-            for (let i = 0; i < samples.length; i++) {
-                wavData[i] = Math.max(-32768, Math.min(32767, Math.floor(samples[i] * 32767)));
-            }
-            
-            const bufferLength = 44 + wavData.length * 2;
-            const arrayBuffer = new ArrayBuffer(bufferLength);
-            const view = new DataView(arrayBuffer);
-            
-            writeString(view, 0, 'RIFF');
-            view.setUint32(4, 36 + wavData.length * 2, true);
-            writeString(view, 8, 'WAVE');
-            writeString(view, 12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, format, true);
-            view.setUint16(22, numChannels, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * numChannels * (bitDepth / 8), true);
-            view.setUint16(32, numChannels * (bitDepth / 8), true);
-            view.setUint16(34, bitDepth, true);
-            writeString(view, 36, 'data');
-            view.setUint32(40, wavData.length * 2, true);
-            
-            let offset = 44;
-            for (let i = 0; i < wavData.length; i++) {
-                view.setInt16(offset, wavData[i], true);
-                offset += 2;
-            }
-            
-            return new Blob([arrayBuffer], { type: 'audio/wav' });
-        }
-        
-        function writeString(view, offset, string) {
-            for (let i = 0; i < string.length; i++) {
-                view.setUint8(offset + i, string.charCodeAt(i));
-            }
-        }
-
-        // Ativar detector
-        async function activateDetector() {
-            if (isDetecting) {
-                // Desativar detector
-                isDetecting = false;
-                activateDetectorBtn.innerHTML = `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                        <line x1="12" x2="12" y1="19" y2="22"/>
-                    </svg>
-                    Ativar Detector
-                `;
-                loadingDots.classList.add('hidden');
-                statusText.innerHTML = '⚡ Detector desativado';
-                polarityIndicator.className = 'polarity-indicator waiting';
-                polarityIcon.innerHTML = '?';
-                polarityText.textContent = 'Aguardando';
-                signalFill.style.width = '0%';
-                signalPercent.textContent = '0%';
-                if (animationId) cancelAnimationFrame(animationId);
-                return;
-            }
-            
-            statusText.innerHTML = '🎤 Iniciando detector...';
-            loadingDots.classList.remove('hidden');
-            
-            const hasPermission = await requestMicrophonePermission();
-            if (!hasPermission) {
-                loadingDots.classList.add('hidden');
-                return;
-            }
-            
-            const captureStarted = await startAudioCapture();
-            if (!captureStarted) {
-                loadingDots.classList.add('hidden');
-                statusText.innerHTML = '❌ Erro ao iniciar captura de áudio';
-                return;
-            }
-            
-            if (audioContext.state === 'suspended') {
-                await audioContext.resume();
-            }
-            
-            startTouchTest();
-            
-            isDetecting = true;
-            startPolarityDetection();
-            
-            activateDetectorBtn.innerHTML = `
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="6" y="4" width="4" height="16" rx="1"/>
-                    <rect x="14" y="4" width="4" height="16" rx="1"/>
-                </svg>
-                Parar Detector
-            `;
-            loadingDots.classList.add('hidden');
-            statusText.innerHTML = '🎤 Detector ativo - Aproxime o microfone do alto-falante e toque o sinal';
-        }
-
-        // Event listeners
-        refreshMicBtn.addEventListener('click', async () => {
-            if (isDetecting) {
-                statusText.innerHTML = '🔄 Desative o detector antes de trocar o microfone';
-                return;
-            }
-            await requestMicrophonePermission();
-            statusText.innerHTML = '🔄 Microfones atualizados';
-            setTimeout(() => {
-                statusText.innerHTML = '⚡ Clique em "Ativar Detector" para começar';
-            }, 2000);
-        });
-        
-        playSignalBtn.addEventListener('click', () => {
-            if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-            playTestSignal();
-        });
-        
-        downloadSignalBtn.addEventListener('click', downloadTestTrack);
-        
-        activateDetectorBtn.addEventListener('click', activateDetector);
-        
-        sensitivitySlider.addEventListener('input', (e) => {
-            sensitivity = e.target.value / 100;
-            sensitivityValue.textContent = e.target.value + '%';
-        });
-        
-        micSelect.addEventListener('change', () => {
-            if (isDetecting) {
-                statusText.innerHTML = '⚠️ Desative o detector antes de trocar o microfone';
-            }
-        });
-        
-        // Inicialização
-        (async () => {
-            await requestMicrophonePermission();
-            statusText.innerHTML = '⚡ Clique em "Ativar Detector" para começar';
-        })();
+        initMics();
     </script>
 </body>
 </html>
