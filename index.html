@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AudioBase Pro | Neon v11.3 Tutorial</title>
+    <title>AudioBase Pro | Final Gold Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -15,179 +15,193 @@
         .active-ring-pos { border-color: #22c55e !important; box-shadow: 0 0 30px rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.05); }
         .active-ring-neg { border-color: #ef4444 !important; box-shadow: 0 0 30px rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); }
         .nav-btn.active { background-color: #06b6d4; color: #0a0d14; box-shadow: 0 0 15px rgba(6, 182, 212, 0.5); }
-        .nav-btn { transition: all 0.2s; }
-        input[type=range] { -webkit-appearance: none; background: transparent; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #30363d; border-radius: 3px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #06b6d4; margin-top: -6px; box-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
-        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
-        .shadow-glow-cyan { box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); }
-        .shadow-glow-gold { box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .nav-btn { transition: all 0.2s; cursor: pointer; }
+        input[type=range] { -webkit-appearance: none; background: transparent; width: 100%; }
+        input[type=range]::-webkit-slider-runnable-track { height: 6px; background: #30363d; border-radius: 3px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #06b6d4; margin-top: -6px; }
         .lcd-text { font-family: 'Courier New', Courier, monospace; }
         .help-box { display: none; }
         .help-box.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
+        .modal.active { display: flex; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 md:p-8">
 
+    <div id="reportModal" class="modal" onclick="closeModal()">
+        <div class="bg-ab-card w-full max-w-lg rounded-[2.5rem] border border-ab-border p-8 shadow-2xl space-y-6" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-ab-border pb-4">
+                <h3 class="text-ab-cyan font-black uppercase italic tracking-widest">Diagnóstico Técnico</h3>
+                <button onclick="closeModal()" class="text-slate-500 text-2xl font-bold">&times;</button>
+            </div>
+            <div id="reportContent" class="space-y-4"></div>
+            <button onclick="closeModal()" class="w-full bg-ab-border text-white font-black py-4 rounded-xl uppercase text-[10px] tracking-widest">Entendido</button>
+        </div>
+    </div>
+
     <div class="max-w-5xl w-full">
         <header class="flex flex-col md:flex-row items-center justify-between mb-10 pb-6 border-b border-ab-border gap-6">
             <div class="flex items-center gap-4">
-                <div class="p-3 bg-ab-cyan/10 rounded-2xl text-ab-cyan shadow-glow-cyan border border-ab-cyan/20">
+                <div class="p-3 bg-ab-cyan/10 rounded-2xl text-ab-cyan border border-ab-cyan/20">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-black text-white italic tracking-tighter uppercase">AUDIOBASE <span class="font-light text-ab-cyan">PRO</span></h1>
-                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-[0.3em]">Sound Designer Tools</p>
+                    <h1 class="text-3xl font-black text-white italic tracking-tighter uppercase leading-none">AUDIOBASE <span class="font-light text-ab-cyan">PRO</span></h1>
+                    <p class="text-[9px] text-slate-500 uppercase font-bold tracking-[0.4em] mt-1">Jaguaruana Engineering</p>
                 </div>
             </div>
-            
-            <nav class="flex gap-2 p-1.5 bg-ab-card rounded-full border border-ab-border shadow-inner">
-                <button type="button" onclick="showTab('alinhamento')" id="btn-alinhamento" class="nav-btn py-2.5 px-5 rounded-full text-xs font-black uppercase active tracking-widest">Delay</button>
-                <button type="button" onclick="showTab('projeto')" id="btn-projeto" class="nav-btn py-2.5 px-5 rounded-full text-xs font-black uppercase tracking-widest">Projeto</button>
-                <button type="button" onclick="showTab('polaridade')" id="btn-polaridade" class="nav-btn py-2.5 px-5 rounded-full text-xs font-black uppercase tracking-widest">Fase</button>
+            <nav class="flex gap-1 p-1 bg-ab-card rounded-full border border-ab-border">
+                <button onclick="showTab('alinhamento')" id="btn-alinhamento" class="nav-btn py-2.5 px-5 rounded-full text-[10px] font-black uppercase active">Delay</button>
+                <button onclick="showTab('projeto')" id="btn-projeto" class="nav-btn py-2.5 px-5 rounded-full text-[10px] font-black uppercase">Projeto</button>
+                <button onclick="showTab('polaridade')" id="btn-polaridade" class="nav-btn py-2.5 px-5 rounded-full text-[10px] font-black uppercase">Fase</button>
             </nav>
         </header>
 
         <div id="tab-alinhamento" class="tab-content space-y-8">
-            <section class="bg-ab-card p-7 rounded-[2.5rem] border border-ab-border shadow-2xl relative">
-                <button onclick="toggleHelp('help-delay')" class="absolute top-7 right-7 w-8 h-8 rounded-full border border-ab-gold/50 text-ab-gold flex items-center justify-center font-bold hover:bg-ab-gold hover:text-black transition-all">?</button>
+            <section class="bg-ab-card p-7 rounded-[2.5rem] border border-ab-border relative">
+                <button onclick="toggleHelp('help-delay')" class="absolute top-7 right-7 w-8 h-8 rounded-full border border-ab-gold/50 text-ab-gold flex items-center justify-center font-bold">?</button>
+                <div class="flex items-center gap-3 mb-6"><div class="w-2 h-6 bg-ab-gold rounded-full"></div><h2 class="text-xl font-bold text-white uppercase italic">Delay (Alinhamento)</h2></div>
                 
-                <div class="flex items-center gap-3 mb-6"><div class="w-2 h-6 bg-ab-gold rounded-full"></div><h2 class="text-xl font-bold text-white uppercase tracking-tight">Cálculo de Delay</h2></div>
-                
-                <div id="help-delay" class="help-box mb-6 p-5 bg-ab-gold/10 border border-ab-gold/20 rounded-2xl text-xs text-ab-gold leading-relaxed">
-                    <p class="font-black mb-2 uppercase italic text-sm">Como usar o Delay (TA):</p>
-                    1. Meça a distância da caixa que está mais longe (ex: PA principal).<br>
-                    2. Meça a distância da caixa que está mais perto (ex: Front-fill ou Delay Tower).<br>
-                    3. O app calcula o tempo exato em **milissegundos** que você deve inserir no DSP da caixa que está **perto** para que o som chegue junto ao ouvinte.
+                <div id="help-delay" class="help-box mb-6 p-5 bg-ab-gold/10 border border-ab-gold/20 rounded-2xl text-[11px] text-ab-gold leading-relaxed">
+                    <p class="font-black mb-2 uppercase italic text-sm">Como usar o Delay:</p>
+                    1. <b>Longe:</b> Meça a distância do PA principal até o ouvinte.<br>
+                    2. <b>Perto:</b> Meça a distância da caixa de reforço (ex: Front-fill) até o mesmo ouvinte.<br>
+                    3. Insira o valor resultante (ms) no processador da caixa que está <b>perto</b>.
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-                    <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border focus-within:border-ab-gold transition-colors"><label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Longe (m)</label><div class="flex items-center gap-3"><input type="number" id="distL" value="1.50" step="0.01" oninput="runTA()" class="bg-transparent text-4xl font-black text-white w-full outline-none"><span class="text-ab-gold font-bold text-lg">m</span></div></div>
-                    <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border focus-within:border-ab-gold transition-colors"><label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Perto (m)</label><div class="flex items-center gap-3"><input type="number" id="distR" value="0.40" step="0.01" oninput="runTA()" class="bg-transparent text-4xl font-black text-white w-full outline-none"><span class="text-ab-gold font-bold text-lg">m</span></div></div>
+                    <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Distância Longe (m)</label><input type="number" id="distL" value="5.00" step="0.1" oninput="runTA()" class="bg-transparent text-4xl font-black text-white w-full outline-none"></div>
+                    <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Distância Perto (m)</label><input type="number" id="distR" value="1.00" step="0.1" oninput="runTA()" class="bg-transparent text-4xl font-black text-white w-full outline-none"></div>
                 </div>
 
-                <div class="bg-ab-bg p-10 rounded-[2rem] border border-ab-border flex flex-col items-center justify-center text-center shadow-glow-gold relative overflow-hidden">
-                    <div class="absolute inset-0 bg-ab-gold/5 opacity-30 pointer-events-none"></div>
-                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4 relative z-10">Inserir no Processador</p>
-                    <div class="flex items-baseline gap-1 relative z-10 lcd-text leading-none"><span id="taValue" class="text-8xl font-black text-white tracking-tighter">3.20</span><span class="text-2xl font-bold text-ab-gold italic">ms</span></div>
-                    <span id="taTarget" class="text-xs font-bold text-ab-gold uppercase tracking-widest mt-6 relative z-10 block pt-2">Atrasar Perto</span>
+                <div class="bg-ab-bg p-10 rounded-[2rem] border border-ab-border text-center relative overflow-hidden">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Valor para o DSP</p>
+                    <div class="flex items-baseline justify-center gap-1 lcd-text leading-none"><span id="taValue" class="text-8xl font-black text-white">11.63</span><span class="text-xl font-bold text-ab-gold italic">ms</span></div>
+                    <span id="taTarget" class="text-[10px] font-black text-ab-gold uppercase mt-6 block border border-ab-gold/30 py-2 rounded-full mx-auto max-w-xs italic">Atrasar Perto</span>
                 </div>
             </section>
         </div>
 
         <div id="tab-projeto" class="tab-content hidden space-y-6">
-            <section class="bg-ab-card p-7 rounded-[2.5rem] border border-ab-border shadow-2xl relative">
-                <button onclick="toggleHelp('help-projeto')" class="absolute top-7 right-7 w-8 h-8 rounded-full border border-ab-cyan/50 text-ab-cyan flex items-center justify-center font-bold hover:bg-ab-cyan hover:text-black transition-all">?</button>
-                
-                <div class="flex items-center gap-3 mb-6"><div class="w-2 h-6 bg-ab-cyan rounded-full"></div><h2 class="text-xl font-bold text-white uppercase tracking-tight">Carga & Potência</h2></div>
-                
-                <div id="help-projeto" class="help-box mb-6 p-5 bg-ab-cyan/10 border border-ab-cyan/20 rounded-2xl text-xs text-ab-cyan leading-relaxed">
-                    <p class="font-black mb-2 uppercase italic text-sm">Como usar o Projeto:</p>
-                    1. Insira a quantidade e a impedância de cada alto-falante.<br>
-                    2. Escolha se vai ligar em **Paralelo** (divide a impedância) ou **Série** (soma).<br>
-                    3. O app dirá se o amplificador suporta a carga final e qual a **Voltagem RMS** para configurar seu Limiter.
-                </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <section class="bg-ab-card p-7 rounded-[2.5rem] border border-ab-border lg:col-span-2 relative">
+                    <button onclick="toggleHelp('help-proj')" class="absolute top-7 right-7 w-8 h-8 rounded-full border border-ab-cyan/50 text-ab-cyan flex items-center justify-center font-bold">?</button>
+                    <div class="flex items-center gap-3 mb-6"><div class="w-2 h-6 bg-ab-cyan rounded-full"></div><h2 class="text-xl font-bold text-white uppercase italic">Carga por Canal</h2></div>
+                    
+                    <div id="help-proj" class="help-box mb-6 p-5 bg-ab-cyan/10 border border-ab-cyan/20 rounded-2xl text-[11px] text-ab-cyan leading-relaxed">
+                        <p class="font-black mb-2 uppercase italic text-sm">Manual de Carga:</p>
+                        • <b>Quantidade:</b> Quantos falantes ligados em UM só canal do amp.<br>
+                        • <b>Ligar em Paralelo:</b> A impedância diminui (Padrão de 90% dos casos).<br>
+                        • <b>Ligar em Série:</b> A impedância aumenta (Ex: 2 falantes de 4Ω = 8Ω).
+                    </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
-                    <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border flex items-center gap-4"><div class="flex-1"><label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Quantidade</label><input type="number" id="spkQty" value="2" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none"></div><div class="flex-1"><label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Ω Unit.</label><input type="number" id="spkImp" value="8" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none"></div></div>
-                    <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border focus-within:border-ab-cyan transition-colors"><label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Watts RMS Unit.</label><input type="number" id="spkPwr" value="1600" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none"></div>
-                </div>
-                <select id="spkType" onchange="runMasterCalc()" class="w-full bg-ab-bg border border-ab-border p-5 rounded-2xl text-white font-black text-xs uppercase appearance-none mb-6">
-                    <option value="paralelo">LIGAÇÃO EM PARALELO (Padrão)</option>
-                    <option value="serie">LIGAÇÃO EM SÉRIE</option>
-                </select>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-ab-bg p-6 rounded-2xl border border-ab-border">
-                        <div id="verdictBox" class="text-center p-3 rounded-full text-[10px] font-black uppercase border tracking-widest mb-4">Análise</div>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center text-xs font-bold border-b border-ab-border pb-2"><span class="text-slate-500 uppercase">Carga Final</span><span id="resFinalImp" class="text-white text-lg font-black lcd-text">-- Ω</span></div>
-                            <div class="flex justify-between items-center text-xs font-bold border-b border-ab-border pb-2"><span class="text-slate-500 uppercase">Potência Total</span><span id="resFinalPwr" class="text-white text-lg font-black lcd-text">-- W</span></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Falantes no Canal</label><input type="number" id="spkQty" value="2" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none"></div>
+                        <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Ω Nominal Unit.</label><input type="number" id="spkImp" value="8" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none"></div>
+                        <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border md:col-span-2"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Watts RMS (Cada Falante)</label><input type="number" id="spkPwr" value="1600" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none"></div>
+                    </div>
+                    <select id="spkType" onchange="runMasterCalc()" class="w-full bg-ab-bg border border-ab-border p-5 rounded-2xl text-white font-black text-xs mt-4 appearance-none uppercase">
+                        <option value="paralelo">LIGAÇÃO EM PARALELO (Divide Ω)</option>
+                        <option value="serie">LIGAÇÃO EM SÉRIE (Soma Ω)</option>
+                    </select>
+                </section>
+                
+                <section onclick="openReport()" class="bg-ab-card p-7 rounded-[2.5rem] border border-ab-border flex flex-col justify-between cursor-pointer hover:border-ab-cyan transition-all group border-dashed">
+                    <div id="verdictBox" class="text-center p-3 rounded-full text-[9px] font-black uppercase border tracking-widest">Análise do Sistema</div>
+                    <div class="space-y-4 my-6">
+                        <div class="flex justify-between items-center text-xs font-bold border-b border-ab-border pb-2"><span class="text-slate-500 uppercase">Carga</span><span id="resFinalImp" class="text-white text-lg font-black lcd-text">-- Ω</span></div>
+                        <div class="flex justify-between items-center text-xs font-bold border-b border-ab-border pb-2"><span class="text-slate-500 uppercase">Total Canal</span><span id="resFinalPwr" class="text-white text-lg font-black lcd-text">-- W</span></div>
+                        <div class="bg-ab-bg p-5 rounded-2xl border border-ab-border text-center border-l-4 border-l-ab-cyan shadow-lg">
+                            <p class="text-[9px] text-ab-cyan font-black uppercase mb-1">Vrms (Limiter)</p>
+                            <span id="resVolts" class="text-5xl font-black text-white lcd-text">0 V</span>
                         </div>
                     </div>
-                    <div class="bg-ab-cyan/5 p-6 rounded-2xl border border-ab-cyan/30 text-center shadow-glow-cyan border-l-4 border-l-ab-cyan">
-                        <p class="text-[10px] text-ab-cyan font-black uppercase mb-2 tracking-widest">Tensão (Limiter)</p>
-                        <span id="resVolts" class="text-6xl font-black text-white tracking-tighter lcd-text">0 V</span>
-                    </div>
+                    <p class="text-[9px] text-center text-slate-600 font-bold uppercase group-hover:text-ab-cyan">Toque para ver Relatório ➔</p>
+                </section>
+            </div>
+
+            <section class="bg-ab-card p-6 rounded-3xl border border-ab-border border-l-4 border-l-ab-purple space-y-4 shadow-xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-ab-bg rounded-xl border border-ab-border"><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Amp: RMS por Canal</label><input type="number" id="ampPwr" value="3000" oninput="runMasterCalc()" class="bg-transparent text-xl font-bold text-white w-full outline-none"></div>
+                    <div class="p-4 bg-ab-bg rounded-xl border border-ab-border"><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Amp: Impedância Mínima</label><input type="number" id="ampImpMin" value="2" oninput="runMasterCalc()" class="bg-transparent text-xl font-bold text-white w-full outline-none"></div>
                 </div>
+                <select id="ampMode" onchange="runMasterCalc()" class="w-full bg-ab-bg border border-ab-border p-4 rounded-xl text-white font-black text-[10px] uppercase appearance-none">
+                    <option value="stereo">Modo Stereo / Independente</option>
+                    <option value="bridge">Modo Bridge (Ponte Mono)</option>
+                </select>
             </section>
         </div>
 
         <div id="tab-polaridade" class="tab-content hidden space-y-6">
-            <section class="bg-ab-card p-7 rounded-[2.5rem] border border-ab-border shadow-2xl relative">
-                <button onclick="toggleHelp('help-fase')" class="absolute top-7 right-7 w-8 h-8 rounded-full border border-ab-purple/50 text-ab-purple flex items-center justify-center font-bold hover:bg-ab-purple hover:text-black transition-all">?</button>
+            <section class="bg-ab-card p-7 rounded-[2.5rem] border border-ab-border relative shadow-2xl">
+                <button onclick="toggleHelp('help-fase')" class="absolute top-7 right-7 w-8 h-8 rounded-full border border-ab-purple/50 text-ab-purple flex items-center justify-center font-bold">?</button>
+                <div class="flex items-center gap-3 mb-8"><div class="w-2 h-6 bg-ab-purple rounded-full"></div><h2 class="text-xl font-bold text-white uppercase italic tracking-tight">Scanner de Polaridade</h2></div>
                 
-                <div class="flex items-center gap-3 mb-6"><div class="w-2 h-6 bg-ab-purple rounded-full"></div><h2 class="text-xl font-bold text-white uppercase tracking-tight italic">Polaridade & Scanner</h2></div>
-                
-                <div id="help-fase" class="help-box mb-6 p-5 bg-ab-purple/10 border border-ab-purple/20 rounded-2xl text-xs text-ab-purple leading-relaxed">
-                    <p class="font-black mb-2 uppercase italic text-sm">Como usar o Scanner:</p>
-                    1. Use o **Gerador** para tocar um "Pulso" ou um "Tom Senoidal" no som.<br>
-                    2. Aponte o microfone do celular para o alto-falante e clique em **Ativar Scanner**.<br>
-                    3. Se o círculo ficar **Verde (+)**, o falante está empurrando o ar para frente. Se ficar **Vermelho (-)**, está puxando o ar (invertido).
+                <div id="help-fase" class="help-box mb-6 p-5 bg-ab-purple/10 border border-ab-purple/20 rounded-2xl text-[11px] text-ab-purple leading-relaxed">
+                    <p class="font-black mb-2 uppercase italic text-sm">Manual de Fase:</p>
+                    1. <b>Pulso:</b> Toque o sinal de pulso no som do carro/evento.<br>
+                    2. <b>Scanner:</b> Aproxime o celular do alto-falante e clique em Ativar.<br>
+                    3. <b>Normal vs Invertida:</b> (+) Verde significa que o falante empurra o ar. (-) Vermelho significa que ele puxa. Se um falante estiver diferente do outro, o grave some!
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div class="space-y-6">
-                        <div class="flex items-center justify-between bg-ab-bg p-4 rounded-2xl border border-ab-border shadow-inner">
+                        <div class="bg-ab-bg p-5 rounded-3xl border border-ab-border flex items-center justify-between">
                             <div class="flex items-center gap-4">
-                                <button onclick="toggleSignal()" class="w-14 h-14 bg-white text-black rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
-                                    <svg id="playIcon" class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <button onclick="toggleSignal()" class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
+                                    <svg id="playIcon" class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                                 </button>
-                                <span class="text-xs font-black uppercase tracking-widest">Pulso de Teste</span>
+                                <div><p class="text-[10px] font-black uppercase text-white">Pulso de Teste</p><p class="text-[9px] text-slate-500">500ms Intervalado</p></div>
                             </div>
                             <audio id="signalAudio" loop src="AudioBase_Polaridade_Intervalado_500ms.wav"></audio>
                         </div>
-                        <div class="bg-ab-bg p-6 rounded-2xl border border-ab-border space-y-4">
-                             <div class="flex justify-between items-center">
+                        <div class="bg-ab-bg p-6 rounded-3xl border border-ab-border space-y-4">
+                            <div class="flex justify-between items-center">
                                 <div class="bg-ab-card px-4 py-2 rounded-xl border border-ab-border flex items-baseline gap-1">
                                     <input type="number" id="freqInput" value="60" oninput="manualFreq(this.value)" class="bg-transparent text-2xl font-black text-white w-16 outline-none text-right lcd-text">
                                     <span class="text-ab-cyan text-xs font-bold italic">Hz</span>
                                 </div>
-                                <button onclick="toggleTone()" id="btnTone" class="bg-ab-cyan text-black px-5 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all">Iniciar Tom</button>
-                             </div>
-                             <input type="range" id="freqSlider" min="20" max="2000" value="60" oninput="sliderFreq(this.value)" class="w-full">
+                                <button onclick="toggleTone()" id="btnTone" class="bg-ab-cyan text-black px-5 py-3 rounded-xl text-[9px] font-black uppercase active:scale-95 transition-all">Gerar Tom</button>
+                            </div>
+                            <input type="range" id="freqSlider" min="20" max="2000" value="60" oninput="sliderFreq(this.value)">
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-center">
-                        <div class="flex justify-between w-full mb-4 items-center">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Feedback Visual</span>
-                            <button onclick="togglePhase()" id="phaseIndicator" class="text-[9px] font-black text-ab-gold bg-ab-gold/10 border border-ab-gold/30 px-4 py-1.5 rounded-full uppercase tracking-widest">Invertida (HW)</button>
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="flex justify-between w-full mb-4 px-2">
+                            <span class="text-[9px] font-black text-slate-600 uppercase">Leitura em tempo real</span>
+                            <button onclick="togglePhase()" id="phaseIndicator" class="text-[8px] font-black text-ab-gold border border-ab-gold/30 px-3 py-1 rounded-full uppercase">HW Invertida</button>
                         </div>
-                        <div id="statusCircle" class="w-52 h-52 rounded-full border-[12px] border-ab-bg flex flex-col items-center justify-center transition-all duration-300 mb-6 bg-black/20">
-                            <div id="contentDefault" class="text-lg font-bold text-slate-800 uppercase tracking-tighter lcd-text">Pronto</div>
-                            <div id="resLabel" class="hidden text-center leading-none">
-                                <span id="symbol" class="text-8xl font-black block leading-none"></span>
-                                <span id="desc" class="text-[10px] font-black uppercase tracking-widest mt-2 block pt-2"></span>
+                        <div id="statusCircle" class="w-56 h-56 rounded-full border-[12px] border-ab-bg flex flex-col items-center justify-center transition-all bg-black/20 shadow-inner">
+                            <div id="contentDefault" class="text-xl font-bold text-slate-800 uppercase italic">Standby</div>
+                            <div id="resLabel" class="hidden text-center">
+                                <span id="symbol" class="text-9xl font-black leading-none italic"></span>
+                                <span id="desc" class="text-[10px] font-black uppercase tracking-widest mt-2 block"></span>
                             </div>
                         </div>
-                        <button onclick="toggleApp(event)" id="btnAction" class="w-full bg-ab-purple text-white font-black py-5 rounded-2xl uppercase text-xs tracking-[0.2em] shadow-lg active:scale-95 transition-all">Ativar Scanner</button>
+                        <button onclick="toggleApp(event)" id="btnAction" class="w-full mt-8 bg-ab-purple text-white font-black py-5 rounded-2xl uppercase text-[11px] tracking-widest shadow-xl active:scale-95 transition-all">Ativar Scanner</button>
                     </div>
                 </div>
             </section>
         </div>
         
-        <footer class="mt-12 text-center text-[9px] text-slate-700 uppercase font-black tracking-[0.4em] pb-6">Pro Audio Engineering • Jaguaruana-CE • v11.3 Final</footer>
+        <footer class="mt-16 text-center text-[9px] text-slate-700 uppercase font-black tracking-[0.4em] pb-10">Sound Master v11.5 Final Gold Edition • Jaguaruana - Ceará</footer>
     </div>
 
     <script>
-        // FUNÇÕES DE NAVEGAÇÃO E AJUDA
+        let reportData = { status: "", detail: "" };
+
         function showTab(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-'+t).classList.remove('hidden');
             document.getElementById('btn-'+t).classList.add('active');
-            // Fecha todas as ajudas ao trocar de aba
             document.querySelectorAll('.help-box').forEach(h => h.classList.remove('active'));
         }
 
-        function toggleHelp(id) {
-            document.getElementById(id).classList.toggle('active');
-        }
+        function toggleHelp(id) { document.getElementById(id).classList.toggle('active'); }
 
-        // LÓGICA DE CÁLCULOS
         function runTA() {
             let L = parseFloat(document.getElementById('distL').value) || 0, R = parseFloat(document.getElementById('distR').value) || 0;
             let d = Math.abs(R - L), ms = d / 0.344;
@@ -197,31 +211,52 @@
 
         function runMasterCalc() {
             let q = parseFloat(document.getElementById('spkQty').value)||1, i = parseFloat(document.getElementById('spkImp').value)||4, p = parseFloat(document.getElementById('spkPwr').value)||0;
-            let type = document.getElementById('spkType').value;
-            let fi = (type==='paralelo') ? i/q : i*q, tp = p*q;
+            let type = document.getElementById('spkType').value, ap = parseFloat(document.getElementById('ampPwr').value)||0, ai = parseFloat(document.getElementById('ampImpMin').value)||2, am = document.getElementById('ampMode').value;
+            let fi = (type==='paralelo') ? i/q : i*q, eai = (am==='bridge') ? ai*2 : ai, eap = (am==='bridge') ? ap*2 : ap, tp = p*q;
             let v = document.getElementById('verdictBox');
-            v.innerText="✓ Sistema Otimizado"; 
-            v.className="text-center p-3 rounded-full text-[10px] font-black uppercase border border-ab-green text-ab-green bg-ab-green/10 tracking-widest";
+            
+            if(fi < eai){
+                v.innerText="⚠ Carga Perigosa"; v.className="text-center p-3 rounded-full text-[9px] font-black border border-ab-red text-ab-red bg-ab-red/10";
+                reportData.status = "IMPEDÂNCIA MUITO BAIXA";
+                reportData.detail = `<p class="text-white">O sistema está em <b>${fi.toFixed(1)}Ω</b>, mas o amp só desce até <b>${eai}Ω</b>.</p><p class='text-ab-red mt-2'><b>RISCO:</b> O amplificador vai fritar! Os transistores de saída vão trabalhar além do limite, podendo causar queima total ou desarmes constantes por proteção térmica.</p>`;
+            } else if(eap < tp * 0.8){
+                v.innerText="⚠ Amplificador Fraco"; v.className="text-center p-3 rounded-full text-[9px] font-black border border-ab-gold text-ab-gold bg-ab-gold/10";
+                reportData.status = "FALTA DE HEADROOM";
+                reportData.detail = `<p class="text-white">Seu amp fornece <b>${eap}W</b> mas seus falantes precisam de <b>${tp}W</b>.</p><p class='text-ab-gold mt-2'><b>RISCO (CLIPPING):</b> Você vai forçar o volume para compensar a falta de potência. Isso gera onda quadrada (Clipping), que queima a bobina do falante por calor, mesmo "mandando pouca força".</p>`;
+            } else {
+                v.innerText="✓ Sistema Otimizado"; v.className="text-center p-3 rounded-full text-[9px] font-black border border-ab-green text-ab-green bg-ab-green/10";
+                reportData.status = "SISTEMA SEGURO";
+                reportData.detail = `<p class="text-white">Impedância e potência estão casadas.</p><p class='text-ab-green mt-2'><b>DICA:</b> Mantenha o Limiter em <b>${Math.sqrt(tp*fi).toFixed(0)}V</b> para proteger contra transientes e garantir anos de uso sem manutenção.</p>`;
+            }
             document.getElementById('resFinalImp').innerText = fi.toFixed(1)+" Ω";
             document.getElementById('resFinalPwr').innerText = tp+" W";
             document.getElementById('resVolts').innerText = tp>0?Math.sqrt(tp*fi).toFixed(0)+" V":"0 V";
         }
 
-        // LÓGICA DE ÁUDIO
+        function openReport() {
+            document.getElementById('reportContent').innerHTML = `
+                <div class="p-4 bg-ab-bg rounded-xl border border-ab-border border-l-4 ${reportData.status.includes('PERIGOSA')||reportData.status.includes('BAIXA')?'border-l-ab-red':'border-l-ab-cyan'}">
+                    <p class="text-sm font-black text-white italic">${reportData.status}</p>
+                </div>
+                <div class="text-slate-400 text-[13px] leading-relaxed">${reportData.detail}</div>`;
+            document.getElementById('reportModal').classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('reportModal').classList.remove('active'); }
+
+        // AUDIO ENGINE
         let audioCtx, analyzer, source, dataArray, running=false, phaseInverted=true, timeout, oscillator, isToneRunning=false, mediaStream;
 
         function sliderFreq(v){ document.getElementById('freqInput').value=v; updateOsc(v); }
         function manualFreq(v){ let val=parseInt(v); if(val>=20 && val<=20000){ document.getElementById('freqSlider').value=val; updateOsc(val); } }
         function updateOsc(v){ if(oscillator && audioCtx) oscillator.frequency.setTargetAtTime(v, audioCtx.currentTime, 0.02); }
-        
         function toggleTone(){
             if(!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
             if(!isToneRunning){ oscillator=audioCtx.createOscillator(); oscillator.frequency.value=document.getElementById('freqInput').value; oscillator.connect(audioCtx.destination); oscillator.start(); isToneRunning=true; document.getElementById('btnTone').innerText="Parar"; document.getElementById('btnTone').classList.replace('bg-ab-cyan', 'bg-ab-red'); }
-            else { if(oscillator) oscillator.stop(); isToneRunning=false; document.getElementById('btnTone').innerText="Iniciar Tom"; document.getElementById('btnTone').classList.replace('bg-ab-red', 'bg-ab-cyan'); }
+            else { if(oscillator) oscillator.stop(); isToneRunning=false; document.getElementById('btnTone').innerText="Gerar Tom"; document.getElementById('btnTone').classList.replace('bg-ab-red', 'bg-ab-cyan'); }
         }
-
         function toggleSignal(){ let a=document.getElementById('signalAudio'); if(a.paused){ a.play(); document.getElementById('playIcon').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';} else { a.pause(); document.getElementById('playIcon').innerHTML='<path d="M8 5v14l11-7z"/>';}}
-        function togglePhase(){ phaseInverted=!phaseInverted; let i=document.getElementById('phaseIndicator'); i.innerText=phaseInverted?'Invertida (HW)':'Normal (SW)'; }
+        function togglePhase(){ phaseInverted=!phaseInverted; let i=document.getElementById('phaseIndicator'); i.innerText=phaseInverted?'HW Invertida':'SW Normal'; }
 
         async function toggleApp(e) {
             if (e) e.preventDefault();
@@ -229,6 +264,7 @@
                 running = false;
                 if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
                 document.getElementById('btnAction').innerText = "Ativar Scanner";
+                document.getElementById('btnAction').classList.replace('bg-ab-red', 'bg-ab-purple');
                 return; 
             }
             if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
@@ -241,8 +277,9 @@
                 source.connect(analyzer);
                 running = true;
                 document.getElementById('btnAction').innerText = "Parar Scanner";
+                document.getElementById('btnAction').classList.replace('bg-ab-purple', 'bg-ab-red');
                 process();
-            } catch (err) { alert("Mic Error!"); }
+            } catch (err) { alert("Microfone não disponível!"); }
         }
 
         function process() {
@@ -255,13 +292,13 @@
                 const c=document.getElementById('statusCircle'), def=document.getElementById('contentDefault'), res=document.getElementById('resLabel'), sym=document.getElementById('symbol'), dsc=document.getElementById('desc');
                 def.classList.add('hidden'); res.classList.remove('hidden');
                 if (peak > 0) {
-                    c.className="w-52 h-52 rounded-full border-[12px] flex flex-col items-center justify-center active-ring-pos bg-ab-green/5";
-                    sym.innerText="+"; sym.className="text-7xl font-black text-ab-green italic leading-none"; dsc.innerText="Positiva"; dsc.className="text-ab-green font-black uppercase tracking-widest pt-2";
+                    c.className="w-56 h-56 rounded-full border-[12px] flex flex-col items-center justify-center active-ring-pos bg-ab-green/5 transition-all duration-75";
+                    sym.innerText="+"; sym.className="text-8xl font-black text-ab-green italic leading-none"; dsc.innerText="Positiva"; dsc.className="text-ab-green font-black uppercase text-[10px] pt-4";
                 } else {
-                    c.className="w-52 h-52 rounded-full border-[12px] flex flex-col items-center justify-center active-ring-neg bg-ab-red/5";
-                    sym.innerText="-"; sym.className="text-7xl font-black text-ab-red italic leading-none"; dsc.innerText="Negativa"; dsc.className="text-ab-red font-black uppercase tracking-widest pt-2";
+                    c.className="w-56 h-56 rounded-full border-[12px] flex flex-col items-center justify-center active-ring-neg bg-ab-red/5 transition-all duration-75";
+                    sym.innerText="-"; sym.className="text-8xl font-black text-ab-red italic leading-none"; dsc.innerText="Negativa"; dsc.className="text-ab-red font-black uppercase text-[10px] pt-4";
                 }
-                timeout = setTimeout(() => { c.className="w-52 h-52 rounded-full border-[12px] border-ab-bg flex flex-col items-center justify-center bg-black/20"; def.classList.remove('hidden'); res.classList.add('hidden'); }, 1200);
+                timeout = setTimeout(() => { c.className="w-56 h-56 rounded-full border-[12px] border-ab-bg flex flex-col items-center justify-center bg-black/20"; def.classList.remove('hidden'); res.classList.add('hidden'); }, 1200);
             }
             requestAnimationFrame(process);
         }
