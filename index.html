@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AudioBase Pro | Jaguaruana-CE</title>
+    <title>AudioBase Pro | Sound Engineering</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -11,7 +11,7 @@
         }
     </script>
     <style>
-        body { background-color: #0a0d14; color: #c9d1d9; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #0a0d14; color: #c9d1d9; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
         .active-ring-pos { border-color: #22c55e !important; box-shadow: 0 0 30px rgba(34, 197, 94, 0.2); }
         .active-ring-neg { border-color: #ef4444 !important; box-shadow: 0 0 30px rgba(239, 68, 68, 0.2); }
         .nav-btn.active { border-bottom: 3px solid #06b6d4; color: white; opacity: 1; }
@@ -19,7 +19,6 @@
         input[type=range] { -webkit-appearance: none; background: transparent; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #30363d; border-radius: 3px; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #06b6d4; margin-top: -6px; }
-        .glass { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center">
@@ -27,22 +26,20 @@
     <div class="max-w-6xl w-full">
         <header class="flex flex-col items-center mb-8 pb-6 border-b border-ab-border gap-4">
             <div class="flex items-center gap-4">
-                <div class="w-16 h-16 bg-gradient-to-br from-ab-cyan to-ab-purple rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4" opacity="0.5"/>
+                <div class="w-16 h-16 bg-gradient-to-br from-ab-cyan to-ab-purple rounded-2xl flex items-center justify-center shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-black text-white italic tracking-tighter">AUDIOBASE <span class="text-ab-cyan font-light text-xl">PRO</span></h1>
+                    <h1 class="text-3xl font-black text-white italic tracking-tighter uppercase">AudioBase <span class="text-ab-cyan">Pro</span></h1>
                     <div class="flex items-center gap-2">
-                        <span class="text-[9px] bg-white/10 text-slate-400 px-2 py-0.5 rounded font-bold uppercase tracking-widest">Jaguaruana / CE</span>
-                        <span class="text-[9px] text-ab-cyan font-bold uppercase tracking-widest">v10.0 Gold</span>
+                        <span class="text-[9px] bg-ab-cyan/20 text-ab-cyan px-2 py-0.5 rounded font-bold uppercase tracking-widest">Sound Designer Tools</span>
                     </div>
                 </div>
             </div>
             
-            <nav class="flex gap-4 text-[10px] font-black uppercase overflow-x-auto w-full justify-center pt-4">
+            <nav class="flex gap-4 text-[10px] font-black uppercase overflow-x-auto w-full justify-center pt-2">
                 <button type="button" onclick="showTab('alinhamento')" id="btn-alinhamento" class="nav-btn py-2 active">Alinhamento/TA</button>
                 <button type="button" onclick="showTab('projeto')" id="btn-projeto" class="nav-btn py-2">Projeto/Amp</button>
                 <button type="button" onclick="showTab('polaridade')" id="btn-polaridade" class="nav-btn py-2">Fase/Tons</button>
@@ -52,24 +49,23 @@
         <div id="tab-alinhamento" class="tab-content space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <section class="bg-ab-card p-6 rounded-[2.5rem] border border-ab-border border-l-4 border-l-ab-gold">
-                    <h2 class="text-xs font-black text-ab-gold uppercase mb-4">Time Alignment (Palco)</h2>
+                    <h2 class="text-xs font-black text-ab-gold uppercase mb-4 italic">Time Alignment (Cálculo de Delay)</h2>
                     <div class="space-y-4">
                         <div class="p-4 bg-ab-dark rounded-2xl border border-ab-border">
-                            <label class="text-[9px] font-bold text-slate-500 uppercase mb-2 block">Referência Longe (ex: Sub/Longe)</label>
-                            <div class="flex items-center gap-3"><input type="number" id="distL" value="1.50" step="0.01" oninput="runTA()" class="bg-transparent text-3xl font-black text-white w-full outline-none"><span class="text-ab-gold font-bold">m</span></div>
+                            <label class="text-[9px] font-bold text-slate-500 uppercase mb-2 block tracking-widest">Referência Longe (m)</label>
+                            <input type="number" id="distL" value="1.50" step="0.01" oninput="runTA()" class="bg-transparent text-3xl font-black text-white w-full outline-none">
                         </div>
                         <div class="p-4 bg-ab-dark rounded-2xl border border-ab-border">
-                            <label class="text-[9px] font-bold text-slate-500 uppercase mb-2 block">Referência Perto (ex: Line/Perto)</label>
-                            <div class="flex items-center gap-3"><input type="number" id="distR" value="0.40" step="0.01" oninput="runTA()" class="bg-transparent text-3xl font-black text-white w-full outline-none"><span class="text-ab-gold font-bold">m</span></div>
+                            <label class="text-[9px] font-bold text-slate-500 uppercase mb-2 block tracking-widest">Referência Perto (m)</label>
+                            <input type="number" id="distR" value="0.40" step="0.01" oninput="runTA()" class="bg-transparent text-3xl font-black text-white w-full outline-none">
                         </div>
                     </div>
                 </section>
                 <section class="bg-ab-card p-8 rounded-[2.5rem] border border-ab-border flex flex-col items-center justify-center">
-                    <div class="bg-ab-dark p-8 rounded-[2rem] border-2 border-ab-gold w-full text-center shadow-lg">
-                        <span id="taTarget" class="text-[10px] font-black text-ab-gold uppercase block mb-2 tracking-widest italic">Atrasar Lado Perto</span>
+                    <div class="bg-ab-dark p-8 rounded-[2rem] border-2 border-ab-gold w-full text-center">
+                        <span id="taTarget" class="text-[10px] font-black text-ab-gold uppercase block mb-2 tracking-widest">Ajustar no DSP</span>
                         <span id="taValue" class="text-7xl font-black text-white tracking-tighter">3.20</span><span class="text-xl font-bold text-ab-gold ml-1 italic">ms</span>
                     </div>
-                    <p class="mt-4 text-[10px] text-slate-500 italic uppercase">Cálculo baseado em 344 m/s (20°C)</p>
                 </section>
             </div>
         </div>
@@ -77,19 +73,19 @@
         <div id="tab-projeto" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border space-y-4">
-                    <h2 class="text-xs font-black text-ab-cyan uppercase">Especificação Técnica</h2>
+                    <h2 class="text-xs font-black text-ab-cyan uppercase italic">Carga dos Alto-Falantes</h2>
                     <div class="grid grid-cols-2 gap-2">
                         <div class="bg-ab-dark p-3 rounded-xl border border-ab-border">
-                            <label class="text-[8px] text-slate-500 uppercase block mb-1 font-bold">Qtd</label>
+                            <label class="text-[8px] text-slate-500 uppercase block mb-1 font-bold">Quantidade</label>
                             <input type="number" id="spkQty" value="2" oninput="runMasterCalc()" class="bg-transparent text-xl font-black text-white w-full outline-none">
                         </div>
                         <div class="bg-ab-dark p-3 rounded-xl border border-ab-border">
-                            <label class="text-[8px] text-slate-500 uppercase block mb-1 font-bold">Imp. Ω</label>
+                            <label class="text-[8px] text-slate-500 uppercase block mb-1 font-bold">Imp. Nominal (Ω)</label>
                             <input type="number" id="spkImp" value="8" oninput="runMasterCalc()" class="bg-transparent text-xl font-black text-white w-full outline-none">
                         </div>
                     </div>
                     <div class="bg-ab-dark p-3 rounded-xl border border-ab-border">
-                        <label class="text-[8px] text-slate-500 uppercase block mb-1 font-bold">Watts RMS Unitário (Ex: Triton/EAP)</label>
+                        <label class="text-[8px] text-slate-500 uppercase block mb-1 font-bold">Potência Unitária (W RMS)</label>
                         <input type="number" id="spkPwr" value="1600" oninput="runMasterCalc()" class="bg-transparent text-xl font-black text-white w-full outline-none">
                     </div>
                     <select id="spkType" onchange="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold appearance-none text-xs">
@@ -99,29 +95,29 @@
                 </section>
                 
                 <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border space-y-4 border-l-4 border-l-ab-purple">
-                    <h2 class="text-xs font-black text-ab-purple uppercase">Amplificação</h2>
+                    <h2 class="text-xs font-black text-ab-purple uppercase italic">Amplificador</h2>
                     <div class="bg-ab-dark p-3 rounded-xl border border-ab-border">
-                        <label class="text-[8px] text-slate-500 uppercase block mb-1 font-bold">Potência Amp (W)</label>
+                        <label class="text-[8px] text-slate-500 uppercase block mb-1 font-bold">W RMS Total</label>
                         <input type="number" id="ampPwr" value="3000" oninput="runMasterCalc()" class="bg-transparent text-xl font-black text-white w-full outline-none">
                     </div>
                     <div class="bg-ab-dark p-3 rounded-xl border border-ab-border">
-                        <label class="text-[8px] text-slate-500 uppercase block mb-1 font-bold">Imp. Mínima Ω (Stereo)</label>
+                        <label class="text-[8px] text-slate-500 uppercase block mb-1 font-bold">Imp. Mínima (Ω)</label>
                         <input type="number" id="ampImpMin" value="2" oninput="runMasterCalc()" class="bg-transparent text-xl font-black text-white w-full outline-none">
                     </div>
                     <select id="ampMode" onchange="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold appearance-none text-xs">
                         <option value="stereo">MODO STEREO</option>
-                        <option value="bridge">MODO BRIDGE (DOBRA Ω)</option>
+                        <option value="bridge">MODO BRIDGE</option>
                     </select>
                 </section>
 
                 <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border flex flex-col justify-between">
-                    <div id="verdictBox" class="text-center p-2 rounded-full text-[9px] font-black uppercase border">Status</div>
+                    <div id="verdictBox" class="text-center p-2 rounded-full text-[9px] font-black uppercase border">Verificando...</div>
                     <div class="space-y-4 my-4">
-                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest"><span class="text-slate-500">Carga Final</span><span id="resFinalImp" class="text-white">--</span></div>
-                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest"><span class="text-slate-500">Capacidade</span><span id="resFinalPwr" class="text-white">--</span></div>
-                        <div class="bg-ab-cyan/10 p-4 rounded-xl text-center border border-ab-cyan/30 shadow-inner">
-                            <p class="text-[8px] text-ab-cyan font-black mb-1 uppercase tracking-[0.2em]">Tensão RMS (Limiter)</p>
-                            <span id="resVolts" class="text-3xl font-black text-white tracking-tighter">0 V</span>
+                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest"><span>Impedância Final</span><span id="resFinalImp">--</span></div>
+                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest"><span>Capacidade Total</span><span id="resFinalPwr">--</span></div>
+                        <div class="bg-ab-dark p-4 rounded-xl text-center border border-ab-cyan/30">
+                            <p class="text-[8px] text-ab-cyan font-black mb-1 uppercase tracking-widest">Voltagem Limiter (RMS)</p>
+                            <span id="resVolts" class="text-3xl font-black text-white">0 V</span>
                         </div>
                     </div>
                 </section>
@@ -131,24 +127,24 @@
         <div id="tab-polaridade" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <section class="bg-ab-card p-6 rounded-[2.5rem] border border-ab-border space-y-6">
-                    <h2 class="text-xs font-black text-ab-cyan uppercase tracking-widest">Ferramentas de Áudio</h2>
-                    <div class="flex items-center gap-4 bg-ab-dark p-5 rounded-2xl border border-ab-border shadow-lg">
-                        <button type="button" onclick="toggleSignal()" class="w-14 h-14 bg-white text-ab-dark rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
+                    <h2 class="text-xs font-black text-ab-cyan uppercase tracking-widest italic">Sinais de Teste</h2>
+                    <div class="flex items-center gap-4 bg-ab-dark p-5 rounded-2xl border border-ab-border">
+                        <button type="button" onclick="toggleSignal()" class="w-14 h-14 bg-white text-ab-dark rounded-full flex items-center justify-center shadow-lg">
                             <svg id="playIcon" class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                         </button>
                         <div>
-                            <p class="text-[11px] font-black uppercase">Sinal de Pulso</p>
-                            <p class="text-[9px] text-slate-500 uppercase">Intervalo 500ms</p>
+                            <p class="text-[11px] font-black uppercase">Pulso de Fase</p>
+                            <p class="text-[9px] text-slate-500 uppercase">Ajuste de Polaridade</p>
                         </div>
                         <audio id="signalAudio" loop src="AudioBase_Polaridade_Intervalado_500ms.wav"></audio>
                     </div>
                     <div class="bg-ab-dark p-6 rounded-2xl border border-ab-border space-y-6">
                         <div class="flex justify-between items-center">
-                            <div class="flex items-baseline bg-ab-card px-4 py-2 rounded-xl border border-ab-border shadow-inner">
+                            <div class="flex items-baseline bg-ab-card px-4 py-2 rounded-xl border border-ab-border">
                                 <input type="number" id="freqInput" value="60" oninput="manualFreq(this.value)" class="bg-transparent text-3xl font-black text-white w-24 outline-none">
-                                <span class="text-ab-cyan text-sm font-bold ml-1 italic">Hz</span>
+                                <span class="text-ab-cyan text-sm font-bold ml-1">Hz</span>
                             </div>
-                            <button type="button" onclick="toggleTone()" id="btnTone" class="bg-ab-cyan text-ab-dark px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg">Iniciar Tom</button>
+                            <button type="button" onclick="toggleTone()" id="btnTone" class="bg-ab-cyan text-ab-dark px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest font-bold">Iniciar Tom</button>
                         </div>
                         <input type="range" id="freqSlider" min="20" max="20000" value="60" class="w-full" oninput="sliderFreq(this.value)">
                     </div>
@@ -156,28 +152,28 @@
                 
                 <section class="bg-ab-card p-8 rounded-[2.5rem] border border-ab-border flex flex-col items-center min-h-[450px]">
                     <div class="flex justify-between w-full mb-8 items-center">
-                        <h2 class="text-xs font-black uppercase tracking-widest">Análise de Fase</h2>
-                        <button type="button" onclick="togglePhase()" id="phaseIndicator" class="text-[8px] font-black text-ab-gold border border-ab-gold/30 px-4 py-1.5 rounded-full uppercase glass tracking-widest">Fase Invertida (HW)</button>
+                        <h2 class="text-xs font-black uppercase tracking-widest">Scanner de Polaridade</h2>
+                        <button type="button" onclick="togglePhase()" id="phaseIndicator" class="text-[8px] font-black text-ab-gold border border-ab-gold/40 px-3 py-1.5 rounded-full uppercase tracking-widest">Invertida (HW)</button>
                     </div>
-                    <div id="statusCircle" class="w-56 h-56 rounded-full border-[14px] border-ab-dark flex items-center justify-center transition-all duration-300 mb-8 bg-black/20 shadow-inner">
-                        <div id="contentDefault" class="text-5xl font-black text-slate-800 tracking-tighter italic">WAIT</div>
+                    <div id="statusCircle" class="w-56 h-56 rounded-full border-[12px] border-ab-dark flex items-center justify-center transition-all duration-300 mb-8 bg-black/10 shadow-inner">
+                        <div id="contentDefault" class="text-4xl font-black text-slate-800 tracking-tighter italic italic">STANDBY</div>
                         <div id="resLabel" class="hidden text-center">
                             <span id="symbol" class="text-8xl font-black block"></span>
                             <span id="desc" class="text-[10px] font-black uppercase mt-1 tracking-widest italic"></span>
                         </div>
                     </div>
-                    <button type="button" onclick="toggleApp(event)" id="btnAction" class="w-full bg-ab-cyan text-ab-dark font-black py-5 rounded-2xl uppercase text-[11px] tracking-[0.2em] shadow-xl hover:brightness-110 active:scale-95 transition-all">Ativar Scanner</button>
+                    <button type="button" onclick="toggleApp(event)" id="btnAction" class="w-full bg-ab-cyan text-ab-dark font-black py-5 rounded-2xl uppercase text-[11px] tracking-[0.2em] shadow-xl hover:brightness-110 active:scale-95 transition-all">Iniciar Análise</button>
                 </section>
             </div>
         </div>
-        
+
         <footer class="mt-12 text-center text-[8px] text-slate-600 uppercase font-bold tracking-[0.3em]">
-            Engenharia de Som Aplicada • Jaguaruana-CE • Netonda & Agy Telecom
+            Engenharia de Áudio Profissional • Jaguaruana - CE
         </footer>
     </div>
 
     <script>
-        // MANTIVE TODAS AS FUNÇÕES DA V9.1 CORRIGIDAS
+        // Lógica mantida da v9.1 - Robusta e funcional
         function showTab(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -197,9 +193,9 @@
             let type = document.getElementById('spkType').value, ap = parseFloat(document.getElementById('ampPwr').value)||0, ai = parseFloat(document.getElementById('ampImpMin').value)||2, am = document.getElementById('ampMode').value;
             let fi = (type==='paralelo') ? i/q : i*q, eai = (am==='bridge') ? ai*2 : ai, eap = (am==='bridge') ? ap*2 : ap, tp = p*q;
             let v = document.getElementById('verdictBox');
-            if(fi < eai){ v.innerText="⚠ CARGA MUITO BAIXA"; v.className="text-center p-2 rounded-full text-[9px] font-black border border-ab-red text-ab-red bg-ab-red/10"; }
-            else if(eap < tp){ v.innerText="⚠ AMPLIFICADOR FRACO"; v.className="text-center p-2 rounded-full text-[9px] font-black border border-ab-gold text-ab-gold bg-ab-gold/10"; }
-            else { v.innerText="✓ SISTEMA OTIMIZADO"; v.className="text-center p-2 rounded-full text-[9px] font-black border border-ab-green text-ab-green bg-ab-green/10"; }
+            if(fi < eai){ v.innerText="⚠ CARGA CRÍTICA"; v.className="text-center p-2 rounded-full text-[9px] font-black border border-ab-red text-ab-red bg-ab-red/10"; }
+            else if(eap < tp){ v.innerText="⚠ POTÊNCIA INSUFICIENTE"; v.className="text-center p-2 rounded-full text-[9px] font-black border border-ab-gold text-ab-gold bg-ab-gold/10"; }
+            else { v.innerText="✓ SISTEMA SEGURO"; v.className="text-center p-2 rounded-full text-[9px] font-black border border-ab-green text-ab-green bg-ab-green/10"; }
             document.getElementById('resFinalImp').innerText = fi.toFixed(1)+"Ω";
             document.getElementById('resFinalPwr').innerText = tp+"W RMS";
             document.getElementById('resVolts').innerText = Math.sqrt(tp*fi).toFixed(0)+" V";
@@ -215,14 +211,14 @@
             else { if(oscillator) oscillator.stop(); isToneRunning=false; document.getElementById('btnTone').innerText="Iniciar Tom"; document.getElementById('btnTone').classList.replace('bg-ab-red', 'bg-ab-cyan'); }
         }
         function toggleSignal(){ let a=document.getElementById('signalAudio'); if(a.paused){ a.play(); document.getElementById('playIcon').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';} else { a.pause(); document.getElementById('playIcon').innerHTML='<path d="M8 5v14l11-7z"/>';}}
-        function togglePhase(){ phaseInverted=!phaseInverted; let i=document.getElementById('phaseIndicator'); i.innerText=phaseInverted?'Fase Invertida (HW)':'Fase Normal (SW)'; }
+        function togglePhase(){ phaseInverted=!phaseInverted; let i=document.getElementById('phaseIndicator'); i.innerText=phaseInverted?'Invertida (HW)':'Normal (SW)'; }
 
         async function toggleApp(e) {
             if (e) e.preventDefault();
             if (running) { 
                 running = false;
                 if (source) source.disconnect();
-                document.getElementById('btnAction').innerText = "Ativar Scanner";
+                document.getElementById('btnAction').innerText = "Iniciar Análise";
                 document.getElementById('btnAction').classList.replace('bg-ab-red', 'bg-ab-cyan');
                 return; 
             }
@@ -235,7 +231,7 @@
                 dataArray = new Float32Array(analyzer.fftSize);
                 source.connect(analyzer);
                 running = true;
-                document.getElementById('btnAction').innerText = "Parar Scanner";
+                document.getElementById('btnAction').innerText = "Parar Análise";
                 document.getElementById('btnAction').classList.replace('bg-ab-cyan', 'bg-ab-red');
                 process();
             } catch (err) { alert("Mic Error!"); }
@@ -251,13 +247,13 @@
                 const c=document.getElementById('statusCircle'), def=document.getElementById('contentDefault'), res=document.getElementById('resLabel'), sym=document.getElementById('symbol'), dsc=document.getElementById('desc');
                 def.classList.add('hidden'); res.classList.remove('hidden');
                 if (peak > 0) {
-                    c.className="w-56 h-56 rounded-full border-[14px] flex items-center justify-center active-ring-pos bg-ab-green/5";
-                    sym.innerText="+"; sym.className="text-8xl font-black text-ab-green italic"; dsc.innerText="Positiva"; dsc.className="text-ab-green font-black uppercase";
+                    c.className="w-56 h-56 rounded-full border-[12px] flex items-center justify-center active-ring-pos bg-ab-green/5";
+                    sym.innerText="+"; sym.className="text-8xl font-black text-ab-green italic"; dsc.innerText="Positiva"; dsc.className="text-ab-green font-bold uppercase";
                 } else {
-                    c.className="w-56 h-56 rounded-full border-[14px] flex items-center justify-center active-ring-neg bg-ab-red/5";
+                    c.className="w-56 h-56 rounded-full border-[12px] flex items-center justify-center active-ring-neg bg-ab-red/5";
                     sym.innerText="-"; sym.className="text-8xl font-black text-ab-red italic"; dsc.innerText="Negativa"; dsc.className="text-ab-red font-black uppercase";
                 }
-                timeout = setTimeout(() => { c.className="w-56 h-56 rounded-full border-[14px] border-ab-dark flex items-center justify-center bg-black/20"; def.classList.remove('hidden'); res.classList.add('hidden'); }, 1200);
+                timeout = setTimeout(() => { c.className="w-56 h-56 rounded-full border-[12px] border-ab-dark flex items-center justify-center bg-black/10"; def.classList.remove('hidden'); res.classList.add('hidden'); }, 1200);
             }
             requestAnimationFrame(process);
         }
