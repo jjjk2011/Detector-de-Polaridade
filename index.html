@@ -126,19 +126,45 @@
         }
 
         async function toggleApp() {
-            if (running) return location.reload();
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: document.getElementById('micSelect').value, echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    if (running) return location.reload();
+    
+    try {
+        // Força a inicialização do contexto de áudio (exigência do Chrome/iOS)
+        if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            analyzer = audioCtx.createAnalyser();
-            source = audioCtx.createMediaStreamSource(stream);
-            analyzer.fftSize = 2048;
-            dataArray = new Float32Array(analyzer.fftSize);
-            source.connect(analyzer);
-            running = true;
-            document.getElementById('textAction').innerText = "Parar Scanner";
-            document.getElementById('btnAction').className = "w-full bg-red-600 text-white font-black py-5 rounded-2xl transition-all uppercase tracking-widest text-xs";
-            process();
         }
+        
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
+        const constraints = { 
+            audio: { 
+                deviceId: document.getElementById('micSelect').value ? { exact: document.getElementById('micSelect').value } : undefined,
+                echoCancellation: false, 
+                noiseSuppression: false, 
+                autoGainControl: false 
+            } 
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        
+        analyzer = audioCtx.createAnalyser();
+        source = audioCtx.createMediaStreamSource(stream);
+        analyzer.fftSize = 2048;
+        dataArray = new Float32Array(analyzer.fftSize);
+        source.connect(analyzer);
+
+        running = true;
+        document.getElementById('textAction').innerText = "Parar Scanner";
+        document.getElementById('btnAction').className = "w-full bg-red-600 text-white font-black py-5 rounded-2xl transition-all uppercase tracking-widest text-xs";
+        
+        process();
+    } catch (e) {
+        console.error("Erro ao acessar mic:", e);
+        alert("Erro: Certifique-se de estar usando HTTPS e que deu permissão ao microfone. Detalhe: " + e.message);
+    }
+}
 
         function process() {
             if (!running) return;
