@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AudioBase Pro | Neon Edition</title>
+    <title>AudioBase Pro | Alinhamento Neon v11.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -23,6 +23,7 @@
         .shadow-glow-cyan { box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); }
         .shadow-glow-gold { box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .lcd-text { font-family: 'Courier New', Courier, monospace; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 md:p-8">
@@ -35,7 +36,7 @@
                 </div>
                 <div>
                     <h1 class="text-3xl font-black text-white italic tracking-tighter">AUDIOBASE <span class="font-light text-ab-cyan">PRO</span></h1>
-                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-[0.3em]">Advanced Sound Engineering</p>
+                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-[0.3em]">Sound Designer Tools</p>
                 </div>
             </div>
             
@@ -49,137 +50,106 @@
         <div id="tab-alinhamento" class="tab-content space-y-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <section class="bg-ab-card p-7 rounded-[2.5rem] border border-ab-border shadow-2xl space-y-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-2 h-6 bg-ab-gold rounded-full"></div>
-                        <h2 class="text-xl font-bold text-white uppercase tracking-tight">Cálculo de Delay (TA)</h2>
-                    </div>
+                    <div class="flex items-center gap-3"><div class="w-2 h-6 bg-ab-gold rounded-full"></div><h2 class="text-xl font-bold text-white uppercase tracking-tight">Cálculo de Delay</h2></div>
                     <div class="space-y-5">
-                        <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border focus-within:border-ab-gold transition-colors">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Referência A (Longe)</label>
-                            <div class="flex items-center gap-3">
-                                <input type="number" id="distL" value="1.50" step="0.01" oninput="runTA()" class="bg-transparent text-4xl font-black text-white w-full outline-none">
-                                <span class="text-ab-gold font-bold text-lg">m</span>
-                            </div>
-                        </div>
-                        <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border focus-within:border-ab-gold transition-colors">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Referência B (Perto)</label>
-                            <div class="flex items-center gap-3">
-                                <input type="number" id="distR" value="0.40" step="0.01" oninput="runTA()" class="bg-transparent text-4xl font-black text-white w-full outline-none">
-                                <span class="text-ab-gold font-bold text-lg">m</span>
-                            </div>
-                        </div>
+                        <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border focus-within:border-ab-gold transition-colors"><label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Longe (m)</label><div class="flex items-center gap-3"><input type="number" id="distL" value="1.50" step="0.01" oninput="runTA()" class="bg-transparent text-4xl font-black text-white w-full outline-none"><span class="text-ab-gold font-bold text-lg">m</span></div></div>
+                        <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border focus-within:border-ab-gold transition-colors"><label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Perto (m)</label><div class="flex items-center gap-3"><input type="number" id="distR" value="0.40" step="0.01" oninput="runTA()" class="bg-transparent text-4xl font-black text-white w-full outline-none"><span class="text-ab-gold font-bold text-lg">m</span></div></div>
                     </div>
                 </section>
-                <section class="bg-ab-card p-10 rounded-[2.5rem] border border-ab-border flex flex-col items-center justify-center text-center shadow-glow-gold relative overflow-hidden">
-                    <div class="absolute inset-0 bg-ab-gold/5 opacity-30 pointer-events-none"></div>
-                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] mb-6">Ajuste no DSP</p>
-                    <div class="flex items-baseline gap-1 relative z-10">
-                        <span id="taValue" class="text-9xl font-black text-white tracking-tighter">3.20</span>
-                        <span class="text-2xl font-bold text-ab-gold italic">ms</span>
-                    </div>
-                    <span id="taTarget" class="text-xs font-bold text-ab-gold uppercase tracking-widest mt-4 relative z-10">Atrasar Referência B</span>
-                </section>
+                <section class="bg-ab-card p-10 rounded-[2.5rem] border border-ab-border flex flex-col items-center justify-center text-center shadow-glow-gold relative overflow-hidden"><div class="absolute inset-0 bg-ab-gold/5 opacity-30 pointer-events-none"></div><p class="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em] mb-6 relative z-10">Ajuste no DSP</p><div class="flex items-baseline gap-1 relative z-10 lcd-text leading-none"><span id="taValue" class="text-9xl font-black text-white tracking-tighter">3.20</span><span class="text-2xl font-bold text-ab-gold italic">ms</span></div><span id="taTarget" class="text-xs font-bold text-ab-gold uppercase tracking-widest mt-6 relative z-10 block leading-none pt-2">Atrasar Perto</span></section>
             </div>
         </div>
 
-        <div id="tab-projeto" class="tab-content hidden space-y-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div id="tab-projeto" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <section class="bg-ab-card p-7 rounded-[2.5rem] border border-ab-border shadow-2xl space-y-5 lg:col-span-2">
-                    <div class="flex items-center gap-3">
-                        <div class="w-2 h-6 bg-ab-cyan rounded-full"></div>
-                        <h2 class="text-xl font-bold text-white uppercase tracking-tight">Carga & Potência</h2>
-                    </div>
+                    <div class="flex items-center gap-3"><div class="w-2 h-6 bg-ab-cyan rounded-full"></div><h2 class="text-xl font-bold text-white uppercase tracking-tight">Carga & Potência</h2></div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border flex items-center gap-4">
-                            <div class="flex-1">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Quantidade</label>
-                                <input type="number" id="spkQty" value="2" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none">
-                            </div>
-                            <div class="flex-1">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Ω Unit.</label>
-                                <input type="number" id="spkImp" value="8" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none">
-                            </div>
-                        </div>
-                        <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border focus-within:border-ab-cyan transition-colors">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Watts RMS Unit.</label>
-                            <input type="number" id="spkPwr" value="1600" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none">
-                        </div>
+                        <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border flex items-center gap-4"><div class="flex-1"><label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Quantidade</label><input type="number" id="spkQty" value="2" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none"></div><div class="flex-1"><label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Ω Unit.</label><input type="number" id="spkImp" value="8" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none"></div></div>
+                        <div class="p-5 bg-ab-bg rounded-2xl border border-ab-border focus-within:border-ab-cyan transition-colors"><label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Watts RMS Unit.</label><input type="number" id="spkPwr" value="1600" oninput="runMasterCalc()" class="bg-transparent text-3xl font-black text-white w-full outline-none"></div>
                     </div>
-                    <select id="spkType" onchange="runMasterCalc()" class="w-full bg-ab-bg border border-ab-border p-5 rounded-2xl text-white font-black text-xs uppercase appearance-none transition-all focus:border-ab-cyan">
-                        <option value="paralelo">LIGAÇÃO EM PARALELO</option>
-                        <option value="serie">LIGAÇÃO EM SÉRIE</option>
-                    </select>
+                    <div class="pt-2">
+                        <select id="spkType" onchange="runMasterCalc()" class="w-full bg-ab-bg border border-ab-border p-5 rounded-2xl text-white font-black text-xs uppercase appearance-none transition-all focus:border-ab-cyan">
+                            <option value="paralelo">LIGAÇÃO EM PARALELO</option>
+                            <option value="serie">LIGAÇÃO EM SÉRIE</option>
+                        </select>
+                    </div>
                 </section>
                 
                 <section class="bg-ab-card p-7 rounded-[2.5rem] border border-ab-border flex flex-col justify-between h-full min-h-[350px]">
                     <div id="verdictBox" class="text-center p-3 rounded-full text-[10px] font-black uppercase border tracking-widest">Analise</div>
-                    <div class="space-y-5 my-6">
-                        <div class="flex justify-between items-center text-xs font-bold border-b border-ab-border pb-2"><span class="text-slate-500 uppercase tracking-widest">Carga</span><span id="resFinalImp" class="text-white text-lg font-black">--</span></div>
-                        <div class="flex justify-between items-center text-xs font-bold border-b border-ab-border pb-2"><span class="text-slate-500 uppercase tracking-widest">RMS Total</span><span id="resFinalPwr" class="text-white text-lg font-black">--</span></div>
-                        <div class="bg-ab-dark p-6 rounded-2xl border border-ab-border text-center shadow-glow-cyan border-l-4 border-l-ab-cyan">
+                    <div class="space-y-4 my-6">
+                        <div class="flex justify-between items-center text-xs font-bold border-b border-ab-border pb-2"><span class="text-slate-500 uppercase tracking-widest">Carga</span><span id="resFinalImp" class="text-white text-lg font-black lcd-text">-- Ω</span></div>
+                        <div class="flex justify-between items-center text-xs font-bold border-b border-ab-border pb-2"><span class="text-slate-500 uppercase tracking-widest">RMS Total</span><span id="resFinalPwr" class="text-white text-lg font-black lcd-text">-- W</span></div>
+                        <div class="bg-ab-dark p-6 rounded-2xl border border-ab-border text-center shadow-glow-cyan border-l-4 border-l-ab-cyan mt-4">
                             <p class="text-[10px] text-ab-cyan font-black uppercase mb-2 tracking-widest">Tensão (Limiter)</p>
-                            <span id="resVolts" class="text-5xl font-black text-white tracking-tighter">0 V</span>
+                            <span id="resVolts" class="text-5xl font-black text-white tracking-tighter lcd-text">0 V</span>
                         </div>
                     </div>
                 </section>
             </div>
-            <section class="bg-ab-card p-6 rounded-3xl border border-ab-border border-l-4 border-l-ab-purple grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                <input type="number" id="ampPwr" value="3000" oninput="runMasterCalc()" placeholder="Amp W RMS" class="bg-ab-bg border border-ab-border p-4 rounded-xl text-white font-bold text-sm">
-                <input type="number" id="ampImpMin" value="2" oninput="runMasterCalc()" placeholder="Amp Ω Mín" class="bg-ab-bg border border-ab-border p-4 rounded-xl text-white font-bold text-sm">
-                <select id="ampMode" onchange="runMasterCalc()" class="bg-ab-bg border border-ab-border p-4 rounded-xl text-white font-bold text-xs uppercase appearance-none">
-                    <option value="stereo">Modo Stereo</option><option value="bridge">Modo Bridge</option>
-                </select>
+            <section class="bg-ab-card p-6 rounded-3xl border border-ab-border border-l-4 border-l-ab-purple space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-ab-bg rounded-xl border border-ab-border focus-within:border-ab-purple transition-colors"><label class="text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Amp Watts (RMS)</label><input type="number" id="ampPwr" value="3000" oninput="runMasterCalc()" class="bg-transparent text-xl font-bold text-white w-full outline-none"></div>
+                    <div class="p-4 bg-ab-bg rounded-xl border border-ab-border focus-within:border-ab-purple transition-colors"><label class="text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Amp Ω Mín</label><input type="number" id="ampImpMin" value="2" oninput="runMasterCalc()" class="bg-transparent text-xl font-bold text-white w-full outline-none"></div>
+                </div>
+                <div class="pt-1">
+                    <select id="ampMode" onchange="runMasterCalc()" class="w-full bg-ab-bg border border-ab-border p-4 rounded-xl text-white font-bold text-xs uppercase appearance-none transition-all focus:border-ab-purple">
+                        <option value="stereo">Modo Stereo</option><option value="bridge">Modo Bridge</option>
+                    </select>
+                </div>
             </section>
         </div>
 
-        <div id="tab-polaridade" class="tab-content hidden space-y-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div id="tab-polaridade" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <section class="bg-ab-card p-7 rounded-[2.5rem] border border-ab-border space-y-6 shadow-2xl">
+                    <div class="flex items-center gap-3"><div class="w-2 h-6 bg-ab-cyan rounded-full"></div><h2 class="text-xl font-bold text-white uppercase tracking-tight">Gerador de Sinais</h2></div>
                     <div class="flex items-center justify-between bg-ab-bg p-4 rounded-2xl border border-ab-border shadow-inner">
                         <div class="flex items-center gap-4">
-                            <button type="button" onclick="toggleSignal()" class="w-14 h-14 bg-white text-ab-bg rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
+                            <button type="button" onclick="toggleSignal()" class="w-14 h-14 bg-white text-ab-dark rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
                                 <svg id="playIcon" class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             </button>
-                            <span class="text-xs font-black uppercase tracking-widest">Pulso de Fase (500ms)</span>
+                            <span class="text-xs font-black uppercase tracking-widest">Pulso de Fase</span>
                         </div>
                         <audio id="signalAudio" loop src="AudioBase_Polaridade_Intervalado_500ms.wav"></audio>
                     </div>
                     <div class="bg-ab-dark p-6 rounded-2xl border border-ab-border space-y-6 shadow-glow-cyan">
-                        <div class="flex justify-between items-center gap-4">
-                            <div class="bg-ab-card px-5 py-2.5 rounded-xl border border-ab-border flex items-baseline gap-1">
-                                <input type="number" id="freqInput" value="60" oninput="manualFreq(this.value)" class="bg-transparent text-3xl font-black text-white w-20 outline-none text-right">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div class="bg-ab-card px-5 py-2.5 rounded-xl border border-ab-border flex items-baseline gap-1 focus-within:border-ab-cyan transition-colors">
+                                <input type="number" id="freqInput" value="60" oninput="manualFreq(this.value)" class="bg-transparent text-3xl font-black text-white w-20 outline-none text-right lcd-text">
                                 <span class="text-ab-cyan text-sm font-bold italic">Hz</span>
                             </div>
-                            <button type="button" onclick="toggleTone()" id="btnTone" class="bg-ab-cyan text-ab-bg px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 transition-all">Iniciar Tom</button>
+                            <button type="button" onclick="toggleTone()" id="btnTone" class="w-full sm:w-auto mt-2 sm:mt-0 bg-ab-cyan text-ab-bg px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 transition-all block">Iniciar Tom</button>
                         </div>
-                        <input type="range" id="freqSlider" min="20" max="20000" value="60" oninput="sliderFreq(this.value)">
+                        <input type="range" id="freqSlider" min="20" max="20000" value="60" oninput="sliderFreq(this.value)" class="pt-2">
                     </div>
                 </section>
                 
                 <section class="bg-ab-card p-8 rounded-[2.5rem] border border-ab-border flex flex-col items-center min-h-[480px] shadow-2xl">
-                    <div class="flex justify-between w-full mb-8 items-center border-b border-ab-border pb-4">
+                    <div class="flex justify-between w-full mb-8 items-center border-b border-ab-border pb-4 gap-4 flex-wrap">
                         <h2 class="text-sm font-bold uppercase tracking-tight">Scanner de Polaridade</h2>
                         <button type="button" onclick="togglePhase()" id="phaseIndicator" class="text-[9px] font-black text-ab-gold bg-ab-gold/10 border border-ab-gold/30 px-4 py-2 rounded-full uppercase tracking-widest active:scale-95 transition-all">Invertida (HW)</button>
                     </div>
                     <div id="statusCircle" class="w-60 h-60 rounded-full border-[14px] border-ab-bg flex flex-col items-center justify-center transition-all duration-300 mb-8 bg-black/10 shadow-inner">
                         <div id="contentDefault" class="text-2xl font-bold text-slate-800 uppercase tracking-tighter lcd-text">Pronto</div>
                         <div id="resLabel" class="hidden text-center leading-none">
-                            <span id="symbol" class="text-9xl font-black block"></span>
+                            <span id="symbol" class="text-9xl font-black block leading-none"></span>
                             <span id="desc" class="text-[11px] font-black uppercase tracking-widest mt-2 block leading-none pt-4"></span>
                         </div>
                     </div>
-                    <button type="button" onclick="toggleApp(event)" id="btnAction" class="w-full bg-ab-cyan text-ab-bg font-black py-5 rounded-2xl uppercase text-xs tracking-[0.2em] shadow-lg active:scale-95 transition-all">Ativar Scanner</button>
+                    <div class="w-full pt-4 mt-auto">
+                        <button type="button" onclick="toggleApp(event)" id="btnAction" class="w-full bg-ab-cyan text-ab-bg font-black py-5 rounded-2xl uppercase text-xs tracking-[0.2em] shadow-lg active:scale-95 transition-all block">Ativar Scanner</button>
+                    </div>
                 </section>
             </div>
         </div>
         
-        <footer class="mt-12 text-center text-[9px] text-slate-700 uppercase font-black tracking-[0.4em] pb-6">
-            Pro Audio Engineering • Jaguaruana-CE • v11.0 Neon
-        </footer>
+        <footer class="mt-12 text-center text-[9px] text-slate-700 uppercase font-black tracking-[0.4em] pb-6">Sound Design Tools • Jaguaruana-CE • Neon v11.1</table></footer>
     </div>
 
     <script>
-        // Lógica consolidada e robusta (v11.0 Neon Edition)
+        // Lógica robusta mantida (v11.1)
         function showTab(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -202,9 +172,9 @@
             if(fi < eai){ v.innerText="⚠ Carga Muito Baixa"; v.className="text-center p-3 rounded-full text-[10px] font-black uppercase border border-ab-red text-ab-red bg-ab-red/10 tracking-widest"; }
             else if(eap < tp){ v.innerText="⚠ Amplificador Fraco"; v.className="text-center p-3 rounded-full text-[10px] font-black uppercase border border-ab-gold text-ab-gold bg-ab-gold/10 tracking-widest"; }
             else { v.innerText="✓ Sistema Otimizado"; v.className="text-center p-3 rounded-full text-[10px] font-black uppercase border border-ab-green text-ab-green bg-ab-green/10 tracking-widest"; }
-            document.getElementById('resFinalImp').innerText = fi.toFixed(1)+" Ω";
-            document.getElementById('resFinalPwr').innerText = tp+" W";
-            document.getElementById('resVolts').innerText = Math.sqrt(tp*fi).toFixed(0)+" V";
+            document.getElementById('resFinalImp').innerText = fi.toFixed(fi>20?0:1)+" Ω";
+            document.getElementById('resFinalPwr').innerText = tp>1000?(tp/1000).toFixed(1)+'k W':tp+" W";
+            document.getElementById('resVolts').innerText = tp>0?Math.sqrt(tp*fi).toFixed(0)+" V":"0 V";
         }
 
         let audioCtx, analyzer, source, dataArray, running=false, phaseInverted=true, timeout, oscillator, isToneRunning=false;
@@ -254,10 +224,10 @@
                 def.classList.add('hidden'); res.classList.remove('hidden');
                 if (peak > 0) {
                     c.className="w-60 h-60 rounded-full border-[14px] flex flex-col items-center justify-center active-ring-pos bg-ab-green/5";
-                    sym.innerText="+"; sym.className="text-8xl font-black text-ab-green italic"; dsc.innerText="Positiva"; dsc.className="text-ab-green font-black uppercase tracking-widest";
+                    sym.innerText="+"; sym.className="text-8xl font-black text-ab-green italicLEADING_NONE leading-none"; dsc.innerText="Positiva"; dsc.className="text-ab-green font-black uppercase tracking-widest pt-4";
                 } else {
                     c.className="w-60 h-60 rounded-full border-[14px] flex flex-col items-center justify-center active-ring-neg bg-ab-red/5";
-                    sym.innerText="-"; sym.className="text-8xl font-black text-ab-red italic"; dsc.innerText="Negativa"; dsc.className="text-ab-red font-black uppercase tracking-widest";
+                    sym.innerText="-"; sym.className="text-8xl font-black text-ab-red italicLEADING_NONE leading-none"; dsc.innerText="Negativa"; dsc.className="text-ab-red font-black uppercase tracking-widest pt-4";
                 }
                 timeout = setTimeout(() => { c.className="w-60 h-60 rounded-full border-[14px] border-ab-bg flex flex-col items-center justify-center bg-black/10"; def.classList.remove('hidden'); res.classList.add('hidden'); }, 1200);
             }
