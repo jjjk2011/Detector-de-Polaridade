@@ -1,5 +1,4 @@
-// Mude de 'v1' para 'v2'
-const cacheName = 'audiobase-v2'; 
+const cacheName = 'audiobase-v3';
 const assets = [
   './',
   './index.html',
@@ -8,14 +7,11 @@ const assets = [
 ];
 
 self.addEventListener('install', e => {
-  self.skipWaiting(); // Força a instalação imediata
-  e.waitUntil(
-    caches.open(cacheName).then(cache => cache.addAll(assets))
-  );
+  self.skipWaiting();
+  e.waitUntil(caches.open(cacheName).then(cache => cache.addAll(assets)));
 });
 
 self.addEventListener('activate', e => {
-  // Limpa o cache antigo
   e.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(keys.filter(key => key !== cacheName).map(key => caches.delete(key)));
