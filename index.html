@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AudioBase Pro Detector de Polaridade</title>
+    <title>AudioBase Pro</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0d1117">
+    <meta name="theme-color" content="#0a0d14">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            theme: { extend: { colors: { 'ab-dark': '#0d1117', 'ab-card': '#161b22', 'ab-border': '#30363d', 'ab-cyan': '#06b6d4' } } }
+            theme: { extend: { colors: { 'ab-dark': '#0a0d14', 'ab-card': '#161b22', 'ab-border': '#30363d', 'ab-cyan': '#06b6d4' } } }
         }
     </script>
     <style>
-        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #0a0d14; color: #c9d1d9; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
         .active-ring-pos { border-color: #22c55e !important; box-shadow: 0 0 40px rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.05); }
         .active-ring-neg { border-color: #ef4444 !important; box-shadow: 0 0 40px rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); }
         input[type=range] { -webkit-appearance: none; background: transparent; }
@@ -30,8 +30,8 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-extrabold text-white">Polaridade Pro</h1>
-                    <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Offline App Mode</p>
+                    <h1 class="text-2xl font-extrabold text-white tracking-tight">AudioBase Pro</h1>
+                    <p class="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-bold">Polaridade & Sinal</p>
                 </div>
             </div>
             <button onclick="togglePhase()" id="phaseIndicator" class="px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-orange-400 border border-slate-700">FASE: INVERTIDA (HW)</button>
@@ -40,57 +40,53 @@
         <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-6">
                 <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border shadow-xl">
-                    <h2 class="text-lg font-semibold text-white mb-4 text-left">Fonte de Sinal</h2>
+                    <h2 class="text-lg font-semibold text-white mb-4">Fonte de Sinal</h2>
                     <div class="bg-ab-dark p-4 rounded-2xl border border-ab-border flex items-center gap-4">
-                        <button id="btnPlay" onclick="toggleSignal()" class="w-12 h-12 flex-shrink-0 bg-white text-ab-dark rounded-full flex items-center justify-center">
+                        <button id="btnPlay" onclick="toggleSignal()" class="w-12 h-12 flex-shrink-0 bg-white text-ab-dark rounded-full flex items-center justify-center hover:bg-ab-cyan transition-colors">
                             <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                         </button>
-                        <div class="text-left">
-                            <p class="text-[11px] font-bold text-white uppercase">Pulso Intervalado</p>
-                            <p class="text-[9px] text-slate-500 uppercase">AudioBase Pattern (500ms)</p>
+                        <div class="flex-1">
+                            <p class="text-[11px] font-bold text-white uppercase tracking-wider">AudioBase Pattern</p>
+                            <p class="text-[9px] text-slate-500 uppercase">Pulso 500ms</p>
                         </div>
-                        <audio id="signalAudio" loop preload="auto">
-                            <source src="AudioBase_Polaridade_Intervalado_500ms.wav" type="audio/wav">
-                        </audio>
+                        <audio id="signalAudio" loop src="AudioBase_Polaridade_Intervalado_500ms.wav"></audio>
                     </div>
                 </section>
 
                 <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border shadow-xl">
+                    <h2 class="text-lg font-semibold text-white mb-6">Configuração</h2>
                     <div class="space-y-6">
-                        <div class="space-y-3">
-                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block text-left">Microfone</label>
-                            <select id="micSelect" class="w-full bg-ab-dark border border-ab-border p-4 rounded-2xl text-sm outline-none appearance-none bg-no-repeat bg-[right_1rem_center]"></select>
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-bold text-slate-500 uppercase">Entrada</label>
+                            <select id="micSelect" class="w-full bg-ab-dark border border-ab-border p-4 rounded-2xl text-sm outline-none appearance-none"></select>
                         </div>
-                        <div class="space-y-3 text-left">
+                        <div class="space-y-2">
                             <div class="flex justify-between text-[11px] font-bold text-slate-500 uppercase">
                                 <label>Sensibilidade</label>
                                 <span id="sensValue" class="text-ab-cyan">0.25</span>
                             </div>
                             <input type="range" id="sensSlider" min="0.05" max="0.80" step="0.01" value="0.25" class="w-full" oninput="updateSens(this.value)">
                         </div>
-                        <button id="btnAction" onclick="toggleApp()" class="w-full bg-ab-cyan hover:bg-cyan-500 text-ab-dark font-black py-5 rounded-2xl transition-all uppercase tracking-widest text-xs">Iniciar Scanner</button>
+                        <button id="btnAction" onclick="toggleApp()" class="w-full bg-ab-cyan hover:bg-cyan-500 text-ab-dark font-black py-5 rounded-2xl transition-all uppercase tracking-widest text-xs">Ativar Scanner</button>
                     </div>
                 </section>
             </div>
 
-            <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border shadow-xl flex flex-col items-center justify-between min-h-[400px]">
-                <div class="w-full mb-4 text-left">
-                    <h2 class="text-lg font-semibold text-white">Resultado</h2>
-                </div>
-                <div id="statusCircle" class="w-60 h-60 rounded-full border-[14px] border-ab-dark flex items-center justify-center transition-all duration-200 ease-out">
+            <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border shadow-xl flex flex-col items-center justify-between min-h-[450px]">
+                <h2 class="text-lg font-semibold text-white w-full">Resultado</h2>
+                <div id="statusCircle" class="w-64 h-64 rounded-full border-[14px] border-ab-dark flex items-center justify-center transition-all duration-200">
                     <div id="contentDefault" class="text-6xl font-black text-slate-800">--</div>
                     <div id="resLabel" class="hidden text-center">
-                        <span id="symbol" class="text-8xl font-black block leading-none"></span>
+                        <span id="symbol" class="text-8xl font-black block"></span>
                         <span id="desc" class="text-[11px] font-black uppercase tracking-[0.3em] mt-2 block"></span>
                     </div>
                 </div>
-                <div class="w-full px-4 mb-4">
-                    <div class="flex justify-between text-[10px] mb-2 font-black text-slate-500 uppercase tracking-widest">
-                        <span>Input Level</span>
-                        <span id="rmsNum">0%</span>
+                <div class="w-full px-4">
+                    <div class="flex justify-between text-[10px] mb-2 font-black text-slate-500 uppercase">
+                        <span>Sinal</span> <span id="rmsNum">0%</span>
                     </div>
-                    <div class="w-full bg-ab-dark h-2 rounded-full overflow-hidden p-[1px] border border-ab-border">
-                        <div id="levelBar" class="bg-ab-cyan h-full w-0 transition-all duration-75"></div>
+                    <div class="w-full bg-ab-dark h-2 rounded-full overflow-hidden border border-ab-border">
+                        <div id="levelBar" class="bg-ab-cyan h-full w-0 transition-all"></div>
                     </div>
                 </div>
             </section>
@@ -98,66 +94,50 @@
     </div>
 
     <script>
-        // Registrar Service Worker para Offline
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(reg => console.log('Offline Ready')).catch(err => console.log('SW Fail', err));
-            });
-        }
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
 
-        let audioCtx, analyzer, source, dataArray;
-        let running = false, phaseInverted = true, threshold = 0.25, timeout;
+        let audioCtx, analyzer, source, dataArray, running = false, phaseInverted = true, threshold = 0.25, timeout;
         const audioPlayer = document.getElementById('signalAudio');
 
         function toggleSignal() {
             if (audioPlayer.paused) {
                 audioPlayer.play();
-                document.getElementById('btnPlay').classList.replace('bg-white', 'bg-ab-cyan');
                 document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
             } else {
                 audioPlayer.pause();
-                document.getElementById('btnPlay').classList.replace('bg-ab-cyan', 'bg-white');
                 document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
             }
         }
 
         function updateSens(v) { threshold = parseFloat(v); document.getElementById('sensValue').innerText = v; }
-        
-        function togglePhase() {
-            phaseInverted = !phaseInverted;
-            const ind = document.getElementById('phaseIndicator');
-            ind.innerText = phaseInverted ? 'FASE: INVERTIDA (HW)' : 'FASE: NORMAL';
-            ind.className = phaseInverted ? 'px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-orange-400 border border-slate-700' : 'px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-ab-cyan border border-slate-700';
+        function togglePhase() { 
+            phaseInverted = !phaseInverted; 
+            document.getElementById('phaseIndicator').innerText = phaseInverted ? 'FASE: INVERTIDA (HW)' : 'FASE: NORMAL';
+            document.getElementById('phaseIndicator').classList.toggle('text-orange-400');
+            document.getElementById('phaseIndicator').classList.toggle('text-ab-cyan');
         }
 
         async function initMics() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                stream.getTracks().forEach(t => t.stop());
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const select = document.getElementById('micSelect');
-                devices.filter(d => d.kind === 'audioinput').forEach(d => {
-                    select.add(new Option(d.label || `Mic ${select.length + 1}`, d.deviceId));
-                });
-            } catch (e) {}
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream.getTracks().forEach(t => t.stop());
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const select = document.getElementById('micSelect');
+            devices.filter(d => d.kind === 'audioinput').forEach(d => select.add(new Option(d.label || `Mic ${select.length+1}`, d.deviceId)));
         }
 
         async function toggleApp() {
             if (running) return location.reload();
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: document.getElementById('micSelect').value, echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                analyzer = audioCtx.createAnalyser();
-                source = audioCtx.createMediaStreamSource(stream);
-                analyzer.fftSize = 2048;
-                dataArray = new Float32Array(analyzer.fftSize);
-                source.connect(analyzer);
-                running = true;
-                document.getElementById('textAction').innerText = "Parar Scanner";
-                document.getElementById('btnAction').classList.replace('bg-ab-cyan', 'bg-red-600');
-                document.getElementById('btnAction').classList.add('text-white');
-                process();
-            } catch (e) { alert("Erro mic"); }
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: document.getElementById('micSelect').value, echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyzer = audioCtx.createAnalyser();
+            source = audioCtx.createMediaStreamSource(stream);
+            analyzer.fftSize = 2048;
+            dataArray = new Float32Array(analyzer.fftSize);
+            source.connect(analyzer);
+            running = true;
+            document.getElementById('textAction').innerText = "Parar Scanner";
+            document.getElementById('btnAction').className = "w-full bg-red-600 text-white font-black py-5 rounded-2xl transition-all uppercase tracking-widest text-xs";
+            process();
         }
 
         function process() {
@@ -174,23 +154,19 @@
 
             if (maxV > threshold) {
                 clearTimeout(timeout);
-                let peak = dataArray[maxI];
-                if (phaseInverted) peak *= -1;
+                let peak = dataArray[maxI]; if (phaseInverted) peak *= -1;
                 const circle = document.getElementById('statusCircle'), def = document.getElementById('contentDefault'), res = document.getElementById('resLabel'), sym = document.getElementById('symbol'), dsc = document.getElementById('desc');
                 def.classList.add('hidden'); res.classList.remove('hidden');
                 if (peak > 0) {
-                    circle.className = "w-60 h-60 rounded-full border-[14px] flex items-center justify-center transition-all duration-75 active-ring-pos";
+                    circle.className = "w-64 h-64 rounded-full border-[14px] flex items-center justify-center transition-all duration-75 active-ring-pos";
                     sym.innerText = "+"; sym.className = "text-8xl font-black block text-green-500";
                     dsc.innerText = "Positiva"; dsc.className = "text-[11px] font-black uppercase text-green-500 mt-2 block";
                 } else {
-                    circle.className = "w-60 h-60 rounded-full border-[14px] flex items-center justify-center transition-all duration-75 active-ring-neg";
+                    circle.className = "w-64 h-64 rounded-full border-[14px] flex items-center justify-center transition-all duration-75 active-ring-neg";
                     sym.innerText = "-"; sym.className = "text-8xl font-black block text-red-500";
                     dsc.innerText = "Negativa"; dsc.className = "text-[11px] font-black uppercase text-red-500 mt-2 block";
                 }
-                timeout = setTimeout(() => {
-                    circle.className = "w-60 h-60 rounded-full border-[14px] border-ab-dark flex items-center justify-center transition-all duration-500";
-                    def.classList.remove('hidden'); res.classList.add('hidden');
-                }, 1000);
+                timeout = setTimeout(() => { circle.className = "w-64 h-64 rounded-full border-[14px] border-ab-dark flex items-center justify-center transition-all duration-500"; def.classList.remove('hidden'); res.classList.add('hidden'); }, 1200);
             }
             requestAnimationFrame(process);
         }
