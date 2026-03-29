@@ -23,6 +23,8 @@
         .nav-btn { opacity: 0.5; transition: all 0.2s; }
         .shadow-glow { box-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
         select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
+        /* Remove setinhas do input number */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
@@ -35,19 +37,18 @@
                 </div>
                 <div>
                     <h1 class="text-2xl font-black text-white tracking-tight">AudioBase Pro</h1>
-                    <p class="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-bold">Gerenciamento de Sistema</p>
+                    <p class="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-bold">Sistema de Engenharia</p>
                 </div>
             </div>
             
             <nav class="flex gap-4 md:gap-8 text-[11px] font-black uppercase tracking-widest">
-                <button onclick="showTab('projeto')" id="btn-projeto" class="nav-btn py-2 active">Projeto Amp/Falante</button>
-                <button onclick="showTab('polaridade')" id="btn-polaridade" class="nav-btn py-2">Polaridade & Tom</button>
+                <button onclick="showTab('projeto')" id="btn-projeto" class="nav-btn py-2 active">Cálculo de Projeto</button>
+                <button onclick="showTab('polaridade')" id="btn-polaridade" class="nav-btn py-2">Polaridade & Tons</button>
             </nav>
         </header>
 
         <div id="tab-projeto" class="tab-content space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
                 <div class="space-y-6">
                     <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border shadow-xl space-y-4">
                         <h2 class="text-sm font-black text-ab-cyan uppercase tracking-widest flex items-center gap-2">
@@ -56,20 +57,20 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-2">
                                 <label class="text-[9px] font-bold text-slate-500 uppercase">Quantidade</label>
-                                <input type="number" id="spkQty" value="2" oninput="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none focus:border-ab-cyan">
+                                <input type="number" id="spkQty" value="2" oninput="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none">
                             </div>
                             <div class="space-y-2">
-                                <label class="text-[9px] font-bold text-slate-500 uppercase">Impedância Unit.</label>
-                                <input type="number" id="spkImp" value="8" oninput="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none focus:border-ab-cyan">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase">Imp. Unit.</label>
+                                <input type="number" id="spkImp" value="8" oninput="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none">
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-2">
-                                <label class="text-[9px] font-bold text-slate-500 uppercase">Potência Unit. (RMS)</label>
-                                <input type="number" id="spkPwr" value="600" oninput="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none focus:border-ab-cyan">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase">Watts RMS Unit.</label>
+                                <input type="number" id="spkPwr" value="600" oninput="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none">
                             </div>
                             <div class="space-y-2">
-                                <label class="text-[9px] font-bold text-slate-500 uppercase">Tipo Ligação</label>
+                                <label class="text-[9px] font-bold text-slate-500 uppercase">Ligação</label>
                                 <select id="spkType" onchange="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none appearance-none">
                                     <option value="paralelo">Paralelo</option>
                                     <option value="serie">Série</option>
@@ -84,34 +85,27 @@
                         </h2>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-2">
-                                <label class="text-[9px] font-bold text-slate-500 uppercase">W RMS por Canal</label>
-                                <input type="number" id="ampPwr" value="1200" oninput="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none focus:border-ab-purple">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase">W RMS Canal</label>
+                                <input type="number" id="ampPwr" value="1200" oninput="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none">
                             </div>
                             <div class="space-y-2">
-                                <label class="text-[9px] font-bold text-slate-500 uppercase">Ω Mínima Canal</label>
-                                <input type="number" id="ampImpMin" value="4" oninput="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none focus:border-ab-purple">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase">Ω Mín. Canal</label>
+                                <input type="number" id="ampImpMin" value="4" oninput="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none">
                             </div>
                         </div>
-                        <div class="space-y-2">
-                            <label class="text-[9px] font-bold text-slate-500 uppercase">Modo de Operação</label>
-                            <select id="ampMode" onchange="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none appearance-none">
-                                <option value="stereo">Stereo (Canal Individual)</option>
-                                <option value="bridge">Bridge (Ponte)</option>
-                            </select>
-                        </div>
+                        <select id="ampMode" onchange="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-4 rounded-xl text-white font-bold outline-none appearance-none">
+                            <option value="stereo">Modo Stereo</option>
+                            <option value="bridge">Modo Bridge</option>
+                        </select>
                     </section>
                 </div>
 
                 <div class="space-y-6">
-                    <section class="bg-ab-card p-8 rounded-[2.5rem] border border-ab-border shadow-2xl flex flex-col justify-between h-full min-h-[500px]">
-                        <div class="text-center space-y-2">
-                            <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Resultado do Casamento</h2>
-                            <div id="verdictBox" class="inline-block px-6 py-2 rounded-full text-[11px] font-black uppercase tracking-widest mt-2 border">
-                                Analisando...
-                            </div>
+                    <section class="bg-ab-card p-8 rounded-[2.5rem] border border-ab-border shadow-2xl flex flex-col justify-between h-full min-h-[480px]">
+                        <div class="text-center">
+                            <div id="verdictBox" class="inline-block px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border">Analise</div>
                         </div>
-
-                        <div class="grid grid-cols-2 gap-4 my-8">
+                        <div class="grid grid-cols-2 gap-4 my-6">
                             <div class="bg-ab-dark p-6 rounded-3xl border border-ab-border text-center">
                                 <p class="text-[9px] font-bold text-slate-500 uppercase mb-2">Carga Final</p>
                                 <span id="resFinalImp" class="text-4xl font-black text-white">4.0Ω</span>
@@ -121,19 +115,10 @@
                                 <span id="resFinalPwr" class="text-4xl font-black text-white">1200W</span>
                             </div>
                         </div>
-
-                        <div class="space-y-6 bg-ab-dark/40 p-6 rounded-[2rem] border border-ab-border">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase">Headroom (Folga)</span>
-                                <span id="resHeadroom" class="text-lg font-black text-ab-cyan">2.0x</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase">Tensão Necessária</span>
-                                <span id="resVolts" class="text-lg font-black text-white">69.2 V</span>
-                            </div>
-                            <div id="safetyMsg" class="text-[10px] leading-relaxed text-slate-400 text-center italic mt-4">
-                                Insira os dados para validar a segurança do sistema.
-                            </div>
+                        <div class="bg-ab-dark/40 p-6 rounded-[2rem] border border-ab-border space-y-4">
+                            <div class="flex justify-between"><span class="text-[10px] text-slate-400 uppercase font-bold">Headroom</span><span id="resHeadroom" class="font-black text-ab-cyan">2.0x</span></div>
+                            <div class="flex justify-between"><span class="text-[10px] text-slate-400 uppercase font-bold">Volts Necessários</span><span id="resVolts" class="font-black text-white">69 V</span></div>
+                            <p id="safetyMsg" class="text-[9px] text-slate-500 text-center italic border-t border-ab-border pt-4"></p>
                         </div>
                     </section>
                 </div>
@@ -143,27 +128,35 @@
         <div id="tab-polaridade" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <section class="bg-ab-card p-6 md:p-8 rounded-[2.5rem] border border-ab-border shadow-2xl space-y-6">
-                    <h2 class="text-xl font-bold text-white">Sinais</h2>
+                    <h2 class="text-xl font-bold text-white uppercase tracking-tighter">Gerador de Sinais</h2>
+                    
                     <div class="bg-ab-dark p-5 rounded-2xl border border-ab-border flex items-center gap-6">
                         <button onclick="toggleSignal()" class="w-14 h-14 bg-white text-ab-dark rounded-full flex items-center justify-center shadow-xl active:scale-90 transition-all">
                             <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                         </button>
                         <div>
-                            <p class="text-xs font-black text-white uppercase tracking-widest">Pulso AudioBase</p>
-                            <p class="text-[9px] text-slate-500 uppercase font-bold mt-1">Teste de Fase</p>
+                            <p class="text-xs font-black text-white uppercase tracking-widest">Pulso de Fase</p>
+                            <p class="text-[9px] text-slate-500 uppercase font-bold mt-1 italic">Arquivo WAV (Offline)</p>
                         </div>
                         <audio id="signalAudio" loop src="AudioBase_Polaridade_Intervalado_500ms.wav"></audio>
                     </div>
-                    <div class="bg-ab-dark p-6 rounded-2xl border border-ab-border space-y-4">
-                        <div class="flex justify-between items-end">
-                            <span id="freqValue" class="text-4xl font-black text-white">440<span class="text-ab-cyan text-sm ml-1">Hz</span></span>
-                            <button onclick="toggleTone()" id="btnTone" class="bg-ab-cyan text-ab-dark px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest">Iniciar Tom</button>
+
+                    <div class="bg-ab-dark p-6 rounded-2xl border border-ab-border space-y-6">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-baseline gap-1 bg-ab-card border border-ab-border px-4 py-2 rounded-xl">
+                                <input type="number" id="freqInput" value="440" min="20" max="20000" oninput="manualFreq(this.value)" class="bg-transparent text-3xl font-black text-white w-24 outline-none border-none text-right">
+                                <span class="text-ab-cyan text-sm font-bold">Hz</span>
+                            </div>
+                            <button onclick="toggleTone()" id="btnTone" class="bg-ab-cyan text-ab-dark px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all">Iniciar Tom</button>
                         </div>
-                        <input type="range" id="freqSlider" min="20" max="20000" step="1" value="440" class="w-full" oninput="updateFreq(this.value)">
+                        <input type="range" id="freqSlider" min="20" max="20000" step="1" value="440" class="w-full" oninput="sliderFreq(this.value)">
+                        <div class="flex justify-between text-[9px] font-black text-slate-600 uppercase tracking-widest">
+                            <span>20Hz</span> <span>20000Hz</span>
+                        </div>
                     </div>
                 </section>
 
-                <section class="bg-ab-card p-6 md:p-8 rounded-[2.5rem] border border-ab-border shadow-2xl flex flex-col items-center justify-between min-h-[450px]">
+                <section class="bg-ab-card p-6 md:p-8 rounded-[2.5rem] border border-ab-border shadow-2xl flex flex-col items-center justify-between min-h-[480px]">
                     <div class="flex justify-between w-full items-center">
                         <h2 class="text-xl font-bold text-white">Scanner</h2>
                         <button onclick="togglePhase()" id="phaseIndicator" class="px-4 py-1.5 bg-slate-800 rounded-full text-[9px] font-black text-orange-400 border border-slate-700 uppercase">Invertida (HW)</button>
@@ -175,14 +168,13 @@
                             <span id="desc" class="text-[10px] font-black uppercase tracking-[0.4em] mt-4 block"></span>
                         </div>
                     </div>
-                    <button onclick="toggleApp(event)" id="btnAction" class="w-full bg-ab-cyan text-ab-dark font-black py-5 rounded-2xl uppercase tracking-widest text-[11px] shadow-glow">Ativar Scanner</button>
+                    <button onclick="toggleApp(event)" id="btnAction" class="w-full bg-ab-cyan text-ab-dark font-black py-5 rounded-2xl uppercase tracking-widest text-[11px] shadow-glow">Ativar Microfone</button>
                 </section>
             </div>
         </div>
     </div>
 
     <script>
-        // NAVEGAÇÃO
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -190,75 +182,64 @@
             document.getElementById('btn-' + tab).classList.add('active');
         }
 
-        // MOTOR DE CÁLCULO MASTER
+        // FREQUÊNCIA: LÓGICA DE SINCRONIZAÇÃO
+        function sliderFreq(v) {
+            document.getElementById('freqInput').value = v;
+            updateOscillator(v);
+        }
+
+        function manualFreq(v) {
+            let val = parseInt(v);
+            if (val >= 20 && val <= 20000) {
+                document.getElementById('freqSlider').value = val;
+                updateOscillator(val);
+            }
+        }
+
+        function updateOscillator(v) {
+            if (oscillator && audioCtx) {
+                oscillator.frequency.setTargetAtTime(v, audioCtx.currentTime, 0.02);
+            }
+        }
+
+        // MOTOR DE CÁLCULO
         function runMasterCalc() {
-            // Dados Falantes
             const sQty = parseFloat(document.getElementById('spkQty').value) || 1;
             const sImp = parseFloat(document.getElementById('spkImp').value) || 4;
             const sPwr = parseFloat(document.getElementById('spkPwr').value) || 0;
             const sType = document.getElementById('spkType').value;
-
-            // Dados Amp
             let aPwr = parseFloat(document.getElementById('ampPwr').value) || 0;
             let aImpMin = parseFloat(document.getElementById('ampImpMin').value) || 2;
             const aMode = document.getElementById('ampMode').value;
 
-            // 1. Calcular Carga Final dos Falantes
             let finalImp = (sType === 'paralelo') ? (sImp / sQty) : (sImp * sQty);
-            
-            // 2. Ajustar Amp para Bridge se necessário
-            // No Bridge a impedância mínima dobra e a potência geralmente quadruplica (ou 2x a soma dos canais)
-            let effectiveAmpImpMin = aImpMin;
-            let effectiveAmpPwr = aPwr;
-
-            if(aMode === 'bridge') {
-                effectiveAmpImpMin = aImpMin * 2;
-                effectiveAmpPwr = aPwr * 2; // Considerando Bridge como soma de 2 canais
-            }
-
-            // 3. Potência Total que os falantes aguentam
+            let effAmpImpMin = (aMode === 'bridge') ? aImpMin * 2 : aImpMin;
+            let effAmpPwr = (aMode === 'bridge') ? aPwr * 2 : aPwr;
             let totalSpkPwr = sPwr * sQty;
 
-            // 4. Calcular Veredito de Segurança
-            const verdictBox = document.getElementById('verdictBox');
-            const safetyMsg = document.getElementById('safetyMsg');
-            
-            let status = "SAFE";
-            let msg = "";
-
-            // Erro de Impedância (Perigo de queimar o amp)
-            if (finalImp < effectiveAmpImpMin) {
-                status = "DANGER";
-                msg = "PERIGO: Impedância abaixo do mínimo suportado pelo amplificador! Risco de queima.";
-                verdictBox.className = "inline-block px-6 py-2 rounded-full text-[11px] font-black uppercase tracking-widest mt-2 border border-red-500 text-red-500 bg-red-500/10";
-                verdictBox.innerText = "IMPEDÂNCIA BAIXA";
-            } 
-            // Pouca Potência (Risco de Clip/Queima de Driver)
-            else if (effectiveAmpPwr < totalSpkPwr) {
-                status = "WARN";
-                msg = "CUIDADO: Amplificador fraco para esses falantes. Risco de distorsão (Clip) e queima de reparos.";
-                verdictBox.className = "inline-block px-6 py-2 rounded-full text-[11px] font-black uppercase tracking-widest mt-2 border border-orange-500 text-orange-500 bg-orange-500/10";
-                verdictBox.innerText = "POUCA POTÊNCIA";
-            }
-            // Perfeito
-            else {
-                status = "OK";
-                msg = "SISTEMA SEGURO: Casamento de impedância e potência dentro dos padrões ideais.";
-                verdictBox.className = "inline-block px-6 py-2 rounded-full text-[11px] font-black uppercase tracking-widest mt-2 border border-green-500 text-green-500 bg-green-500/10";
-                verdictBox.innerText = "SISTEMA IDEAL";
+            const vBox = document.getElementById('verdictBox');
+            if (finalImp < effAmpImpMin) {
+                vBox.innerText = "IMPEDÂNCIA BAIXA";
+                vBox.className = "inline-block px-6 py-2 rounded-full text-[10px] font-black uppercase border border-red-500 text-red-500 bg-red-500/10";
+                document.getElementById('safetyMsg').innerText = "ERRO: Carga menor que o mínimo do amplificador!";
+            } else if (effAmpPwr < totalSpkPwr) {
+                vBox.innerText = "AMPLIFICADOR FRACO";
+                vBox.className = "inline-block px-6 py-2 rounded-full text-[10px] font-black uppercase border border-orange-500 text-orange-500 bg-orange-500/10";
+                document.getElementById('safetyMsg').innerText = "ALERTA: Risco de Clipping e queima por distorção.";
+            } else {
+                vBox.innerText = "SISTEMA SEGURO";
+                vBox.className = "inline-block px-6 py-2 rounded-full text-[10px] font-black uppercase border border-green-500 text-green-500 bg-green-500/10";
+                document.getElementById('safetyMsg').innerText = "OK: Impedância e potência bem dimensionadas.";
             }
 
-            // Exibir Resultados
             document.getElementById('resFinalImp').innerText = finalImp.toFixed(1) + "Ω";
             document.getElementById('resFinalPwr').innerText = totalSpkPwr + "W";
-            document.getElementById('resHeadroom').innerText = (effectiveAmpPwr / (totalSpkPwr || 1)).toFixed(1) + "x";
-            document.getElementById('resVolts').innerText = Math.sqrt(totalSpkPwr * finalImp).toFixed(1) + " V";
-            safetyMsg.innerText = msg;
+            document.getElementById('resHeadroom').innerText = (effAmpPwr / (totalSpkPwr || 1)).toFixed(1) + "x";
+            document.getElementById('resVolts').innerText = Math.sqrt(totalSpkPwr * finalImp).toFixed(0) + " V";
         }
 
-        // SCANNER & ÁUDIO (Mantendo a lógica que já funciona)
-        let audioCtx, analyzer, source, dataArray, running = false, phaseInverted = true, timeout;
-        let oscillator, isToneRunning = false;
+        // ÁUDIO & SCANNER
+        let audioCtx, analyzer, source, dataArray, running = false, phaseInverted = true, timeout, oscillator, isToneRunning = false;
         const audioPlayer = document.getElementById('signalAudio');
 
         function togglePhase() { 
@@ -268,27 +249,22 @@
             ind.className = phaseInverted ? 'px-4 py-1.5 bg-slate-800 rounded-full text-[9px] font-black text-orange-400 border border-slate-700 uppercase' : 'px-4 py-1.5 bg-ab-cyan/20 rounded-full text-[9px] font-black text-ab-cyan border border-ab-cyan/30 uppercase';
         }
 
-        function updateFreq(v) {
-            document.getElementById('freqValue').innerHTML = `${v}<span class="text-ab-cyan text-sm ml-1 font-bold">Hz</span>`;
-            if (oscillator) oscillator.frequency.setTargetAtTime(v, audioCtx.currentTime, 0.02);
-        }
-
         function toggleTone() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') audioCtx.resume();
             if (!isToneRunning) {
                 oscillator = audioCtx.createOscillator();
-                oscillator.frequency.value = document.getElementById('freqSlider').value;
+                oscillator.frequency.value = document.getElementById('freqInput').value;
                 oscillator.connect(audioCtx.destination);
                 oscillator.start();
                 isToneRunning = true;
                 document.getElementById('btnTone').innerText = "Parar Tom";
-                document.getElementById('btnTone').className = "bg-red-600 text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase";
+                document.getElementById('btnTone').className = "bg-red-600 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase";
             } else {
                 oscillator.stop();
                 isToneRunning = false;
                 document.getElementById('btnTone').innerText = "Iniciar Tom";
-                document.getElementById('btnTone').className = "bg-ab-cyan text-ab-dark px-6 py-2 rounded-xl font-black text-[10px] uppercase";
+                document.getElementById('btnTone').className = "bg-ab-cyan text-ab-dark px-6 py-3 rounded-xl font-black text-[10px] uppercase";
             }
         }
 
