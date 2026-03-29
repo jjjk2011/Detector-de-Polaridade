@@ -3,20 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AudioBase Pro - Detector & Gerador</title>
+    <title>AudioBase Pro Detector de Polaridade</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d1117">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'ab-dark': '#0d1117',
-                        'ab-card': '#161b22',
-                        'ab-border': '#30363d',
-                        'ab-cyan': '#06b6d4',
-                    }
-                }
-            }
+            theme: { extend: { colors: { 'ab-dark': '#0d1117', 'ab-card': '#161b22', 'ab-border': '#30363d', 'ab-cyan': '#06b6d4' } } }
         }
     </script>
     <style>
@@ -24,8 +17,8 @@
         .active-ring-pos { border-color: #22c55e !important; box-shadow: 0 0 40px rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.05); }
         .active-ring-neg { border-color: #ef4444 !important; box-shadow: 0 0 40px rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); }
         input[type=range] { -webkit-appearance: none; background: transparent; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #30363d; border-radius: 3px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #06b6d4; cursor: pointer; margin-top: -6px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #30363d; border-radius: 3px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #06b6d4; margin-top: -6px; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-10 flex flex-col items-center">
@@ -37,83 +30,66 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-extrabold text-white tracking-tight text-ab-cyan">Polaridade Pro</h1>
-                    <p class="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-bold">Analysis & Signal Source</p>
+                    <h1 class="text-2xl font-extrabold text-white">Polaridade Pro</h1>
+                    <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Offline App Mode</p>
                 </div>
             </div>
-            <button onclick="togglePhase()" id="phaseIndicator" class="px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-orange-400 border border-slate-700 transition-all active:scale-95">FASE: INVERTIDA (HW)</button>
+            <button onclick="togglePhase()" id="phaseIndicator" class="px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-orange-400 border border-slate-700">FASE: INVERTIDA (HW)</button>
         </header>
 
         <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
             <div class="space-y-6">
                 <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border shadow-xl">
-                    <h2 class="text-lg font-semibold text-white mb-4">Fonte de Sinal</h2>
-                    
+                    <h2 class="text-lg font-semibold text-white mb-4 text-left">Fonte de Sinal</h2>
                     <div class="bg-ab-dark p-4 rounded-2xl border border-ab-border flex items-center gap-4">
-                        <button id="btnPlay" onclick="toggleSignal()" class="w-12 h-12 flex-shrink-0 bg-white text-ab-dark rounded-full flex items-center justify-center hover:bg-ab-cyan transition-colors">
+                        <button id="btnPlay" onclick="toggleSignal()" class="w-12 h-12 flex-shrink-0 bg-white text-ab-dark rounded-full flex items-center justify-center">
                             <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                         </button>
-                        <div class="flex-1">
-                            <p class="text-[11px] font-bold text-white uppercase tracking-wider">Play Sinal</p>
-                            <p class="text-[9px] text-slate-500 uppercase">500ms - Audio Base Polaridade Intervalado</p>
+                        <div class="text-left">
+                            <p class="text-[11px] font-bold text-white uppercase">Pulso Intervalado</p>
+                            <p class="text-[9px] text-slate-500 uppercase">AudioBase Pattern (500ms)</p>
                         </div>
-                        <audio id="signalAudio" loop>
+                        <audio id="signalAudio" loop preload="auto">
                             <source src="AudioBase_Polaridade_Intervalado_500ms.wav" type="audio/wav">
                         </audio>
                     </div>
                 </section>
 
                 <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border shadow-xl">
-                    <h2 class="text-lg font-semibold text-white mb-6 text-left">Configuração de Captura</h2>
-
                     <div class="space-y-6">
                         <div class="space-y-3">
-                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Entrada de Áudio</label>
-                            <select id="micSelect" class="w-full bg-ab-dark border border-ab-border p-4 rounded-2xl text-sm outline-none appearance-none cursor-pointer focus:border-ab-cyan/50 transition"></select>
+                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block text-left">Microfone</label>
+                            <select id="micSelect" class="w-full bg-ab-dark border border-ab-border p-4 rounded-2xl text-sm outline-none appearance-none bg-no-repeat bg-[right_1rem_center]"></select>
                         </div>
-
-                        <div class="space-y-3">
+                        <div class="space-y-3 text-left">
                             <div class="flex justify-between text-[11px] font-bold text-slate-500 uppercase">
-                                <label>Sensibilidade (Threshold)</label>
+                                <label>Sensibilidade</label>
                                 <span id="sensValue" class="text-ab-cyan">0.25</span>
                             </div>
                             <input type="range" id="sensSlider" min="0.05" max="0.80" step="0.01" value="0.25" class="w-full" oninput="updateSens(this.value)">
                         </div>
-
-                        <button id="btnAction" onclick="toggleApp()" class="w-full bg-ab-cyan hover:bg-cyan-500 text-ab-dark font-black py-5 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
-                            <span id="iconAction"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
-                            <span id="textAction">Iniciar Scanner</span>
-                        </button>
+                        <button id="btnAction" onclick="toggleApp()" class="w-full bg-ab-cyan hover:bg-cyan-500 text-ab-dark font-black py-5 rounded-2xl transition-all uppercase tracking-widest text-xs">Iniciar Scanner</button>
                     </div>
                 </section>
             </div>
 
-            <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border shadow-xl flex flex-col items-center justify-between min-h-[450px]">
-                <div class="w-full mb-4 flex justify-between items-center">
-                    <h2 class="text-lg font-semibold text-white">Análise em Tempo Real</h2>
-                    <div id="liveIndicator" class="hidden flex items-center gap-2">
-                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                        <span class="text-[10px] font-bold text-red-500">LIVE</span>
-                    </div>
+            <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border shadow-xl flex flex-col items-center justify-between min-h-[400px]">
+                <div class="w-full mb-4 text-left">
+                    <h2 class="text-lg font-semibold text-white">Resultado</h2>
                 </div>
-
-                <div id="statusCircle" class="w-64 h-64 rounded-full border-[14px] border-ab-dark flex items-center justify-center transition-all duration-200 ease-out mb-8">
-                    <div id="contentDefault" class="text-center">
-                        <div class="text-6xl font-black text-slate-800" id="mainSymbol">--</div>
-                    </div>
+                <div id="statusCircle" class="w-60 h-60 rounded-full border-[14px] border-ab-dark flex items-center justify-center transition-all duration-200 ease-out">
+                    <div id="contentDefault" class="text-6xl font-black text-slate-800">--</div>
                     <div id="resLabel" class="hidden text-center">
                         <span id="symbol" class="text-8xl font-black block leading-none"></span>
                         <span id="desc" class="text-[11px] font-black uppercase tracking-[0.3em] mt-2 block"></span>
                     </div>
                 </div>
-
                 <div class="w-full px-4 mb-4">
                     <div class="flex justify-between text-[10px] mb-2 font-black text-slate-500 uppercase tracking-widest">
-                        <span>Input RMS</span>
+                        <span>Input Level</span>
                         <span id="rmsNum">0%</span>
                     </div>
-                    <div class="w-full bg-ab-dark h-2.5 rounded-full overflow-hidden p-[2px] border border-ab-border">
+                    <div class="w-full bg-ab-dark h-2 rounded-full overflow-hidden p-[1px] border border-ab-border">
                         <div id="levelBar" class="bg-ab-cyan h-full w-0 transition-all duration-75"></div>
                     </div>
                 </div>
@@ -122,38 +98,36 @@
     </div>
 
     <script>
-        let audioCtx, analyzer, source, dataArray;
-        let running = false;
-        let phaseInverted = true;
-        let threshold = 0.25;
-        let timeout;
+        // Registrar Service Worker para Offline
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(reg => console.log('Offline Ready')).catch(err => console.log('SW Fail', err));
+            });
+        }
 
+        let audioCtx, analyzer, source, dataArray;
+        let running = false, phaseInverted = true, threshold = 0.25, timeout;
         const audioPlayer = document.getElementById('signalAudio');
-        const playBtn = document.getElementById('btnPlay');
-        const playIcon = document.getElementById('playIcon');
 
         function toggleSignal() {
             if (audioPlayer.paused) {
                 audioPlayer.play();
-                playBtn.classList.replace('bg-white', 'bg-ab-cyan');
-                playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Icone Pause
+                document.getElementById('btnPlay').classList.replace('bg-white', 'bg-ab-cyan');
+                document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
             } else {
                 audioPlayer.pause();
-                playBtn.classList.replace('bg-ab-cyan', 'bg-white');
-                playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // Icone Play
+                document.getElementById('btnPlay').classList.replace('bg-ab-cyan', 'bg-white');
+                document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
             }
         }
 
-        function updateSens(val) {
-            threshold = parseFloat(val);
-            document.getElementById('sensValue').innerText = val;
-        }
-
+        function updateSens(v) { threshold = parseFloat(v); document.getElementById('sensValue').innerText = v; }
+        
         function togglePhase() {
             phaseInverted = !phaseInverted;
             const ind = document.getElementById('phaseIndicator');
             ind.innerText = phaseInverted ? 'FASE: INVERTIDA (HW)' : 'FASE: NORMAL';
-            ind.className = phaseInverted ? 'px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-orange-400 border border-slate-700 transition-all active:scale-95' : 'px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-ab-cyan border border-slate-700 transition-all active:scale-95';
+            ind.className = phaseInverted ? 'px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-orange-400 border border-slate-700' : 'px-3 py-1 bg-slate-800 rounded-full text-[10px] font-bold text-ab-cyan border border-slate-700';
         }
 
         async function initMics() {
@@ -165,15 +139,13 @@
                 devices.filter(d => d.kind === 'audioinput').forEach(d => {
                     select.add(new Option(d.label || `Mic ${select.length + 1}`, d.deviceId));
                 });
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
 
         async function toggleApp() {
             if (running) return location.reload();
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    audio: { deviceId: document.getElementById('micSelect').value, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-                });
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: document.getElementById('micSelect').value, echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 analyzer = audioCtx.createAnalyser();
                 source = audioCtx.createMediaStreamSource(stream);
@@ -184,9 +156,8 @@
                 document.getElementById('textAction').innerText = "Parar Scanner";
                 document.getElementById('btnAction').classList.replace('bg-ab-cyan', 'bg-red-600');
                 document.getElementById('btnAction').classList.add('text-white');
-                document.getElementById('liveIndicator').classList.remove('hidden');
                 process();
-            } catch (e) { alert("Acesso ao mic negado."); }
+            } catch (e) { alert("Erro mic"); }
         }
 
         function process() {
@@ -205,24 +176,19 @@
                 clearTimeout(timeout);
                 let peak = dataArray[maxI];
                 if (phaseInverted) peak *= -1;
-                const circle = document.getElementById('statusCircle');
-                const def = document.getElementById('contentDefault');
-                const res = document.getElementById('resLabel');
-                const sym = document.getElementById('symbol');
-                const dsc = document.getElementById('desc');
-                def.classList.add('hidden');
-                res.classList.remove('hidden');
+                const circle = document.getElementById('statusCircle'), def = document.getElementById('contentDefault'), res = document.getElementById('resLabel'), sym = document.getElementById('symbol'), dsc = document.getElementById('desc');
+                def.classList.add('hidden'); res.classList.remove('hidden');
                 if (peak > 0) {
-                    circle.className = "w-64 h-64 rounded-full border-[14px] flex items-center justify-center transition-all duration-75 active-ring-pos";
+                    circle.className = "w-60 h-60 rounded-full border-[14px] flex items-center justify-center transition-all duration-75 active-ring-pos";
                     sym.innerText = "+"; sym.className = "text-8xl font-black block text-green-500";
                     dsc.innerText = "Positiva"; dsc.className = "text-[11px] font-black uppercase text-green-500 mt-2 block";
                 } else {
-                    circle.className = "w-64 h-64 rounded-full border-[14px] flex items-center justify-center transition-all duration-75 active-ring-neg";
+                    circle.className = "w-60 h-60 rounded-full border-[14px] flex items-center justify-center transition-all duration-75 active-ring-neg";
                     sym.innerText = "-"; sym.className = "text-8xl font-black block text-red-500";
                     dsc.innerText = "Negativa"; dsc.className = "text-[11px] font-black uppercase text-red-500 mt-2 block";
                 }
                 timeout = setTimeout(() => {
-                    circle.className = "w-64 h-64 rounded-full border-[14px] border-ab-dark flex items-center justify-center transition-all duration-500";
+                    circle.className = "w-60 h-60 rounded-full border-[14px] border-ab-dark flex items-center justify-center transition-all duration-500";
                     def.classList.remove('hidden'); res.classList.add('hidden');
                 }, 1000);
             }
