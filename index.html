@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AudioBase Pro | Alinhamento Neon v11.1</title>
+    <title>AudioBase Pro | Neon v11.2 Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -35,7 +35,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-black text-white italic tracking-tighter">AUDIOBASE <span class="font-light text-ab-cyan">PRO</span></h1>
+                    <h1 class="text-3xl font-black text-white italic tracking-tighter uppercase">AUDIOBASE <span class="font-light text-ab-cyan">PRO</span></h1>
                     <p class="text-[10px] text-slate-500 uppercase font-bold tracking-[0.3em]">Sound Designer Tools</p>
                 </div>
             </div>
@@ -70,8 +70,8 @@
                     </div>
                     <div class="pt-2">
                         <select id="spkType" onchange="runMasterCalc()" class="w-full bg-ab-bg border border-ab-border p-5 rounded-2xl text-white font-black text-xs uppercase appearance-none transition-all focus:border-ab-cyan">
-                            <option value="paralelo">LIGAÇÃO EM PARALELO</option>
-                            <option value="serie">LIGAÇÃO EM SÉRIE</option>
+                            <option value="paralelo">LIGAÇÃO EM PARALELO (Divide)</option>
+                            <option value="serie">LIGAÇÃO EM SÉRIE (Soma)</option>
                         </select>
                     </div>
                 </section>
@@ -128,7 +128,7 @@
                 
                 <section class="bg-ab-card p-8 rounded-[2.5rem] border border-ab-border flex flex-col items-center min-h-[480px] shadow-2xl">
                     <div class="flex justify-between w-full mb-8 items-center border-b border-ab-border pb-4 gap-4 flex-wrap">
-                        <h2 class="text-sm font-bold uppercase tracking-tight">Scanner de Polaridade</h2>
+                        <h2 class="text-sm font-bold uppercase tracking-tight italic">Scanner de Polaridade</h2>
                         <button type="button" onclick="togglePhase()" id="phaseIndicator" class="text-[9px] font-black text-ab-gold bg-ab-gold/10 border border-ab-gold/30 px-4 py-2 rounded-full uppercase tracking-widest active:scale-95 transition-all">Invertida (HW)</button>
                     </div>
                     <div id="statusCircle" class="w-60 h-60 rounded-full border-[14px] border-ab-bg flex flex-col items-center justify-center transition-all duration-300 mb-8 bg-black/10 shadow-inner">
@@ -145,11 +145,11 @@
             </div>
         </div>
         
-        <footer class="mt-12 text-center text-[9px] text-slate-700 uppercase font-black tracking-[0.4em] pb-6">Sound Design Tools • Jaguaruana-CE • Neon v11.1</table></footer>
+        <footer class="mt-12 text-center text-[9px] text-slate-700 uppercase font-black tracking-[0.4em] pb-6">Professional Audio Engineering • Jaguaruana-CE • v11.2</table></footer>
     </div>
 
     <script>
-        // Lógica robusta mantida (v11.1)
+        // Lógica com encerramento de microfone (v11.2)
         function showTab(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -177,40 +177,54 @@
             document.getElementById('resVolts').innerText = tp>0?Math.sqrt(tp*fi).toFixed(0)+" V":"0 V";
         }
 
-        let audioCtx, analyzer, source, dataArray, running=false, phaseInverted=true, timeout, oscillator, isToneRunning=false;
+        let audioCtx, analyzer, source, dataArray, running=false, phaseInverted=true, timeout, oscillator, isToneRunning=false, mediaStream;
+
         function sliderFreq(v){ document.getElementById('freqInput').value=v; updateOsc(v); }
         function manualFreq(v){ let val=parseInt(v); if(val>=20 && val<=20000){ document.getElementById('freqSlider').value=val; updateOsc(val); } }
         function updateOsc(v){ if(oscillator && audioCtx) oscillator.frequency.setTargetAtTime(v, audioCtx.currentTime, 0.02); }
+        
         function toggleTone(){
             if(!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
             if(!isToneRunning){ oscillator=audioCtx.createOscillator(); oscillator.frequency.value=document.getElementById('freqInput').value; oscillator.connect(audioCtx.destination); oscillator.start(); isToneRunning=true; document.getElementById('btnTone').innerText="Parar"; document.getElementById('btnTone').classList.replace('bg-ab-cyan', 'bg-ab-red'); }
             else { if(oscillator) oscillator.stop(); isToneRunning=false; document.getElementById('btnTone').innerText="Iniciar Tom"; document.getElementById('btnTone').classList.replace('bg-ab-red', 'bg-ab-cyan'); }
         }
+
         function toggleSignal(){ let a=document.getElementById('signalAudio'); if(a.paused){ a.play(); document.getElementById('playIcon').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';} else { a.pause(); document.getElementById('playIcon').innerHTML='<path d="M8 5v14l11-7z"/>';}}
         function togglePhase(){ phaseInverted=!phaseInverted; let i=document.getElementById('phaseIndicator'); i.innerText=phaseInverted?'Invertida (HW)':'Normal (SW)'; }
 
         async function toggleApp(e) {
             if (e) e.preventDefault();
+            
             if (running) { 
                 running = false;
+                // PARAR MICROFONE COMPLETAMENTE
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                }
                 if (source) source.disconnect();
+                
                 document.getElementById('btnAction').innerText = "Ativar Scanner";
                 document.getElementById('btnAction').classList.replace('bg-ab-red', 'bg-ab-cyan');
                 return; 
             }
+
             if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') await audioCtx.resume();
+
             try {
-                const s = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+                });
                 analyzer = audioCtx.createAnalyser();
-                source = audioCtx.createMediaStreamSource(s);
+                source = audioCtx.createMediaStreamSource(mediaStream);
                 dataArray = new Float32Array(analyzer.fftSize);
                 source.connect(analyzer);
+                
                 running = true;
                 document.getElementById('btnAction').innerText = "Parar Scanner";
                 document.getElementById('btnAction').classList.replace('bg-ab-cyan', 'bg-ab-red');
                 process();
-            } catch (err) { alert("Mic Error!"); }
+            } catch (err) { alert("Erro ao acessar o microfone!"); }
         }
 
         function process() {
@@ -223,11 +237,11 @@
                 const c=document.getElementById('statusCircle'), def=document.getElementById('contentDefault'), res=document.getElementById('resLabel'), sym=document.getElementById('symbol'), dsc=document.getElementById('desc');
                 def.classList.add('hidden'); res.classList.remove('hidden');
                 if (peak > 0) {
-                    c.className="w-60 h-60 rounded-full border-[14px] flex flex-col items-center justify-center active-ring-pos bg-ab-green/5";
-                    sym.innerText="+"; sym.className="text-8xl font-black text-ab-green italicLEADING_NONE leading-none"; dsc.innerText="Positiva"; dsc.className="text-ab-green font-black uppercase tracking-widest pt-4";
+                    c.className="w-60 h-60 rounded-full border-[14px] flex flex-col items-center justify-center active-ring-pos bg-ab-green/5 transition-all";
+                    sym.innerText="+"; sym.className="text-8xl font-black text-ab-green italic leading-none"; dsc.innerText="Positiva"; dsc.className="text-ab-green font-black uppercase tracking-widest pt-4";
                 } else {
-                    c.className="w-60 h-60 rounded-full border-[14px] flex flex-col items-center justify-center active-ring-neg bg-ab-red/5";
-                    sym.innerText="-"; sym.className="text-8xl font-black text-ab-red italicLEADING_NONE leading-none"; dsc.innerText="Negativa"; dsc.className="text-ab-red font-black uppercase tracking-widest pt-4";
+                    c.className="w-60 h-60 rounded-full border-[14px] flex flex-col items-center justify-center active-ring-neg bg-ab-red/5 transition-all";
+                    sym.innerText="-"; sym.className="text-8xl font-black text-ab-red italic leading-none"; dsc.innerText="Negativa"; dsc.className="text-ab-red font-black uppercase tracking-widest pt-4";
                 }
                 timeout = setTimeout(() => { c.className="w-60 h-60 rounded-full border-[14px] border-ab-bg flex flex-col items-center justify-center bg-black/10"; def.classList.remove('hidden'); res.classList.add('hidden'); }, 1200);
             }
