@@ -210,28 +210,49 @@
         }
 
         function runMasterCalc() {
-            let q = parseFloat(document.getElementById('spkQty').value)||1, i = parseFloat(document.getElementById('spkImp').value)||4, p = parseFloat(document.getElementById('spkPwr').value)||0;
-            let type = document.getElementById('spkType').value, ap = parseFloat(document.getElementById('ampPwr').value)||0, ai = parseFloat(document.getElementById('ampImpMin').value)||2, am = document.getElementById('ampMode').value;
-            let fi = (type==='paralelo') ? i/q : i*q, eai = (am==='bridge') ? ai*2 : ai, eap = (am==='bridge') ? ap*2 : ap, tp = p*q;
-            let v = document.getElementById('verdictBox');
-            
-            if(fi < eai){
-                v.innerText="⚠ Carga Perigosa"; v.className="text-center p-3 rounded-full text-[9px] font-black border border-ab-red text-ab-red bg-ab-red/10";
-                reportData.status = "IMPEDÂNCIA MUITO BAIXA";
-                reportData.detail = `<p class="text-white">O sistema está em <b>${fi.toFixed(1)}Ω</b>, mas o amp só desce até <b>${eai}Ω</b>.</p><p class='text-ab-red mt-2'><b>RISCO:</b> O amplificador vai fritar! Os transistores de saída vão trabalhar além do limite, podendo causar queima total ou desarmes constantes por proteção térmica.</p>`;
-            } else if(eap < tp * 0.8){
-                v.innerText="⚠ Amplificador Fraco"; v.className="text-center p-3 rounded-full text-[9px] font-black border border-ab-gold text-ab-gold bg-ab-gold/10";
-                reportData.status = "FALTA DE HEADROOM";
-                reportData.detail = `<p class="text-white">Seu amp fornece <b>${eap}W</b> mas seus falantes precisam de <b>${tp}W</b>.</p><p class='text-ab-gold mt-2'><b>RISCO (CLIPPING):</b> Você vai forçar o volume para compensar a falta de potência. Isso gera onda quadrada (Clipping), que queima a bobina do falante por calor, mesmo "mandando pouca força".</p>`;
-            } else {
-                v.innerText="✓ Sistema Otimizado"; v.className="text-center p-3 rounded-full text-[9px] font-black border border-ab-green text-ab-green bg-ab-green/10";
-                reportData.status = "SISTEMA SEGURO";
-                reportData.detail = `<p class="text-white">Impedância e potência estão casadas.</p><p class='text-ab-green mt-2'><b>DICA:</b> Mantenha o Limiter em <b>${Math.sqrt(tp*fi).toFixed(0)}V</b> para proteger contra transientes e garantir anos de uso sem manutenção.</p>`;
-            }
-            document.getElementById('resFinalImp').innerText = fi.toFixed(1)+" Ω";
-            document.getElementById('resFinalPwr').innerText = tp+" W";
-            document.getElementById('resVolts').innerText = tp>0?Math.sqrt(tp*fi).toFixed(0)+" V":"0 V";
-        }
+    let q = parseFloat(document.getElementById('spkQty').value) || 1;
+    let i = parseFloat(document.getElementById('spkImp').value) || 4;
+    let p = parseFloat(document.getElementById('spkPwr').value) || 0;
+    let type = document.getElementById('spkType').value;
+    
+    // Agora pegamos os valores do AMP exatamente como você digitou
+    let ap = parseFloat(document.getElementById('ampPwr').value) || 0;
+    let ai = parseFloat(document.getElementById('ampImpMin').value) || 1;
+
+    // Cálculo da carga dos falantes
+    let fi = (type === 'paralelo') ? i / q : i * q;
+    let tp = p * q; // Potência total dos falantes
+    
+    let v = document.getElementById('verdictBox');
+    
+    // DIAGNÓSTICO DIRETO
+    if (fi < ai) {
+        // Se a carga (fi) for menor que o que o amp aguenta (ai)
+        v.innerText = "⚠ Carga Perigosa";
+        v.className = "text-center p-3 rounded-full text-[9px] font-black border border-ab-red text-ab-red bg-ab-red/10";
+        reportData.status = "IMPEDÂNCIA ABAIXO DO LIMITE";
+        reportData.detail = `<p class="text-white">Carga: <b>${fi.toFixed(1)}Ω</b> | Limite Amp: <b>${ai}Ω</b></p><p class='text-ab-red mt-2'><b>RISCO:</b> Você está abaixo da impedância mínima. Isso vai superaquecer o amplificador e causar queima ou desarme.</p>`;
+    } 
+    else if (ap < tp * 0.8) {
+        // Se a potência do amp (ap) for menor que 80% da necessária
+        v.innerText = "⚠ Amplificador Fraco";
+        v.className = "text-center p-3 rounded-full text-[9px] font-black border border-ab-gold text-ab-gold bg-ab-gold/10";
+        reportData.status = "FALTA DE POTÊNCIA";
+        reportData.detail = `<p class="text-white">Amp: <b>${ap}W</b> | Necessário: <b>${tp}W</b></p><p class='text-ab-gold mt-2'><b>RISCO:</b> Cuidado com o Clipping! O amp pode mandar sinal quadrado e queimar os falantes por excesso de calor na bobina.</p>`;
+    }
+    else {
+        // Tudo OK (Igual ao seu caso de 1Ω com 1Ω)
+        v.innerText = "✓ Sistema Otimizado";
+        v.className = "text-center p-3 rounded-full text-[9px] font-black border border-ab-green text-ab-green bg-ab-green/10";
+        reportData.status = "SISTEMA SEGURO";
+        reportData.detail = `<p class="text-white">Carga e Potência compatíveis.</p><p class='text-ab-green mt-2'><b>DICA:</b> Mantenha o Limiter em <b>${Math.sqrt(tp * fi).toFixed(0)}V</b> para segurança máxima.</p>`;
+    }
+
+    // Atualiza a tela
+    document.getElementById('resFinalImp').innerText = fi.toFixed(1) + " Ω";
+    document.getElementById('resFinalPwr').innerText = tp + " W";
+    document.getElementById('resVolts').innerText = tp > 0 ? Math.sqrt(tp * fi).toFixed(0) + " V" : "0 V";
+}
 
         function openReport() {
             document.getElementById('reportContent').innerHTML = `
