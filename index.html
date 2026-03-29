@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AudioBase Pro - Sistema Completo</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0a0d14">
+    <title>AudioBase Pro - V9.1 Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,19 +11,18 @@
         }
     </script>
     <style>
-        body { background-color: #0a0d14; color: #c9d1d9; font-family: sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
-        .active-ring-pos { border-color: #22c55e !important; box-shadow: 0 0 40px rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.05); }
-        .active-ring-neg { border-color: #ef4444 !important; box-shadow: 0 0 40px rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); }
+        body { background-color: #0a0d14; color: #c9d1d9; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        .active-ring-pos { border-color: #22c55e !important; box-shadow: 0 0 40px rgba(34, 197, 94, 0.2); }
+        .active-ring-neg { border-color: #ef4444 !important; box-shadow: 0 0 40px rgba(239, 68, 68, 0.2); }
+        .nav-btn.active { border-bottom: 3px solid #06b6d4; color: white; opacity: 1; }
+        .nav-btn { opacity: 0.5; transition: all 0.2s; }
         input[type=range] { -webkit-appearance: none; background: transparent; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #30363d; border-radius: 3px; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #06b6d4; margin-top: -6px; }
-        .nav-btn.active { border-bottom: 3px solid #06b6d4; color: white; opacity: 1; }
-        .nav-btn { opacity: 0.5; transition: all 0.2s; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+<body class="min-h-screen p-4 flex flex-col items-center">
 
     <div class="max-w-6xl w-full">
         <header class="flex flex-col md:flex-row items-center justify-between mb-8 pb-4 border-b border-ab-border gap-6">
@@ -34,48 +31,37 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-black text-white tracking-tight italic">AUDIOBASE PRO</h1>
-                    <p class="text-[9px] text-slate-500 uppercase tracking-[0.4em] font-bold">Jaguaruana Sound Design</p>
+                    <h1 class="text-2xl font-black text-white italic">AUDIOBASE PRO</h1>
+                    <p class="text-[9px] text-slate-500 uppercase font-bold tracking-widest">Jaguaruana Engineering</p>
                 </div>
             </div>
-            
-            <nav class="flex gap-4 md:gap-8 text-[11px] font-black uppercase tracking-widest overflow-x-auto w-full md:w-auto pb-2">
-                <button onclick="showTab('alinhamento')" id="btn-alinhamento" class="nav-btn py-2 active whitespace-nowrap">Alinhamento/TA</button>
-                <button onclick="showTab('projeto')" id="btn-projeto" class="nav-btn py-2 whitespace-nowrap">Projeto/Amp</button>
-                <button onclick="showTab('polaridade')" id="btn-polaridade" class="nav-btn py-2 whitespace-nowrap">Fase/Tons</button>
+            <nav class="flex gap-4 text-[11px] font-black uppercase overflow-x-auto w-full md:w-auto">
+                <button type="button" onclick="showTab('alinhamento')" id="btn-alinhamento" class="nav-btn py-2 active whitespace-nowrap">Alinhamento/TA</button>
+                <button type="button" onclick="showTab('projeto')" id="btn-projeto" class="nav-btn py-2 whitespace-nowrap">Projeto/Amp</button>
+                <button type="button" onclick="showTab('polaridade')" id="btn-polaridade" class="nav-btn py-2 whitespace-nowrap">Fase/Tons</button>
             </nav>
         </header>
 
         <div id="tab-alinhamento" class="tab-content space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <section class="bg-ab-card p-6 rounded-[2.5rem] border border-ab-border space-y-6 border-l-4 border-l-ab-gold">
-                    <h2 class="text-sm font-black text-ab-gold uppercase tracking-widest">Configuração de Palco</h2>
+                    <h2 class="text-sm font-black text-ab-gold uppercase">Configuração de Palco (Distâncias)</h2>
                     <div class="space-y-4">
                         <div class="p-4 bg-ab-dark rounded-2xl border border-ab-border">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase mb-2 block">Referência A (Ex: Lado Longe)</label>
-                            <div class="flex items-center gap-3">
-                                <input type="number" id="distL" value="1.50" step="0.01" oninput="runTA()" class="bg-transparent text-3xl font-black text-white w-full outline-none">
-                                <span class="text-ab-gold font-bold">m</span>
-                            </div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase mb-2 block">Referência A (Longe)</label>
+                            <div class="flex items-center gap-3"><input type="number" id="distL" value="1.50" step="0.01" oninput="runTA()" class="bg-transparent text-3xl font-black text-white w-full outline-none"><span class="text-ab-gold font-bold">m</span></div>
                         </div>
                         <div class="p-4 bg-ab-dark rounded-2xl border border-ab-border">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase mb-2 block">Referência B (Ex: Lado Perto)</label>
-                            <div class="flex items-center gap-3">
-                                <input type="number" id="distR" value="0.40" step="0.01" oninput="runTA()" class="bg-transparent text-3xl font-black text-white w-full outline-none">
-                                <span class="text-ab-gold font-bold">m</span>
-                            </div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase mb-2 block">Referência B (Perto)</label>
+                            <div class="flex items-center gap-3"><input type="number" id="distR" value="0.40" step="0.01" oninput="runTA()" class="bg-transparent text-3xl font-black text-white w-full outline-none"><span class="text-ab-gold font-bold">m</span></div>
                         </div>
                     </div>
                 </section>
-                <section class="bg-ab-card p-8 rounded-[2.5rem] border border-ab-border flex flex-col items-center justify-center text-center">
-                    <p class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-6">Ajuste no Processador</p>
-                    <div class="bg-ab-dark p-8 rounded-[2rem] border-2 border-ab-gold w-full max-w-sm">
+                <section class="bg-ab-card p-8 rounded-[2.5rem] border border-ab-border flex flex-col items-center justify-center">
+                    <p class="text-[11px] font-black text-slate-500 uppercase mb-6">Ajuste no Processador</p>
+                    <div class="bg-ab-dark p-8 rounded-[2rem] border-2 border-ab-gold w-full text-center">
                         <span id="taTarget" class="text-[10px] font-black text-ab-gold uppercase block mb-2">Atrasar Referência B</span>
-                        <span id="taValue" class="text-6xl font-black text-white">3.20</span>
-                        <span class="text-xl font-bold text-ab-gold">ms</span>
-                    </div>
-                    <div class="mt-6 flex gap-4">
-                        <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Diferença: <span id="taDiff" class="text-white ml-1">1.10m</span></span>
+                        <span id="taValue" class="text-6xl font-black text-white">3.20</span><span class="text-xl font-bold text-ab-gold">ms</span>
                     </div>
                 </section>
             </div>
@@ -83,47 +69,38 @@
 
         <div id="tab-projeto" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="space-y-6">
-                    <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border space-y-4">
-                        <h2 class="text-xs font-black text-ab-cyan uppercase">1. Falantes</h2>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="number" id="spkQty" value="2" oninput="runMasterCalc()" placeholder="Qtd" class="bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold">
-                            <input type="number" id="spkImp" value="8" oninput="runMasterCalc()" placeholder="Ω" class="bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold">
-                        </div>
-                        <input type="number" id="spkPwr" value="600" oninput="runMasterCalc()" placeholder="Watts RMS" class="w-full bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold">
-                        <select id="spkType" onchange="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold appearance-none">
-                            <option value="paralelo">Paralelo</option>
-                            <option value="serie">Série</option>
-                        </select>
-                    </section>
-                </div>
-                <div class="space-y-6">
-                    <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border space-y-4 border-l-4 border-l-ab-purple">
-                        <h2 class="text-xs font-black text-ab-purple uppercase">2. Amplificador</h2>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="number" id="ampPwr" value="1200" oninput="runMasterCalc()" class="bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold">
-                            <input type="number" id="ampImpMin" value="4" oninput="runMasterCalc()" class="bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold">
-                        </div>
-                        <select id="ampMode" onchange="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold appearance-none">
-                            <option value="stereo">Modo Stereo</option>
-                            <option value="bridge">Modo Bridge</option>
-                        </select>
-                    </section>
-                </div>
-                <div class="space-y-6">
-                    <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border flex flex-col justify-between min-h-[300px]">
-                        <div id="verdictBox" class="text-center p-2 rounded-full text-[10px] font-black uppercase border">Status</div>
-                        <div class="space-y-3 my-4">
-                            <div class="flex justify-between text-xs font-bold"><span class="text-slate-500">Impedância Final</span><span id="resFinalImp">4.0Ω</span></div>
-                            <div class="flex justify-between text-xs font-bold"><span class="text-slate-500">Potência Total</span><span id="resFinalPwr">1200W</span></div>
-                            <div class="flex justify-between text-xs font-bold"><span class="text-slate-500">Headroom</span><span id="resHeadroom" class="text-ab-cyan">2.0x</span></div>
-                        </div>
-                        <div class="bg-ab-dark p-4 rounded-xl text-center border border-ab-border">
+                <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border space-y-4">
+                    <h2 class="text-xs font-black text-ab-cyan uppercase">1. Falantes</h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="spkQty" value="2" oninput="runMasterCalc()" class="bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold">
+                        <input type="number" id="spkImp" value="8" oninput="runMasterCalc()" class="bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold">
+                    </div>
+                    <input type="number" id="spkPwr" value="600" oninput="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold">
+                    <select id="spkType" onchange="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold appearance-none">
+                        <option value="paralelo">Paralelo</option><option value="serie">Série</option>
+                    </select>
+                </section>
+                <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border space-y-4 border-l-4 border-l-ab-purple">
+                    <h2 class="text-xs font-black text-ab-purple uppercase">2. Amplificador</h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="ampPwr" value="1200" oninput="runMasterCalc()" class="bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold">
+                        <input type="number" id="ampImpMin" value="4" oninput="runMasterCalc()" class="bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold">
+                    </div>
+                    <select id="ampMode" onchange="runMasterCalc()" class="w-full bg-ab-dark border border-ab-border p-3 rounded-xl text-white font-bold appearance-none">
+                        <option value="stereo">Stereo</option><option value="bridge">Bridge</option>
+                    </select>
+                </section>
+                <section class="bg-ab-card p-6 rounded-[2rem] border border-ab-border flex flex-col justify-between">
+                    <div id="verdictBox" class="text-center p-2 rounded-full text-[10px] font-black uppercase border">Status</div>
+                    <div class="space-y-4 my-4">
+                        <div class="flex justify-between text-xs font-bold"><span>Final</span><span id="resFinalImp">4.0Ω</span></div>
+                        <div class="flex justify-between text-xs font-bold"><span>Potência</span><span id="resFinalPwr">1200W</span></div>
+                        <div class="bg-ab-dark p-4 rounded-xl text-center">
                             <p class="text-[9px] text-slate-500 font-bold mb-1 uppercase">Tensão Limiter</p>
                             <span id="resVolts" class="text-2xl font-black text-white">69 V</span>
                         </div>
-                    </section>
-                </div>
+                    </div>
+                </section>
             </div>
         </div>
 
@@ -131,7 +108,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <section class="bg-ab-card p-6 rounded-[2.5rem] border border-ab-border space-y-6">
                     <div class="flex items-center gap-4 bg-ab-dark p-4 rounded-2xl border border-ab-border">
-                        <button onclick="toggleSignal()" class="w-12 h-12 bg-white text-ab-dark rounded-full flex items-center justify-center">
+                        <button type="button" onclick="toggleSignal()" class="w-12 h-12 bg-white text-ab-dark rounded-full flex items-center justify-center">
                             <svg id="playIcon" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                         </button>
                         <p class="text-xs font-black uppercase">Pulso de Fase</p>
@@ -139,22 +116,19 @@
                     </div>
                     <div class="bg-ab-dark p-6 rounded-2xl border border-ab-border space-y-4">
                         <div class="flex justify-between items-center">
-                            <div class="flex items-baseline bg-ab-card px-3 py-1 rounded-lg border border-ab-border">
-                                <input type="number" id="freqInput" value="440" oninput="manualFreq(this.value)" class="bg-transparent text-2xl font-black text-white w-20 outline-none">
-                                <span class="text-ab-cyan text-xs font-bold">Hz</span>
-                            </div>
-                            <button onclick="toggleTone()" id="btnTone" class="bg-ab-cyan text-ab-dark px-4 py-2 rounded-xl text-[10px] font-black uppercase">Iniciar Tom</button>
+                            <input type="number" id="freqInput" value="440" oninput="manualFreq(this.value)" class="bg-ab-card border border-ab-border p-2 rounded text-2xl font-black text-white w-24">
+                            <button type="button" onclick="toggleTone()" id="btnTone" class="bg-ab-cyan text-ab-dark px-4 py-2 rounded-xl text-[10px] font-black uppercase">Iniciar Tom</button>
                         </div>
                         <input type="range" id="freqSlider" min="20" max="20000" value="440" class="w-full" oninput="sliderFreq(this.value)">
                     </div>
                 </section>
-                <section class="bg-ab-card p-6 rounded-[2.5rem] border border-ab-border flex flex-col items-center justify-between min-h-[400px]">
-                    <div class="flex justify-between w-full items-center"><h2 class="text-sm font-bold uppercase">Scanner</h2><button onclick="togglePhase()" id="phaseIndicator" class="text-[9px] font-black text-orange-400 border border-slate-700 px-3 py-1 rounded-full uppercase">Invertida (HW)</button></div>
-                    <div id="statusCircle" class="w-48 h-48 rounded-full border-[12px] border-ab-dark flex items-center justify-center transition-all">
+                <section class="bg-ab-card p-6 rounded-[2.5rem] border border-ab-border flex flex-col items-center min-h-[400px]">
+                    <div class="flex justify-between w-full mb-8"><h2 class="text-sm font-bold uppercase">Scanner</h2><button type="button" onclick="togglePhase()" id="phaseIndicator" class="text-[9px] font-black text-orange-400 border border-slate-700 px-3 py-1 rounded-full uppercase">Invertida (HW)</button></div>
+                    <div id="statusCircle" class="w-48 h-48 rounded-full border-[12px] border-ab-dark flex items-center justify-center transition-all mb-8">
                         <div id="contentDefault" class="text-4xl font-black text-slate-800">--</div>
-                        <div id="resLabel" class="hidden text-center"><span id="symbol" class="text-7xl font-black block"></span><span id="desc" class="text-[9px] font-black uppercase tracking-widest block"></span></div>
+                        <div id="resLabel" class="hidden text-center"><span id="symbol" class="text-7xl font-black block"></span><span id="desc" class="text-[9px] font-black uppercase mt-1"></span></div>
                     </div>
-                    <button onclick="toggleApp(event)" id="btnAction" class="w-full bg-ab-cyan text-ab-dark font-black py-4 rounded-xl uppercase text-[10px]">Ativar Scanner</button>
+                    <button type="button" onclick="toggleApp(event)" id="btnAction" class="w-full bg-ab-cyan text-ab-dark font-black py-4 rounded-xl uppercase text-[10px]">Ativar Scanner</button>
                 </section>
             </div>
         </div>
@@ -168,33 +142,26 @@
             document.getElementById('btn-'+t).classList.add('active');
         }
 
-        // LÓGICA TA
         function runTA() {
-            let L = parseFloat(document.getElementById('distL').value) || 0;
-            let R = parseFloat(document.getElementById('distR').value) || 0;
-            let d = Math.abs(R - L);
-            let ms = d / 0.344;
+            let L = parseFloat(document.getElementById('distL').value) || 0, R = parseFloat(document.getElementById('distR').value) || 0;
+            let d = Math.abs(R - L), ms = d / 0.344;
             document.getElementById('taTarget').innerText = L < R ? "Atrasar Referência A (Perto)" : (R < L ? "Atrasar Referência B (Perto)" : "Alinhado");
             document.getElementById('taValue').innerText = ms.toFixed(2);
-            document.getElementById('taDiff').innerText = d.toFixed(2) + "m";
         }
 
-        // LÓGICA PROJETO
         function runMasterCalc() {
-            let q = parseFloat(document.getElementById('spkQty').value) || 1, i = parseFloat(document.getElementById('spkImp').value) || 4, p = parseFloat(document.getElementById('spkPwr').value) || 0;
-            let type = document.getElementById('spkType').value, ap = parseFloat(document.getElementById('ampPwr').value) || 0, ai = parseFloat(document.getElementById('ampImpMin').value) || 2, am = document.getElementById('ampMode').value;
+            let q = parseFloat(document.getElementById('spkQty').value)||1, i = parseFloat(document.getElementById('spkImp').value)||4, p = parseFloat(document.getElementById('spkPwr').value)||0;
+            let type = document.getElementById('spkType').value, ap = parseFloat(document.getElementById('ampPwr').value)||0, ai = parseFloat(document.getElementById('ampImpMin').value)||2, am = document.getElementById('ampMode').value;
             let fi = (type==='paralelo') ? i/q : i*q, eai = (am==='bridge') ? ai*2 : ai, eap = (am==='bridge') ? ap*2 : ap, tp = p*q;
             let v = document.getElementById('verdictBox');
-            if(fi < eai){ v.innerText="IMPEDÂNCIA BAIXA"; v.className="text-center p-2 rounded-full text-[10px] font-black uppercase border border-red-500 text-red-500 bg-red-500/10"; }
-            else if(eap < tp){ v.innerText="AMP FRACO"; v.className="text-center p-2 rounded-full text-[10px] font-black uppercase border border-orange-500 text-orange-500 bg-orange-500/10"; }
-            else { v.innerText="SISTEMA SEGURO"; v.className="text-center p-2 rounded-full text-[10px] font-black uppercase border border-ab-green text-ab-green bg-ab-green/10"; }
+            if(fi < eai){ v.innerText="IMPEDÂNCIA BAIXA"; v.className="text-center p-2 rounded-full text-[10px] font-black border border-red-500 text-red-500 bg-red-500/10"; }
+            else if(eap < tp){ v.innerText="AMP FRACO"; v.className="text-center p-2 rounded-full text-[10px] font-black border border-orange-500 text-orange-500 bg-orange-500/10"; }
+            else { v.innerText="SISTEMA SEGURO"; v.className="text-center p-2 rounded-full text-[10px] font-black border border-ab-green text-ab-green bg-ab-green/10"; }
             document.getElementById('resFinalImp').innerText = fi.toFixed(1)+"Ω";
             document.getElementById('resFinalPwr').innerText = tp+"W";
-            document.getElementById('resHeadroom').innerText = (eap/(tp||1)).toFixed(1)+"x";
             document.getElementById('resVolts').innerText = Math.sqrt(tp*fi).toFixed(0)+" V";
         }
 
-        // LÓGICA FREQ & SCANNER
         let audioCtx, analyzer, source, dataArray, running=false, phaseInverted=true, timeout, oscillator, isToneRunning=false;
         function sliderFreq(v){ document.getElementById('freqInput').value=v; updateOsc(v); }
         function manualFreq(v){ let val=parseInt(v); if(val>=20 && val<=20000){ document.getElementById('freqSlider').value=val; updateOsc(val); } }
@@ -202,18 +169,54 @@
         function toggleTone(){
             if(!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
             if(!isToneRunning){ oscillator=audioCtx.createOscillator(); oscillator.frequency.value=document.getElementById('freqInput').value; oscillator.connect(audioCtx.destination); oscillator.start(); isToneRunning=true; document.getElementById('btnTone').innerText="Parar"; }
-            else { oscillator.stop(); isToneRunning=false; document.getElementById('btnTone').innerText="Iniciar Tom"; }
+            else { if(oscillator) oscillator.stop(); isToneRunning=false; document.getElementById('btnTone').innerText="Iniciar Tom"; }
         }
         function toggleSignal(){ let a=document.getElementById('signalAudio'); if(a.paused){ a.play(); document.getElementById('playIcon').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';} else { a.pause(); document.getElementById('playIcon').innerHTML='<path d="M8 5v14l11-7z"/>';}}
         function togglePhase(){ phaseInverted=!phaseInverted; let i=document.getElementById('phaseIndicator'); i.innerText=phaseInverted?'Invertida (HW)':'Normal'; i.className=phaseInverted?'text-[9px] font-black text-orange-400 border border-slate-700 px-3 py-1 rounded-full uppercase':'text-[9px] font-black text-ab-cyan border border-ab-cyan px-3 py-1 rounded-full uppercase';}
-        async function toggleApp(e){ e.preventDefault(); if(running){ location.reload(); return; } if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)(); try { const s=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}); analyzer=audioCtx.createAnalyser(); source=audioCtx.createMediaStreamSource(s); dataArray=new Float32Array(analyzer.fftSize); source.connect(analyzer); running=true; document.getElementById('btnAction').innerText="Parar Scanner"; document.getElementById('btnAction').classList.replace('bg-ab-cyan','bg-red-600'); process(); } catch(e){alert("Mic Error!");}}
-        function process(){ if(!running)return; analyzer.getFloatTimeDomainData(dataArray); let mv=0, mi=0; for(let i=0;i<dataArray.length;i++){ if(Math.abs(dataArray[i])>mv){mv=Math.abs(dataArray[i]); mi=i;}}
-            if(mv>0.25){ clearTimeout(timeout); let peak=dataArray[mi]*(phaseInverted?-1:1); const c=document.getElementById('statusCircle'), def=document.getElementById('contentDefault'), res=document.getElementById('resLabel'), sym=document.getElementById('symbol'), dsc=document.getElementById('desc');
+
+        async function toggleApp(e) {
+            if (e) e.preventDefault();
+            if (running) { 
+                running = false;
+                if (source) source.disconnect();
+                document.getElementById('btnAction').innerText = "Ativar Scanner";
+                document.getElementById('btnAction').classList.replace('bg-red-600', 'bg-ab-cyan');
+                return; 
+            }
+            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
+            try {
+                const s = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+                analyzer = audioCtx.createAnalyser();
+                source = audioCtx.createMediaStreamSource(s);
+                dataArray = new Float32Array(analyzer.fftSize);
+                source.connect(analyzer);
+                running = true;
+                document.getElementById('btnAction').innerText = "Parar Scanner";
+                document.getElementById('btnAction').classList.replace('bg-ab-cyan', 'bg-red-600');
+                process();
+            } catch (err) { alert("Mic Error!"); }
+        }
+
+        function process() {
+            if (!running) return;
+            analyzer.getFloatTimeDomainData(dataArray);
+            let mv=0, mi=0; for(let i=0;i<dataArray.length;i++){ if(Math.abs(dataArray[i])>mv){mv=Math.abs(dataArray[i]); mi=i;}}
+            if (mv > 0.25) {
+                clearTimeout(timeout);
+                let peak = dataArray[mi] * (phaseInverted ? -1 : 1);
+                const c=document.getElementById('statusCircle'), def=document.getElementById('contentDefault'), res=document.getElementById('resLabel'), sym=document.getElementById('symbol'), dsc=document.getElementById('desc');
                 def.classList.add('hidden'); res.classList.remove('hidden');
-                if(peak>0){ c.className="w-48 h-48 rounded-full border-[12px] flex items-center justify-center active-ring-pos"; sym.innerText="+"; sym.className="text-7xl font-black text-ab-green"; dsc.innerText="Positiva"; dsc.className="text-[9px] font-black uppercase text-ab-green mt-1 tracking-widest"; }
-                else { c.className="w-48 h-48 rounded-full border-[12px] flex items-center justify-center active-ring-neg"; sym.innerText="-"; sym.className="text-7xl font-black text-red-500"; dsc.innerText="Negativa"; dsc.className="text-[9px] font-black uppercase text-red-500 mt-1 tracking-widest"; }
-                timeout=setTimeout(()=>{ c.className="w-48 h-48 rounded-full border-[12px] border-ab-dark flex items-center justify-center"; def.classList.remove('hidden'); res.classList.add('hidden');},1200);
-            } requestAnimationFrame(process);
+                if (peak > 0) {
+                    c.className="w-48 h-48 rounded-full border-[12px] flex items-center justify-center active-ring-pos";
+                    sym.innerText="+"; sym.className="text-7xl font-black text-ab-green"; dsc.innerText="Positiva"; dsc.className="text-ab-green font-bold uppercase";
+                } else {
+                    c.className="w-48 h-48 rounded-full border-[12px] flex items-center justify-center active-ring-neg";
+                    sym.innerText="-"; sym.className="text-7xl font-black text-red-500"; dsc.innerText="Negativa"; dsc.className="text-red-500 font-bold uppercase";
+                }
+                timeout = setTimeout(() => { c.className="w-48 h-48 rounded-full border-[12px] border-ab-dark flex items-center justify-center"; def.classList.remove('hidden'); res.classList.add('hidden'); }, 1200);
+            }
+            requestAnimationFrame(process);
         }
         window.onload = () => { runTA(); runMasterCalc(); };
     </script>
