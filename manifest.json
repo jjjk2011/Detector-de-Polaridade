@@ -1,0 +1,16 @@
+{
+  "name": "AudioBase Polaridade Pro",
+  "short_name": "Polaridade",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0a0d14",
+  "theme_color": "#06b6d4",
+  "icons": [
+    {
+      "src": "https://appaudiobase.com.br/logo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
