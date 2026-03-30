@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0d14">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <title>AudioBase Pro | Polarity Scanner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0d14;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --cyan: #06b6d4;
+            --purple: #a855f7;
+            --green: #22c55e;
+            --gold: #f59e0b;
+            --red: #ef4444;
+            --orange: #f97316;
+            --text-muted: #8b949e;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #c9d1d9;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: var(--cyan);
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+        }
+        .back-btn:hover {
+            transform: translateX(-4px);
+            border-color: var(--cyan);
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, var(--purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.5rem;
+        }
+        .new-badge {
+            display: inline-block;
+            background: var(--gold);
+            color: black;
+            font-size: 0.55rem;
+            font-weight: 800;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+            text-transform: uppercase;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .card-header .icon {
+            font-size: 1.5rem;
+        }
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-header .badge {
+            margin-left: auto;
+            font-size: 0.6rem;
+            background: rgba(168,85,247,0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            color: var(--purple);
+        }
+
+        /* Círculo de polaridade */
+        .polarity-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .polarity-circle {
+            width: 14rem;
+            height: 14rem;
+            border-radius: 9999px;
+            border: 8px solid var(--bg-dark);
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .polarity-circle.positive {
+            border-color: var(--green);
+            background: radial-gradient(circle at center, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 100%);
+            box-shadow: 0 0 40px rgba(34,197,94,0.4);
+        }
+        .polarity-circle.negative {
+            border-color: var(--red);
+            background: radial-gradient(circle at center, rgba(239,68,68,0.15) 0%, rgba(239,68,68,0.05) 100%);
+            box-shadow: 0 0 40px rgba(239,68,68,0.4);
+        }
+        .polarity-circle.waiting {
+            border-color: var(--text-muted);
+        }
+        .polarity-symbol {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+        .polarity-text {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+            letter-spacing: 1px;
+        }
+        .polarity-subtext {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Botões */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--purple) 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(168,85,247,0.3);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .btn-secondary {
+            background: var(--cyan);
+            color: black;
+            border: none;
+            border-radius: 1rem;
+            padding: 0.75rem;
+            font-weight: 800;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            font-weight: 700;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+        .btn-outline:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+        .btn-icon {
+            background: white;
+            border-radius: 9999px;
+            width: 3.5rem;
+            height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .btn-icon:active {
+            transform: scale(0.94);
+        }
+
+        /* Grids */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Inputs */
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        .input-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .input-number, select {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            width: 100%;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .input-number:focus, select:focus {
+            border-color: var(--purple);
+        }
+
+        /* Indicadores de áudio */
+        .audio-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .level-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .level-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--purple);
+            transition: width 0.05s linear;
+        }
+        .level-value {
+            font-size: 0.6rem;
+            font-family: monospace;
+            color: var(--text-muted);
+            min-width: 45px;
+        }
+
+        /* Dicas */
+        .tips {
+            background: rgba(168,85,247,0.05);
+            border-left: 3px solid var(--purple);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            margin-top: 1rem;
+        }
+        .tips p {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .tips strong {
+            color: var(--purple);
+        }
+
+        /* Animação de pulso */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            100% { transform: scale(1.05); opacity: 0; }
+        }
+        .playing-pulse {
+            position: relative;
+        }
+        .playing-pulse::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: var(--purple);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            animation: pulse-ring 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            pointer-events: none;
+        }
+
+        @media (max-width: 550px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .polarity-circle { width: 11rem; height: 11rem; }
+            .polarity-symbol { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-btn">← VOLTAR AO MENU</a>
+            <h1>DETECTOR DE POLARIDADE <span class="new-badge">NOVO</span></h1>
+            <p class="subtitle">Verifique a fase (positivo/negativo) de Drivers e Tweeters</p>
+        </div>
+
+        <!-- Card Principal do Scanner -->
+        <div class="card">
+            <div class="card-header">
+                <span class="icon">🔊</span>
+                <h2>SCANNER DE POLARIDADE</h2>
+                <span class="badge">Tempo real</span>
+            </div>
+
+            <!-- Círculo de polaridade -->
+            <div class="polarity-container">
+                <div id="polarityCircle" class="polarity-circle waiting">
+                    <div id="circleDefault">
+                        <div class="polarity-symbol" style="color: var(--text-muted);">⚡</div>
+                        <div class="polarity-text" style="color: var(--text-muted);">AGUARDANDO</div>
+                        <div class="polarity-subtext">Aproxime o microfone</div>
+                    </div>
+                    <div id="circleResult" style="display: none;">
+                        <div id="polaritySymbol" class="polarity-symbol"></div>
+                        <div id="polarityText" class="polarity-text"></div>
+                        <div id="polaritySubtext" class="polarity-subtext"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indicador de nível de áudio -->
+            <div class="audio-indicator" id="audioIndicator" style="display: none;">
+                <span style="font-size: 0.6rem;">🎤 NÍVEL</span>
+                <div class="level-bar">
+                    <div id="levelFill" class="level-fill"></div>
+                </div>
+                <span id="levelValue" class="level-value">-dB</span>
+            </div>
+
+            <!-- Seleção de microfone -->
+            <div id="micSelector" class="hidden" style="margin-bottom: 1rem;">
+                <div class="input-label">
+                    <span>🎙️ ENTRADA DE ÁUDIO</span>
+                    <span>Selecione o dispositivo</span>
+                </div>
+                <select id="micSelect" class="input-number"></select>
+            </div>
+
+            <!-- Botão ativar scanner -->
+            <button id="btnScan" class="btn-primary" onclick="toggleScanner()">
+                <span>🎤</span> ATIVAR SCANNER
+            </button>
+
+            <!-- Painel de Sinais de Teste -->
+            <div style="margin-top: 1.5rem;">
+                <div class="input-label">
+                    <span>📡 SINAIS DE TESTE</span>
+                    <span>Para verificação de polaridade</span>
+                </div>
+                <div class="grid-2">
+                    <!-- Pulso de teste -->
+                    <div style="background: var(--bg-dark); border-radius: 1rem; padding: 1rem; text-align: center;">
+                        <div id="pulseBtn" class="btn-icon" style="margin: 0 auto 0.75rem auto;" onclick="playPulse()">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                        <p style="font-weight: 800; font-size: 0.7rem;">PULSO DE TESTE</p>
+                        <p style="font-size: 0.55rem; color: var(--text-muted);">1kHz • 200ms</p>
+                        <p style="font-size: 0.5rem; color: var(--purple); margin-top: 0.25rem;">Ideal para drivers e tweeters</p>
+                    </div>
+
+                    <!-- Tom contínuo -->
+                    <div style="background: var(--bg-dark); border-radius: 1rem; padding: 1rem;">
+                        <div class="input-group" style="margin-bottom: 0.75rem;">
+                            <div class="input-label">
+                                <span>🔊 FREQUÊNCIA</span>
+                                <span id="freqDisplay">60 Hz</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="range" id="freqSlider" min="20" max="20000" value="60" step="1" style="flex: 1;">
+                                <input type="number" id="freqInput" value="60" step="1" style="width: 70px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.5rem; color: white; text-align: center;">
+                            </div>
+                        </div>
+                        <button id="btnTone" class="btn-secondary" style="width: 100%;" onclick="toggleTone()">
+                            ▶ INICIAR TOM
+                        </button>
+                        <p style="font-size: 0.5rem; color: var(--text-muted); text-align: center; margin-top: 0.5rem;">
+                            20Hz ——— FREQUÊNCIA ——— 20kHz
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guia Rápido -->
+        <div class="card">
+            <div class="card-header">
+                <span class="icon">📖</span>
+                <h2>COMO TESTAR</h2>
+                <span class="badge">Quick Guide</span>
+            </div>
+            <div class="tips">
+                <p>1️⃣ <strong>Ative o scanner</strong> e permita o acesso ao microfone.</p>
+                <p>2️⃣ <strong>Aproxime o celular</strong> (10-30cm) do alto-falante que deseja testar.</p>
+                <p>3️⃣ <strong>Clique no pulso de teste</strong> (1kHz) e observe o círculo:</p>
+                <p style="margin-left: 1rem;">🟢 <strong>Verde +</strong> = Fase correta (positivo no terminal positivo)</p>
+                <p style="margin-left: 1rem;">🔴 <strong>Vermelho -</strong> = Fase invertida (troque os cabos)</p>
+                <p>4️⃣ Para testar <strong>subwoofers</strong>, use o tom contínuo em frequências baixas (40-80Hz).</p>
+                <p>💡 <strong>Dica:</strong> O scanner detecta automaticamente o sinal e mostra o resultado por 1.5 segundos.</p>
+            </div>
+        </div>
+
+        <!-- Especificações Técnicas -->
+        <div class="card">
+            <div class="card-header">
+                <span class="icon">⚙️</span>
+                <h2>ESPECIFICAÇÕES</h2>
+                <span class="badge">Tech Info</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.7rem;">
+                <div><span style="color: var(--purple);">Sinal de teste:</span> 1kHz senoidal</div>
+                <div><span style="color: var(--purple);">Duração do pulso:</span> 200ms</div>
+                <div><span style="color: var(--purple);">Detecção:</span> Pico de sinal > ruído ambiente</div>
+                <div><span style="color: var(--purple);">Tempo de resposta:</span> &lt;100ms</div>
+                <div><span style="color: var(--purple);">Frequência do tom:</span> 20Hz - 20kHz</div>
+                <div><span style="color: var(--purple);">Compatível com:</span> Drivers, Tweeters, Subs</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== SCANNER DE POLARIDADE ==========
+        let audioCtx = null;
+        let mediaStream = null;
+        let analyser = null;
+        let isScanning = false;
+        let scanAnimation = null;
+        let resetTimeout = null;
+        let currentMicId = null;
+        let toneOsc = null;
+        let isToneOn = false;
+        let levelUpdateInterval = null;
+
+        // Inicializar contexto de áudio
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Atualizar lista de microfones
+        async function updateMicList() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const inputs = devices.filter(d => d.kind === 'audioinput');
+                const select = document.getElementById('micSelect');
+                select.innerHTML = '';
+                inputs.forEach((d, i) => {
+                    const opt = document.createElement('option');
+                    opt.value = d.deviceId;
+                    opt.text = d.label || `Microfone ${i+1}`;
+                    if (d.deviceId === currentMicId) opt.selected = true;
+                    select.appendChild(opt);
+                });
+                if (inputs.length) {
+                    document.getElementById('micSelector').classList.remove('hidden');
+                }
+            } catch(e) { console.warn(e); }
+        }
+
+        // Atualizar indicador de nível de áudio
+        function startLevelIndicator() {
+            if (levelUpdateInterval) clearInterval(levelUpdateInterval);
+            if (!analyser) return;
+            
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            levelUpdateInterval = setInterval(() => {
+                if (!analyser) return;
+                analyser.getByteTimeDomainData(dataArray);
+                let max = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    const v = (dataArray[i] - 128) / 128;
+                    max = Math.max(max, Math.abs(v));
+                }
+                const percent = Math.min(100, max * 100);
+                const db = max > 0 ? Math.round(20 * Math.log10(max)) : -60;
+                document.getElementById('levelFill').style.width = `${percent}%`;
+                document.getElementById('levelValue').innerHTML = `${db} dB`;
+                
+                // Mudar cor do indicador baseado no nível
+                const fill = document.getElementById('levelFill');
+                if (percent > 30) fill.style.background = 'var(--green)';
+                else if (percent > 15) fill.style.background = 'var(--gold)';
+                else fill.style.background = 'var(--purple)';
+            }, 100);
+        }
+
+        async function startScanner() {
+            initAudio();
+            try {
+                const constraints = {
+                    audio: {
+                        deviceId: currentMicId ? { exact: currentMicId } : undefined,
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false
+                    }
+                };
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                await updateMicList();
+
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 2048;
+                const source = audioCtx.createMediaStreamSource(mediaStream);
+                source.connect(analyser);
+
+                // Calibrar ruído ambiente
+                const buffer = new Float32Array(analyser.fftSize);
+                await new Promise(r => setTimeout(r, 500));
+                analyser.getFloatTimeDomainData(buffer);
+                let sum = 0;
+                for (let i = 0; i < buffer.length; i++) sum += Math.abs(buffer[i]);
+                const noise = sum / buffer.length;
+                window.polarityThreshold = Math.max(0.05, noise * 6);
+
+                isScanning = true;
+                document.getElementById('btnScan').innerHTML = '<span>🔴</span> PARAR SCANNER';
+                document.getElementById('btnScan').style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                document.getElementById('audioIndicator').style.display = 'flex';
+                
+                startLevelIndicator();
+                analyzeLoop();
+                
+            } catch(err) {
+                console.error('Erro ao acessar microfone:', err);
+                alert('Erro ao acessar o microfone. Verifique as permissões.');
+                stopScanner();
+            }
+        }
+
+        function analyzeLoop() {
+            if (!isScanning || !analyser) return;
+            const buffer = new Float32Array(analyser.fftSize);
+            analyser.getFloatTimeDomainData(buffer);
+            let maxVal = 0, maxIdx = 0;
+            for (let i = 0; i < buffer.length; i++) {
+                const abs = Math.abs(buffer[i]);
+                if (abs > maxVal) { maxVal = abs; maxIdx = i; }
+            }
+            
+            if (maxVal > window.polarityThreshold) {
+                if (resetTimeout) clearTimeout(resetTimeout);
+                const peak = buffer[maxIdx];
+                const circle = document.getElementById('polarityCircle');
+                const defaultDiv = document.getElementById('circleDefault');
+                const resultDiv = document.getElementById('circleResult');
+                const symbolSpan = document.getElementById('polaritySymbol');
+                const textSpan = document.getElementById('polarityText');
+                const subtextSpan = document.getElementById('polaritySubtext');
+
+                defaultDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+
+                if (peak > 0) {
+                    circle.className = "polarity-circle positive";
+                    symbolSpan.innerHTML = "+";
+                    symbolSpan.style.color = "var(--green)";
+                    textSpan.innerHTML = "FASE CORRETA";
+                    textSpan.style.color = "var(--green)";
+                    subtextSpan.innerHTML = "Positivo no terminal positivo";
+                    subtextSpan.style.color = "var(--text-muted)";
+                } else {
+                    circle.className = "polarity-circle negative";
+                    symbolSpan.innerHTML = "-";
+                    symbolSpan.style.color = "var(--red)";
+                    textSpan.innerHTML = "FASE INVERTIDA";
+                    textSpan.style.color = "var(--red)";
+                    subtextSpan.innerHTML = "Troque a polaridade dos cabos";
+                    subtextSpan.style.color = "var(--text-muted)";
+                }
+
+                resetTimeout = setTimeout(() => {
+                    circle.className = "polarity-circle waiting";
+                    defaultDiv.style.display = 'block';
+                    resultDiv.style.display = 'none';
+                }, 1800);
+            }
+            scanAnimation = requestAnimationFrame(analyzeLoop);
+        }
+
+        function stopScanner() {
+            isScanning = false;
+            if (scanAnimation) cancelAnimationFrame(scanAnimation);
+            if (levelUpdateInterval) clearInterval(levelUpdateInterval);
+            if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+            if (resetTimeout) clearTimeout(resetTimeout);
+            
+            document.getElementById('btnScan').innerHTML = '<span>🎤</span> ATIVAR SCANNER';
+            document.getElementById('btnScan').style.background = 'linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%)';
+            document.getElementById('audioIndicator').style.display = 'none';
+            document.getElementById('micSelector').classList.add('hidden');
+            
+            const circle = document.getElementById('polarityCircle');
+            const defaultDiv = document.getElementById('circleDefault');
+            const resultDiv = document.getElementById('circleResult');
+            circle.className = "polarity-circle waiting";
+            defaultDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+        }
+
+        function toggleScanner() {
+            if (isScanning) {
+                stopScanner();
+            } else {
+                startScanner();
+            }
+        }
+
+        async function changeMic(deviceId) {
+            currentMicId = deviceId;
+            if (isScanning) {
+                await stopScanner();
+                setTimeout(() => startScanner(), 300);
+            }
+        }
+
+        // ========== GERADOR DE SINAIS ==========
+        function playPulse() {
+            if (!audioCtx) {
+                alert('Clique em qualquer lugar da página primeiro para ativar o áudio.');
+                return;
+            }
+            initAudio();
+            
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = 1000;
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+            
+            // Efeito visual no botão
+            const pulseBtn = document.getElementById('pulseBtn');
+            pulseBtn.classList.add('playing-pulse');
+            setTimeout(() => pulseBtn.classList.remove('playing-pulse'), 250);
+        }
+
+        function toggleTone() {
+            initAudio();
+            const freq = parseFloat(document.getElementById('freqInput').value);
+            
+            if (!isToneOn) {
+                toneOsc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                toneOsc.type = 'sine';
+                toneOsc.frequency.value = freq;
+                toneOsc.connect(gain);
+                gain.connect(audioCtx.destination);
+                gain.gain.value = 0.2;
+                toneOsc.start();
+                isToneOn = true;
+                document.getElementById('btnTone').innerHTML = '⏹ PARAR TOM';
+                document.getElementById('btnTone').style.background = '#ef4444';
+                document.getElementById('btnTone').style.color = 'white';
+            } else {
+                if (toneOsc) toneOsc.stop();
+                isToneOn = false;
+                document.getElementById('btnTone').innerHTML = '▶ INICIAR TOM';
+                document.getElementById('btnTone').style.background = '#06b6d4';
+                document.getElementById('btnTone').style.color = 'black';
+            }
+        }
+
+        function updateFreq(value) {
+            const f = parseFloat(value);
+            if (!isNaN(f) && f >= 20 && f <= 20000) {
+                document.getElementById('freqSlider').value = f;
+                document.getElementById('freqDisplay').innerHTML = Math.round(f) + ' Hz';
+                if (isToneOn && toneOsc) toneOsc.frequency.value = f;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('freqSlider').addEventListener('input', (e) => {
+            document.getElementById('freqInput').value = e.target.value;
+            updateFreq(e.target.value);
+        });
+        document.getElementById('freqInput').addEventListener('input', (e) => {
+            updateFreq(e.target.value);
+        });
+        document.getElementById('micSelect').addEventListener('change', (e) => {
+            changeMic(e.target.value);
+        });
+
+        // Inicializar
+        updateFreq(60);
+
+        // Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(e => console.log('SW error:', e));
+        }
+
+        // Pré-inicializar áudio no primeiro clique
+        document.body.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }, { once: true });
+    </script>
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0d14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <title>AudioBase Pro | Delay/TA Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0d14;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --cyan: #06b6d4;
+            --gold: #f59e0b;
+            --green: #22c55e;
+            --purple: #a855f7;
+            --text-muted: #8b949e;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #c9d1d9;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: var(--cyan);
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+        }
+        .back-btn:hover {
+            transform: translateX(-4px);
+            border-color: var(--cyan);
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, var(--cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.5rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .card-header .icon {
+            font-size: 1.5rem;
+        }
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-header .badge {
+            margin-left: auto;
+            font-size: 0.6rem;
+            background: rgba(6,182,212,0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            color: var(--cyan);
+        }
+
+        /* Inputs */
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        .input-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .input-label span:first-child {
+            letter-spacing: 0.5px;
+        }
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .input-number {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            width: 100%;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .input-number:focus {
+            border-color: var(--gold);
+        }
+        .input-unit {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--text-muted);
+            min-width: 45px;
+        }
+
+        /* Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Toggle de unidades */
+        .unit-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-dark);
+            border-radius: 2rem;
+            padding: 0.25rem;
+            margin-bottom: 1rem;
+        }
+        .unit-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+        .unit-btn.active {
+            background: var(--gold);
+            color: black;
+        }
+
+        /* Resultado principal */
+        .result-card {
+            background: linear-gradient(135deg, rgba(6,182,212,0.05) 0%, rgba(245,158,11,0.05) 100%);
+            border: 1px solid rgba(6,182,212,0.3);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .result-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+        .result-value {
+            font-size: 4rem;
+            font-weight: 900;
+            font-family: 'Courier New', monospace;
+            color: white;
+            line-height: 1;
+            margin: 0.5rem 0;
+        }
+        .result-unit {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--gold);
+        }
+        .result-target {
+            display: inline-block;
+            margin-top: 0.75rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--gold);
+            text-transform: uppercase;
+            border: 1px solid rgba(245,158,11,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+        }
+
+        /* Visualização gráfica simples */
+        .visualization {
+            background: var(--bg-dark);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .vis-title {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+        .vis-bars {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 2rem;
+            height: 100px;
+        }
+        .vis-bar {
+            text-align: center;
+            flex: 1;
+        }
+        .vis-bar .bar {
+            background: var(--cyan);
+            width: 100%;
+            border-radius: 0.5rem 0.5rem 0 0;
+            transition: height 0.3s ease;
+            min-height: 4px;
+        }
+        .vis-bar .label {
+            font-size: 0.6rem;
+            margin-top: 0.5rem;
+            color: var(--text-muted);
+        }
+        .vis-bar .distance {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: white;
+        }
+        .vis-arrow {
+            font-size: 1.5rem;
+            color: var(--gold);
+        }
+
+        /* Dicas profissionais */
+        .tips {
+            background: rgba(245,158,11,0.05);
+            border-left: 3px solid var(--gold);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            margin-top: 1rem;
+        }
+        .tips p {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .tips strong {
+            color: var(--gold);
+        }
+
+        /* Slider de temperatura */
+        .temp-slider {
+            margin-top: 1rem;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            background: transparent;
+            width: 100%;
+        }
+        input[type="range"]:focus {
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: var(--gold);
+            margin-top: -6px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 550px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .vis-bars { gap: 1rem; }
+            .result-value { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-btn">← VOLTAR AO MENU</a>
+            <h1>DELAY / TA</h1>
+            <p class="subtitle">TIME ALIGNMENT CALCULATOR</p>
+        </div>
+
+        <!-- Card de Distâncias -->
+        <div class="card">
+            <div class="card-header">
+                <span class="icon">📏</span>
+                <h2>DISTÂNCIAS</h2>
+                <span class="badge">Configure o alinhamento</span>
+            </div>
+
+            <div class="unit-toggle" id="unitToggle">
+                <button class="unit-btn active" data-unit="m">METROS (m)</button>
+                <button class="unit-btn" data-unit="ft">PÉS (ft)</button>
+            </div>
+
+            <div class="grid-2">
+                <div class="input-group">
+                    <div class="input-label">
+                        <span>🔊 REFERÊNCIA LONGE</span>
+                        <span>Subwoofer ou via mais distante</span>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="number" id="distLong" value="5.00" step="0.1" class="input-number">
+                        <span class="input-unit" id="unitLongLabel">m</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <div class="input-label">
+                        <span>🎵 REFERÊNCIA PERTO</span>
+                        <span>Top ou via mais próxima</span>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="number" id="distNear" value="1.00" step="0.1" class="input-number">
+                        <span class="input-unit" id="unitNearLabel">m</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Temperatura (afeta velocidade do som) -->
+            <div class="temp-slider">
+                <div class="input-label">
+                    <span>🌡️ TEMPERATURA</span>
+                    <span id="tempValue">20°C</span>
+                </div>
+                <input type="range" id="temperature" min="-20" max="50" value="20" step="1" oninput="updateTemp(this.value)">
+                <div style="display: flex; justify-content: space-between; font-size: 0.55rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    <span>-20°C</span>
+                    <span>0°C</span>
+                    <span>20°C</span>
+                    <span>40°C</span>
+                    <span>50°C</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultado Principal -->
+        <div class="result-card">
+            <div class="result-label">VALOR PARA O DSP</div>
+            <div class="result-value">
+                <span id="delayMs">11.63</span>
+                <span class="result-unit">ms</span>
+            </div>
+            <div id="delayTarget" class="result-target">ATRASAR REFERÊNCIA PERTO</div>
+            <div style="margin-top: 0.75rem; font-size: 0.6rem; color: var(--text-muted);">
+                Velocidade do som: <strong id="speedOfSound">343.8</strong> m/s | <span id="speedFt">1128.0</span> ft/s
+            </div>
+        </div>
+
+        <!-- Visualização Gráfica -->
+        <div class="card">
+            <div class="card-header">
+                <span class="icon">📊</span>
+                <h2>VISUALIZAÇÃO</h2>
+                <span class="badge">Posicionamento relativo</span>
+            </div>
+            <div class="visualization">
+                <div class="vis-title">ALINHAMENTO DE TEMPO</div>
+                <div class="vis-bars">
+                    <div class="vis-bar">
+                        <div class="bar" id="barLong" style="height: 80px;"></div>
+                        <div class="label">REFERÊNCIA LONGE</div>
+                        <div class="distance" id="distLongVis">5.00 m</div>
+                    </div>
+                    <div class="vis-arrow">→</div>
+                    <div class="vis-bar">
+                        <div class="bar" id="barNear" style="height: 16px;"></div>
+                        <div class="label">REFERÊNCIA PERTO</div>
+                        <div class="distance" id="distNearVis">1.00 m</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dicas Profissionais -->
+        <div class="card">
+            <div class="card-header">
+                <span class="icon">💡</span>
+                <h2>DICAS PROFISSIONAIS</h2>
+                <span class="badge">Sound Engineering</span>
+            </div>
+            <div class="tips">
+                <p>🎯 <strong>Time Alignment:</strong> O atraso deve ser aplicado na via MAIS PRÓXIMA para alinhar com a via mais distante.</p>
+                <p>🌡️ <strong>Temperatura:</strong> A velocidade do som varia 0.6 m/s por °C. Em dias quentes, o som viaja mais rápido.</p>
+                <p>📐 <strong>Medição precisa:</strong> Meça sempre do ponto de referência (ex: palco) até o centro acústico de cada caixa.</p>
+                <p>🎚️ <strong>Dica:</strong> Após calcular, use um analisador de espectro para ajuste fino com medição em tempo real.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Elementos DOM
+        const distLongInput = document.getElementById('distLong');
+        const distNearInput = document.getElementById('distNear');
+        const unitLongLabel = document.getElementById('unitLongLabel');
+        const unitNearLabel = document.getElementById('unitNearLabel');
+        const delaySpan = document.getElementById('delayMs');
+        const delayTargetSpan = document.getElementById('delayTarget');
+        const speedSpan = document.getElementById('speedOfSound');
+        const speedFtSpan = document.getElementById('speedFt');
+        const barLong = document.getElementById('barLong');
+        const barNear = document.getElementById('barNear');
+        const distLongVis = document.getElementById('distLongVis');
+        const distNearVis = document.getElementById('distNearVis');
+        const tempSlider = document.getElementById('temperature');
+        const tempValueSpan = document.getElementById('tempValue');
+
+        let currentUnit = 'm'; // 'm' ou 'ft'
+        let currentTemp = 20; // °C
+
+        // Função para calcular velocidade do som baseado na temperatura
+        function getSpeedOfSound(tempCelsius) {
+            // Fórmula: v = 331.3 + (0.606 * T) m/s
+            return 331.3 + (0.606 * tempCelsius);
+        }
+
+        // Converter distância para metros
+        function toMeters(value, unit) {
+            if (unit === 'ft') return value * 0.3048;
+            return value;
+        }
+
+        // Converter metros para unidade atual
+        function fromMeters(value, unit) {
+            if (unit === 'ft') return value / 0.3048;
+            return value;
+        }
+
+        // Atualizar todos os cálculos
+        function updateDelay() {
+            // Obter valores em metros
+            let longMeters, nearMeters;
+            
+            if (currentUnit === 'm') {
+                longMeters = parseFloat(distLongInput.value) || 0;
+                nearMeters = parseFloat(distNearInput.value) || 0;
+            } else {
+                longMeters = toMeters(parseFloat(distLongInput.value) || 0, 'ft');
+                nearMeters = toMeters(parseFloat(distNearInput.value) || 0, 'ft');
+            }
+            
+            // Calcular velocidade do som
+            const speed = getSpeedOfSound(currentTemp);
+            const speedFt = speed / 0.3048;
+            
+            // Atualizar display da velocidade
+            speedSpan.innerText = speed.toFixed(1);
+            speedFtSpan.innerText = speedFt.toFixed(0);
+            
+            // Calcular diferença de distância e tempo
+            const diffMeters = Math.abs(longMeters - nearMeters);
+            const delaySeconds = diffMeters / speed;
+            const delayMsValue = delaySeconds * 1000;
+            
+            // Atualizar display do delay
+            delaySpan.innerText = delayMsValue.toFixed(2);
+            
+            // Determinar qual via atrasar
+            let target = "ALINHADO";
+            if (longMeters > nearMeters) target = "ATRASAR REFERÊNCIA LONGE";
+            if (nearMeters > longMeters) target = "ATRASAR REFERÊNCIA PERTO";
+            delayTargetSpan.innerText = target;
+            
+            // Atualizar visualização das distâncias
+            const longDisplay = fromMeters(longMeters, currentUnit);
+            const nearDisplay = fromMeters(nearMeters, currentUnit);
+            const unitSymbol = currentUnit === 'm' ? 'm' : 'ft';
+            
+            distLongVis.innerText = `${longDisplay.toFixed(2)} ${unitSymbol}`;
+            distNearVis.innerText = `${nearDisplay.toFixed(2)} ${unitSymbol}`;
+            
+            // Atualizar barras (altura máxima = 100px para 20m)
+            const maxHeight = 100;
+            const maxDist = 20;
+            const longHeight = Math.min(maxHeight, (longMeters / maxDist) * maxHeight);
+            const nearHeight = Math.min(maxHeight, (nearMeters / maxDist) * maxHeight);
+            barLong.style.height = `${Math.max(8, longHeight)}px`;
+            barNear.style.height = `${Math.max(8, nearHeight)}px`;
+        }
+
+        // Mudar unidade de medida
+        function setUnit(unit) {
+            const longValue = parseFloat(distLongInput.value) || 0;
+            const nearValue = parseFloat(distNearInput.value) || 0;
+            
+            // Converter valores para a nova unidade
+            if (currentUnit === 'm' && unit === 'ft') {
+                distLongInput.value = (longValue / 0.3048).toFixed(2);
+                distNearInput.value = (nearValue / 0.3048).toFixed(2);
+            } else if (currentUnit === 'ft' && unit === 'm') {
+                distLongInput.value = (longValue * 0.3048).toFixed(2);
+                distNearInput.value = (nearValue * 0.3048).toFixed(2);
+            }
+            
+            currentUnit = unit;
+            
+            // Atualizar labels das unidades
+            const unitLabel = unit === 'm' ? 'm' : 'ft';
+            unitLongLabel.innerText = unitLabel;
+            unitNearLabel.innerText = unitLabel;
+            
+            // Atualizar botões de toggle
+            document.querySelectorAll('.unit-btn').forEach(btn => {
+                if (btn.dataset.unit === unit) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            updateDelay();
+        }
+
+        // Atualizar temperatura
+        function updateTemp(temp) {
+            currentTemp = parseInt(temp);
+            tempValueSpan.innerText = `${currentTemp}°C`;
+            updateDelay();
+        }
+
+        // Event listeners
+        distLongInput.addEventListener('input', updateDelay);
+        distNearInput.addEventListener('input', updateDelay);
+        
+        document.querySelectorAll('.unit-btn').forEach(btn => {
+            btn.addEventListener('click', () => setUnit(btn.dataset.unit));
+        });
+        
+        // Inicialização
+        updateDelay();
+        
+        // Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(e => console.log('SW error:', e));
+        }
+        
+        // Expor funções globalmente para o slider
+        window.updateTemp = updateTemp;
+    </script>
+</body>
+</html>
