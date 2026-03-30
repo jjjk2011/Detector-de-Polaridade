@@ -33,7 +33,7 @@
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             padding: 1rem;
-            padding-bottom: 5rem;
+            padding-bottom: 1rem;
         }
 
         .container {
@@ -364,38 +364,6 @@
             background: linear-gradient(135deg, var(--red) 0%, #dc2626 100%);
         }
 
-        /* Menu Inferior */
-        .bottom-menu {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            padding: 0.75rem 0.5rem;
-            z-index: 100;
-        }
-        .menu-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.6rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .menu-item.active {
-            color: var(--purple);
-        }
-        .menu-item span:first-child {
-            font-size: 1.2rem;
-        }
-
         .hidden {
             display: none;
         }
@@ -413,7 +381,7 @@
             <h1>DETECTOR DE POLARIDADE</h1>
         </div>
 
-        <!-- Card: CAPTURA (primeiro) -->
+        <!-- Card: CAPTURA -->
         <div class="card">
             <div class="card-title">🎤 CAPTURA</div>
             
@@ -506,30 +474,6 @@
                 </select>
             </div>
         </div>
-    </div>
-
-    <!-- Menu Inferior -->
-    <div class="bottom-menu">
-        <button class="menu-item" onclick="location.href='/'">
-            <span>🏠</span>
-            <span>HOME</span>
-        </button>
-        <button class="menu-item active">
-            <span>📊</span>
-            <span>PROJETOS</span>
-        </button>
-        <button class="menu-item">
-            <span>📅</span>
-            <span>AGENDA</span>
-        </button>
-        <button class="menu-item">
-            <span>📦</span>
-            <span>ESTOQUE</span>
-        </button>
-        <button class="menu-item">
-            <span>➕</span>
-            <span>MAIS</span>
-        </button>
     </div>
 
     <script>
