@@ -1,341 +1,88 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AudioBase Pro | Jaguaruana v11.7</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: { extend: { colors: { 'ab-bg': '#0a0d14', 'ab-card': '#161b22', 'ab-border': '#30363d', 'ab-cyan': '#06b6d4', 'ab-purple': '#a855f7', 'ab-green': '#22c55e', 'ab-gold': '#f59e0b', 'ab-red': '#ef4444' } } }
-        }
-    </script>
-    <style>
-        :root { --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); }
-        body { background-color: #0a0d14; color: #c9d1d9; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; padding-top: var(--safe-top); padding-bottom: var(--safe-bottom); }
+// VARIÁVEIS DE CONTROLE DE SENSIBILIDADE
+let threshold = 0.25; // Valor padrão de fábrica
+let noiseFloor = 0;
+
+async function toggleApp(e) {
+    if (e) e.preventDefault();
+    if (running) { 
+        running = false;
+        if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+        document.getElementById('btnAction').innerText = "Ativar Scanner";
+        document.getElementById('btnAction').classList.replace('bg-ab-red', 'bg-ab-purple');
+        return; 
+    }
+    
+    if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+    
+    try {
+        // Desativamos o processamento nativo para pegar o sinal "puro" do falante
+        mediaStream = await navigator.mediaDevices.getUserMedia({ 
+            audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } 
+        });
         
-        /* TEXTOS DINÂMICOS */
-        .display-huge { font-size: clamp(3.5rem, 18vw, 7rem); line-height: 1; font-family: 'Courier New', monospace; font-weight: 900; }
-        .display-vrms { font-size: clamp(2rem, 10vw, 4.5rem); line-height: 1; font-family: 'Courier New', monospace; font-weight: 900; }
+        analyzer = audioCtx.createAnalyser();
+        source = audioCtx.createMediaStreamSource(mediaStream);
+        dataArray = new Float32Array(analyzer.fftSize);
+        source.connect(analyzer);
+        running = true;
         
-        /* AJUSTES DE INTERFACE */
-        .nav-btn { transition: all 0.2s; cursor: pointer; white-space: nowrap; font-size: clamp(10px, 2.5vw, 12px); }
-        .nav-btn.active { background-color: #06b6d4; color: #0a0d14; box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); }
+        document.getElementById('btnAction').innerText = "Calibrando...";
         
-        .active-ring-pos { border-color: #22c55e !important; box-shadow: 0 0 30px rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.05); }
-        .active-ring-neg { border-color: #ef4444 !important; box-shadow: 0 0 30px rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); }
-
-        input[type=range] { -webkit-appearance: none; background: transparent; width: 100%; }
-        input[type=range]::-webkit-slider-runnable-track { height: 6px; background: #30363d; border-radius: 3px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #06b6d4; margin-top: -7px; border: 2px solid #0a0d14; }
-
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
-        .modal.active { display: flex; }
-        
-        .help-box { animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col items-center p-4">
-
-    <div id="reportModal" class="modal" onclick="closeModal()">
-        <div class="bg-ab-card w-full max-w-lg rounded-[2.5rem] border border-ab-border p-6 shadow-2xl" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-ab-border pb-4 mb-4">
-                <h3 class="text-ab-cyan font-black uppercase italic tracking-widest text-sm">Relatório Técnico</h3>
-                <button onclick="closeModal()" class="text-slate-500 text-2xl">&times;</button>
-            </div>
-            <div id="reportContent" class="space-y-4 mb-6"></div>
-            <button onclick="closeModal()" class="w-full bg-ab-border text-white font-black py-4 rounded-xl uppercase text-[10px] tracking-widest">Fechar</button>
-        </div>
-    </div>
-
-    <div class="w-full max-w-4xl">
-        <header class="flex flex-col items-center gap-6 mb-8 pb-6 border-b border-ab-border">
-            <div class="flex items-center gap-3">
-                <div class="p-2 bg-ab-cyan/10 rounded-xl text-ab-cyan border border-ab-cyan/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <div class="text-center">
-                    <h1 class="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">AUDIOBASE <span class="font-light text-ab-cyan">PRO</span></h1>
-                    <p class="text-[8px] text-slate-500 uppercase font-bold tracking-[0.3em] mt-1">Jaguaruana Engineering</p>
-                </div>
-            </div>
-            
-            <nav class="flex w-full max-w-xs justify-center gap-1 p-1 bg-ab-card rounded-full border border-ab-border">
-                <button onclick="showTab('alinhamento')" id="btn-alinhamento" class="nav-btn flex-1 py-2.5 rounded-full font-black uppercase active">Delay</button>
-                <button onclick="showTab('projeto')" id="btn-projeto" class="nav-btn flex-1 py-2.5 rounded-full font-black uppercase">Projeto</button>
-                <button onclick="showTab('polaridade')" id="btn-polaridade" class="nav-btn flex-1 py-2.5 rounded-full font-black uppercase">Fase</button>
-            </nav>
-        </header>
-
-        <div id="tab-alinhamento" class="tab-content space-y-6">
-            <div class="bg-ab-card p-6 rounded-[2.5rem] border border-ab-border relative">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-2"><div class="w-1.5 h-5 bg-ab-gold rounded-full"></div><h2 class="text-lg font-bold text-white uppercase italic">Alinhamento</h2></div>
-                    <button onclick="toggleHelp('help-delay')" class="w-7 h-7 rounded-full border border-ab-gold/30 text-ab-gold text-xs font-bold hover:bg-ab-gold hover:text-black">?</button>
-                </div>
-
-                <div id="help-delay" class="help-box hidden mb-6 p-4 bg-ab-gold/5 border border-ab-gold/20 rounded-2xl text-[11px] text-ab-gold leading-relaxed">
-                    <b>Longe:</b> Distância da caixa principal.<br><b>Perto:</b> Distância da caixa de reforço.<br>O valor em <b>ms</b> deve ser aplicado no canal da caixa que está <b>perto</b>.
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                    <div class="p-4 bg-ab-bg rounded-2xl border border-ab-border text-center md:text-left">
-                        <label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Distância Longe (m)</label>
-                        <input type="number" id="distL" value="5.00" step="0.1" oninput="runTA()" class="bg-transparent text-3xl font-black text-white w-full outline-none text-center md:text-left">
-                    </div>
-                    <div class="p-4 bg-ab-bg rounded-2xl border border-ab-border text-center md:text-left">
-                        <label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Distância Perto (m)</label>
-                        <input type="number" id="distR" value="1.00" step="0.1" oninput="runTA()" class="bg-transparent text-3xl font-black text-white w-full outline-none text-center md:text-left">
-                    </div>
-                </div>
-
-                <div class="bg-ab-bg p-8 rounded-[2rem] border border-ab-border text-center overflow-hidden">
-                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Valor para o DSP</p>
-                    <div class="flex items-baseline justify-center gap-1 leading-none">
-                        <span id="taValue" class="display-huge text-white">11.63</span>
-                        <span class="text-sm font-bold text-ab-gold italic">ms</span>
-                    </div>
-                    <span id="taTarget" class="text-[9px] font-black text-ab-gold uppercase mt-6 inline-block border border-ab-gold/20 px-6 py-2 rounded-full italic">Atrasar Referência Perto</span>
-                </div>
-            </div>
-        </div>
-
-        <div id="tab-projeto" class="tab-content hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="md:col-span-2 bg-ab-card p-6 rounded-[2.5rem] border border-ab-border relative">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-lg font-bold text-white uppercase italic">Carga por Canal</h2>
-                        <button onclick="toggleHelp('help-proj')" class="w-7 h-7 rounded-full border border-ab-cyan/30 text-ab-cyan text-xs font-bold hover:bg-ab-cyan hover:text-black">?</button>
-                    </div>
-
-                    <div id="help-proj" class="help-box hidden mb-6 p-4 bg-ab-cyan/5 border border-ab-cyan/20 rounded-2xl text-[11px] text-ab-cyan leading-relaxed">
-                        • <b>Quantidade:</b> Quantos falantes ligados em UM só canal do amp.<br>• Ligue em <b>Paralelo</b> (Divide Ohms) ou <b>Série</b> (Soma Ohms).<br>O <b>Vrms</b> é o ajuste final do seu Limiter no DSP.
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-4 bg-ab-bg rounded-xl border border-ab-border">
-                            <label class="text-[8px] font-bold text-slate-500 uppercase block mb-1">Qtd. Falantes</label>
-                            <input type="number" id="spkQty" value="2" oninput="runMasterCalc()" class="bg-transparent text-2xl font-black text-white w-full outline-none">
-                        </div>
-                        <div class="p-4 bg-ab-bg rounded-xl border border-ab-border">
-                            <label class="text-[8px] font-bold text-slate-500 uppercase block mb-1">Ohms Unit.</label>
-                            <input type="number" id="spkImp" value="8" oninput="runMasterCalc()" class="bg-transparent text-2xl font-black text-white w-full outline-none">
-                        </div>
-                        <div class="col-span-2 p-4 bg-ab-bg rounded-xl border border-ab-border">
-                            <label class="text-[8px] font-bold text-slate-500 uppercase block mb-1">Watts RMS (Cada)</label>
-                            <input type="number" id="spkPwr" value="1600" oninput="runMasterCalc()" class="bg-transparent text-2xl font-black text-white w-full outline-none">
-                        </div>
-                    </div>
-                    <select id="spkType" onchange="runMasterCalc()" class="w-full bg-ab-bg border border-ab-border p-4 rounded-xl text-white font-black text-[10px] mt-4 uppercase outline-none">
-                        <option value="paralelo">Ligação em Paralelo (Divide Ω)</option>
-                        <option value="serie">Ligação em Série (Soma Ω)</option>
-                    </select>
-                </div>
-
-                <div onclick="openReport()" class="bg-ab-card p-6 rounded-[2.5rem] border border-ab-border border-dashed flex flex-col justify-center items-center text-center cursor-pointer hover:border-ab-cyan transition-all">
-                    <div id="verdictBox" class="text-[8px] font-black uppercase px-4 py-1.5 rounded-full mb-4">Análise</div>
-                    <p class="text-[8px] text-slate-500 uppercase font-black mb-1 leading-none italic">Vrms (Ajuste Limiter)</p>
-                    <div class="display-vrms text-white mb-4"><span id="resVolts">0</span><span class="text-xs text-ab-cyan ml-1 italic leading-none">V</span></div>
-                    <div class="w-full space-y-2 text-[10px] font-bold">
-                        <div class="flex justify-between border-b border-ab-border pb-1"><span class="text-slate-500 uppercase">Carga</span><span id="resFinalImp" class="text-white">-- Ω</span></div>
-                        <div class="flex justify-between border-b border-ab-border pb-1"><span class="text-slate-500 uppercase">Total Exigido</span><span id="resFinalPwr" class="text-white">-- W</span></div>
-                    </div>
-                    <p class="text-[8px] text-center text-slate-600 font-bold uppercase group-hover:text-ab-cyan mt-3 leading-none">Ver Relatório ➔</p>
-                </div>
-            </div>
-
-            <div class="bg-ab-card p-6 rounded-3xl border border-ab-border border-l-4 border-l-ab-purple relative shadow-lg">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-black text-white uppercase tracking-widest italic leading-none">Amplificador (Canal)</h2>
-                    <button onclick="toggleHelp('help-amp')" class="w-7 h-7 rounded-full border border-ab-purple/30 text-ab-purple text-xs font-bold hover:bg-ab-purple hover:text-black">?</button>
-                </div>
-                
-                <div id="help-amp" class="help-box hidden mb-6 p-4 bg-ab-purple/5 border border-ab-purple/20 rounded-2xl text-[11px] text-ab-purple leading-relaxed">
-                    Insira a potência e a impedância mínima que o módulo suporta em **UM canal** (ou no Bridge, se estiver usando). O app compara isso com a carga dos falantes para dar o diagnóstico de segurança.
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="p-4 bg-ab-bg rounded-xl border border-ab-border">
-                        <label class="text-[8px] font-bold text-slate-500 uppercase block mb-1 leading-none">Amp RMS Canal</label>
-                        <input type="number" id="ampPwr" value="3000" oninput="runMasterCalc()" class="bg-transparent text-xl font-bold text-white w-full outline-none">
-                    </div>
-                    <div class="p-4 bg-ab-bg rounded-xl border border-ab-border">
-                        <label class="text-[8px] font-bold text-slate-500 uppercase block mb-1 leading-none">Amp Ohms Mín.</label>
-                        <input type="number" id="ampImpMin" value="2" oninput="runMasterCalc()" class="bg-transparent text-xl font-bold text-white w-full outline-none">
-                    </div>
-                </div>
-                <select id="ampMode" onchange="runMasterCalc()" class="w-full bg-ab-bg border border-ab-border p-4 rounded-xl text-white font-black text-[10px] uppercase mt-2 outline-none">
-                    <option value="stereo">Modo Stereo / Independente</option>
-                    <option value="bridge">Modo Bridge (Ponte Mono)</option>
-                </select>
-            </div>
-        </div>
-
-        <div id="tab-polaridade" class="tab-content hidden space-y-6">
-            <div class="bg-ab-card p-6 rounded-[2.5rem] border border-ab-border text-center relative shadow-2xl">
-                <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-lg font-bold text-white uppercase italic tracking-tight">Scanner de Fase</h2>
-                    <button onclick="toggleHelp('help-fase')" class="w-7 h-7 rounded-full border border-ab-purple/30 text-ab-purple text-xs font-bold hover:bg-ab-purple hover:text-black">?</button>
-                </div>
-
-                <div id="help-fase" class="help-box hidden mb-6 p-4 bg-ab-purple/5 border border-ab-purple/20 rounded-2xl text-[11px] text-ab-purple leading-relaxed">
-                    • <b>Pulso de Fase:</b> Sinal ideal para scanner rápido.<br>• <b>Scanner:</b> Aponte o mic para o falante e clique em Ativar.<br>• <b>Normal vs Invertida:</b> (+) Verde é correto (empurra ar), (-) Vermelho é invertido (puxa ar).
-                </div>
-                
-                <div class="flex flex-col items-center gap-8">
-                    <div id="statusCircle" class="w-48 h-48 rounded-full border-[10px] border-ab-bg flex flex-col items-center justify-center transition-all bg-black/20 shadow-inner">
-                        <div id="contentDefault" class="text-sm font-bold text-slate-700 uppercase italic">Standby</div>
-                        <div id="resLabel" class="hidden text-center">
-                            <span id="symbol" class="text-7xl font-black italic"></span>
-                            <span id="desc" class="text-[9px] font-black uppercase tracking-widest mt-2 block pt-2"></span>
-                        </div>
-                    </div>
-
-                    <div class="w-full space-y-5">
-                        <button onclick="toggleApp(event)" id="btnAction" class="w-full bg-ab-purple text-white font-black py-5 rounded-2xl uppercase text-[11px] tracking-widest shadow-xl active:scale-95 transition-all block">Ativar Scanner</button>
-                        
-                        <div class="bg-ab-bg p-5 rounded-3xl border border-ab-border flex items-center justify-between shadow-inner">
-                            <div class="flex items-center gap-4">
-                                <button onclick="toggleSignal()" class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center flex-shrink-0 shadow-lg active:scale-90 transition-all">
-                                    <svg id="playIcon" class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </button>
-                                <div class="text-left"><p class="text-[10px] font-black uppercase text-white leading-none">Pulso de Teste</p><p class="text-[9px] text-slate-500 uppercase mt-1 leading-none">500ms Intervalado</p></div>
-                            </div>
-                            <audio id="signalAudio" loop src="AudioBase_Polaridade_Intervalado_500ms.wav"></audio>
-                        </div>
-
-                        <div class="bg-ab-bg p-6 rounded-3xl border border-ab-border space-y-5 shadow-inner">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                <div class="bg-ab-card px-4 py-2 rounded-xl border border-ab-border flex items-baseline gap-1 focus-within:border-ab-cyan transition-colors">
-                                    <input type="number" id="freqInput" value="60" oninput="manualFreq(this.value)" class="bg-transparent text-2xl font-black text-white w-16 outline-none text-right font-mono">
-                                    <span class="text-ab-cyan text-xs font-bold italic leading-none">Hz</span>
-                                </div>
-                                <button onclick="toggleTone()" id="btnTone" class="w-full sm:w-auto mt-2 sm:mt-0 bg-ab-cyan text-black px-6 py-4 rounded-xl text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all block">Iniciar Tom</button>
-                            </div>
-                            <input type="range" id="freqSlider" min="20" max="20000" value="60" oninput="sliderFreq(this.value)" class="w-full">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <footer class="mt-12 text-center pb-8 border-t border-ab-border pt-6">
-            <p class="text-[8px] text-slate-700 uppercase font-black tracking-[0.4em] leading-none">Sound Master v11.7 Gold • Jaguaruana Engineering</p>
-        </footer>
-    </div>
-
-    <script>
-        // Lógica com encerramento de microfone (v11.7 Completa)
-        let reportData = { status: "", detail: "" };
-        let audioCtx, analyzer, source, dataArray, running=false, phaseInverted=true, timeout, oscillator, isToneRunning=false, mediaStream;
-
-        function showTab(t) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-'+t).classList.remove('hidden');
-            document.getElementById('btn-'+t).classList.add('active');
-            // Fecha todas as ajudas ao trocar de aba
-            document.querySelectorAll('.help-box').forEach(h => h.classList.add('hidden'));
-        }
-
-        function toggleHelp(id) { document.getElementById(id).classList.toggle('hidden'); }
-
-        function runTA() {
-            let L = parseFloat(document.getElementById('distL').value) || 0, R = parseFloat(document.getElementById('distR').value) || 0;
-            let d = Math.abs(R - L), ms = d / 0.344;
-            document.getElementById('taTarget').innerText = L < R ? "Atrasar Referência Longe" : (R < L ? "Atrasar Referência Perto" : "Alinhado");
-            document.getElementById('taValue').innerText = ms.toFixed(2);
-        }
-
-        function runMasterCalc() {
-            let q = parseFloat(document.getElementById('spkQty').value)||1, i = parseFloat(document.getElementById('spkImp').value)||4, p = parseFloat(document.getElementById('spkPwr').value)||0;
-            let type = document.getElementById('spkType').value, ap = parseFloat(document.getElementById('ampPwr').value)||0, ai = parseFloat(document.getElementById('ampImpMin').value)||2, am = document.getElementById('ampMode').value;
-            let fi = (type==='paralelo') ? i/q : i*q, eai = (am==='bridge') ? ai*2 : ai, tp = p*q;
-            let v = document.getElementById('verdictBox');
-            
-            if(fi < eai){
-                v.innerText="Carga Perigosa"; v.className="text-[8px] font-black uppercase px-4 py-1.5 rounded-full mb-4 bg-ab-red/20 text-ab-red border border-ab-red/30 tracking-widest";
-                reportData.status = "IMPEDÂNCIA BAIXA";
-                reportData.detail = `<p class="text-white">O sistema está em <b>${fi.toFixed(1)}Ω</b>. No modo Bridge, seu amp exige no mínimo <b>${eai}Ω</b>. Risco de queima.</p>`;
-            } else if(ap < tp * 0.8){
-                v.innerText="⚠ Módulo Fraco"; v.className="text-[8px] font-black uppercase px-4 py-1.5 rounded-full mb-4 bg-ab-gold/20 text-ab-gold border border-ab-gold/30 tracking-widest";
-                reportData.status = "FALTA DE HEADROOM";
-                reportData.detail = `<p class="text-white">Cuidado com o Clipping! O amp pode mandar sinal quadrado e queimar os falantes por calor.</p>`;
-            } else {
-                v.innerText="✓ Sistema OK"; v.className="text-[8px] font-black uppercase px-4 py-1.5 rounded-full mb-4 bg-ab-green/20 text-ab-green border border-ab-green/30 tracking-widest";
-                reportData.status = "SISTEMA SEGURO";
-                reportData.detail = `Impedância e potência compatíveis. Configure o Limiter!`;
-            }
-            document.getElementById('resFinalImp').innerText = fi.toFixed(1)+" Ω";
-            document.getElementById('resFinalPwr').innerText = tp+" W";
-            document.getElementById('resVolts').innerText = tp>0?Math.sqrt(tp*fi).toFixed(0):"0";
-        }
-
-        function openReport() {
-            document.getElementById('reportContent').innerHTML = `<div class="p-4 bg-ab-bg rounded-xl border border-ab-border border-l-4 ${reportData.status.includes('BAIXA')?'border-l-ab-red':'border-l-ab-cyan'}"><p class="text-ab-cyan font-black uppercase italic tracking-widest text-[10px] leading-none mb-1">Diagnóstico</p><p class="text-white font-bold mb-2 leading-none">${reportData.status}</p></div><p class="text-slate-400 text-xs italic">${reportData.detail}</p>`;
-            document.getElementById('reportModal').classList.add('active');
-        }
-        function closeModal() { document.getElementById('reportModal').classList.remove('active'); }
-
-        // AUDIO ENGINE (Scanner)
-        async function toggleApp(e) {
-            if (e) e.preventDefault();
-            if (running) { 
-                running = false;
-                if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
-                document.getElementById('btnAction').innerText = "Ativar Scanner";
-                document.getElementById('btnAction').classList.replace('bg-ab-red', 'bg-ab-purple');
-                return; 
-            }
-            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-            try {
-                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
-                analyzer = audioCtx.createAnalyser();
-                source = audioCtx.createMediaStreamSource(mediaStream);
-                dataArray = new Float32Array(analyzer.fftSize);
-                source.connect(analyzer);
-                running = true;
-                document.getElementById('btnAction').innerText = "Parar Scanner";
-                document.getElementById('btnAction').classList.replace('bg-ab-purple', 'bg-ab-red');
-                process();
-            } catch (err) { alert("Mic Error! Permita o acesso nas configurações do dispositivo."); }
-        }
-
-        function process() {
-            if (!running) return;
+        // FASE DE CALIBRAGEM AUTOMÁTICA (500ms)
+        setTimeout(() => {
             analyzer.getFloatTimeDomainData(dataArray);
-            let mv=0, mi=0; for(let i=0;i<dataArray.length;i++){ if(Math.abs(dataArray[i])>mv){mv=Math.abs(dataArray[i]); mi=i;}}
-            if (mv > 0.25) {
-                clearTimeout(timeout);
-                let peak = dataArray[mi] * (phaseInverted ? -1 : 1);
-                const c=document.getElementById('statusCircle'), def=document.getElementById('contentDefault'), res=document.getElementById('resLabel'), sym=document.getElementById('symbol'), dsc=document.getElementById('desc');
-                def.classList.add('hidden'); res.classList.remove('hidden');
-                if (peak > 0) {
-                    c.className="w-48 h-48 rounded-full border-[10px] flex flex-col items-center justify-center active-ring-pos bg-ab-green/5";
-                    sym.innerText="+"; sym.className="text-7xl font-black text-ab-green italic leading-none"; dsc.innerText="Positiva"; dsc.className="text-ab-green font-black uppercase text-[10px] pt-4";
-                } else {
-                    c.className="w-48 h-48 rounded-full border-[10px] flex flex-col items-center justify-center active-ring-neg bg-ab-red/5";
-                    sym.innerText="-"; sym.className="text-7xl font-black text-ab-red italic leading-none"; dsc.innerText="Negativa"; dsc.className="text-ab-red font-black uppercase text-[10px] pt-4";
-                }
-                timeout = setTimeout(() => { c.className="w-48 h-48 rounded-full border-[10px] border-ab-bg flex flex-col items-center justify-center bg-black/20"; def.classList.remove('hidden'); res.classList.add('hidden'); }, 1200);
-            }
-            requestAnimationFrame(process);
-        }
+            let sum = 0;
+            for(let i=0; i<dataArray.length; i++) sum += Math.abs(dataArray[i]);
+            noiseFloor = sum / dataArray.length;
+            
+            // Define o gatilho: Ruído médio + margem de segurança
+            threshold = Math.max(0.15, noiseFloor * 10); 
+            
+            document.getElementById('btnAction').innerText = "Parar Scanner";
+            document.getElementById('btnAction').classList.replace('bg-ab-purple', 'bg-ab-red');
+            process();
+        }, 500);
 
-        // GERADOR DE SINAIS (Pulso e Tom)
-        function toggleSignal(){ let a=document.getElementById('signalAudio'); if(a.paused){ a.play(); document.getElementById('playIcon').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';} else { a.pause(); document.getElementById('playIcon').innerHTML='<path d="M8 5v14l11-7z"/>';}}
+    } catch (err) { alert("Erro ao acessar microfone."); }
+}
+
+function process() {
+    if (!running) return;
+    analyzer.getFloatTimeDomainData(dataArray);
+    
+    let mv=0, mi=0; 
+    for(let i=0; i<dataArray.length; i++){ 
+        if(Math.abs(dataArray[i]) > mv){
+            mv = Math.abs(dataArray[i]); 
+            mi = i;
+        }
+    }
+
+    // Só dispara se o som for maior que o ajuste automático (threshold)
+    if (mv > threshold) {
+        clearTimeout(timeout);
+        let peak = dataArray[mi] * (phaseInverted ? -1 : 1);
+        const c=document.getElementById('statusCircle'), def=document.getElementById('contentDefault'), res=document.getElementById('resLabel'), sym=document.getElementById('symbol'), dsc=document.getElementById('desc');
         
-        function sliderFreq(v){ document.getElementById('freqInput').value=v; updateOsc(v); }
-        function manualFreq(v){ let val=parseInt(v); if(val>=20 && val<=20000){ document.getElementById('freqSlider').value=val; updateOsc(val); } }
-        function updateOsc(v){ if(oscillator && audioCtx) oscillator.frequency.setTargetAtTime(v, audioCtx.currentTime, 0.02); }
-        function toggleTone(){
-            if(!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-            if(!isToneRunning){ oscillator=audioCtx.createOscillator(); oscillator.frequency.value=document.getElementById('freqInput').value; oscillator.connect(audioCtx.destination); oscillator.start(); isToneRunning=true; document.getElementById('btnTone').innerText="Parar"; document.getElementById('btnTone').classList.replace('bg-ab-cyan', 'bg-ab-red'); }
-            else { if(oscillator) oscillator.stop(); isToneRunning=false; document.getElementById('btnTone').innerText="Iniciar Tom"; document.getElementById('btnTone').classList.replace('bg-ab-red', 'bg-ab-cyan'); }
-        }
+        def.classList.add('hidden'); 
+        res.classList.remove('hidden');
 
-        window.onload = () => { runTA(); runMasterCalc(); };
-    </script>
-</body>
-</html>
+        if (peak > 0) {
+            c.className="w-48 h-48 rounded-full border-[10px] flex flex-col items-center justify-center active-ring-pos bg-ab-green/5";
+            sym.innerText="+"; sym.className="text-7xl font-black text-ab-green italic leading-none"; 
+            dsc.innerText="Positiva"; dsc.className="text-ab-green font-black uppercase text-[10px] pt-4";
+        } else {
+            c.className="w-48 h-48 rounded-full border-[10px] flex flex-col items-center justify-center active-ring-neg bg-ab-red/5";
+            sym.innerText="-"; sym.className="text-7xl font-black text-ab-red italic leading-none"; 
+            dsc.innerText="Negativa"; dsc.className="text-ab-red font-black uppercase text-[10px] pt-4";
+        }
+        
+        // Tempo de resposta visual (1.2 segundos para dar tempo de ler)
+        timeout = setTimeout(() => { 
+            c.className="w-48 h-48 rounded-full border-[10px] border-ab-bg flex flex-col items-center justify-center bg-black/20"; 
+            def.classList.remove('hidden'); 
+            res.classList.add('hidden'); 
+        }, 1200);
+    }
+    requestAnimationFrame(process);
+}
