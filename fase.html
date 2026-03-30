@@ -127,6 +127,34 @@
             text-decoration: none;
         }
 
+        /* Abas para modo de teste (Driver/Sub) */
+        .test-mode-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            background: var(--bg-dark);
+            padding: 0.25rem;
+            border-radius: 2rem;
+        }
+        .test-mode-tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 1.5rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+        .test-mode-tab.active {
+            background: var(--purple);
+            color: white;
+        }
+        .test-mode-tab.sub.active {
+            background: var(--orange);
+        }
+
         /* Controles do pulso */
         .pulse-controls {
             display: flex;
@@ -162,6 +190,46 @@
             text-align: center;
             color: var(--text-muted);
             margin-bottom: 0.5rem;
+        }
+
+        /* Controles de frequência para Sub */
+        .freq-controls {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border);
+        }
+        .freq-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .freq-value {
+            color: var(--orange);
+            font-weight: bold;
+        }
+        .freq-slider {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        .freq-presets {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        .freq-preset {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .freq-preset:hover {
+            border-color: var(--orange);
+            color: var(--orange);
         }
 
         /* Seleção de Microfone */
@@ -456,14 +524,54 @@
                 </div>
             </div>
 
-            <!-- Controles do Pulso (aparece quando fonte = celular) -->
-            <div id="phoneControls">
+            <!-- Abas: Driver / Subwoofer -->
+            <div class="test-mode-tabs">
+                <div id="modeDriver" class="test-mode-tab active" onclick="setTestMode('driver')">
+                    🔊 DRIVER / TWEETER
+                </div>
+                <div id="modeSub" class="test-mode-tab sub" onclick="setTestMode('sub')">
+                    🎵 SUBWOOFER
+                </div>
+            </div>
+
+            <!-- Controles do Pulso (Driver) -->
+            <div id="driverControls">
                 <div class="pulse-controls">
                     <button id="playPulseBtn" class="pulse-btn" onclick="playPulse()">▶ TOCAR</button>
                     <button id="stopPulseBtn" class="pulse-btn stop" onclick="stopPulse()">⏹ PARAR</button>
                     <button id="loopPulseBtn" class="pulse-btn loop" onclick="toggleLoop()">🔁 LOOP</button>
                 </div>
                 <div id="pulseStatus" class="pulse-status">⏸ Parado</div>
+            </div>
+
+            <!-- Controles do Subwoofer -->
+            <div id="subControls" class="hidden">
+                <div class="pulse-controls">
+                    <button id="playSubBtn" class="pulse-btn" style="background: var(--orange);" onclick="playSubPulse()">▶ TOCAR SUB</button>
+                    <button id="stopSubBtn" class="pulse-btn stop" onclick="stopSubPulse()">⏹ PARAR</button>
+                    <button id="loopSubBtn" class="pulse-btn loop" onclick="toggleSubLoop()">🔁 LOOP</button>
+                </div>
+                <div id="subStatus" class="pulse-status">⏸ Parado</div>
+                
+                <!-- Controles de Frequência -->
+                <div class="freq-controls">
+                    <div class="freq-label">
+                        <span>📶 FREQUÊNCIA DO TOM</span>
+                        <span id="subFreqValue" class="freq-value">60 Hz</span>
+                    </div>
+                    <input type="range" id="subFreqSlider" class="freq-slider" min="20" max="200" value="60" step="1" oninput="updateSubFreq(this.value)">
+                    <div class="freq-presets">
+                        <span class="freq-preset" onclick="setSubFreq(30)">30 Hz</span>
+                        <span class="freq-preset" onclick="setSubFreq(40)">40 Hz</span>
+                        <span class="freq-preset" onclick="setSubFreq(50)">50 Hz</span>
+                        <span class="freq-preset" onclick="setSubFreq(60)">60 Hz</span>
+                        <span class="freq-preset" onclick="setSubFreq(80)">80 Hz</span>
+                    </div>
+                    <div class="freq-label" style="margin-top: 0.5rem;">
+                        <span>🎵 TIPO DE ONDA</span>
+                        <span id="waveTypeDisplay">Senoide</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Seleção de Microfone -->
@@ -487,13 +595,24 @@
         let currentMicId = null;
         let levelInterval = null;
         
-        // Pulso
+        // Pulso (Driver)
         let isPulsePlaying = false;
         let isLoopEnabled = false;
         let pulseInterval = null;
         let currentPulseTimeout = null;
         
-        // Sensibilidade (0-100) -> threshold 0.03 a 0.5
+        // Subwoofer
+        let isSubPlaying = false;
+        let isSubLoopEnabled = false;
+        let subInterval = null;
+        let subOscillator = null;
+        let subGain = null;
+        let currentSubFreq = 60;
+        
+        // Modo de teste
+        let currentTestMode = 'driver'; // 'driver' ou 'sub'
+        
+        // Sensibilidade
         let sensitivityPercent = 25;
         
         // Leitura progressiva
@@ -503,6 +622,27 @@
         // Fonte de sinal
         let currentSource = 'phone';
 
+        // ========== SELEÇÃO DE MODO DE TESTE ==========
+        function setTestMode(mode) {
+            currentTestMode = mode;
+            document.getElementById('modeDriver').classList.remove('active');
+            document.getElementById('modeSub').classList.remove('active');
+            
+            if (mode === 'driver') {
+                document.getElementById('modeDriver').classList.add('active');
+                document.getElementById('driverControls').style.display = 'block';
+                document.getElementById('subControls').style.display = 'none';
+                // Para qualquer som do sub
+                stopSubPulse();
+            } else {
+                document.getElementById('modeSub').classList.add('active');
+                document.getElementById('driverControls').style.display = 'none';
+                document.getElementById('subControls').style.display = 'block';
+                // Para qualquer som do driver
+                stopPulse();
+            }
+        }
+
         // ========== SELEÇÃO DE FONTE ==========
         function selectSource(source) {
             currentSource = source;
@@ -511,14 +651,19 @@
             
             if (source === 'phone') {
                 document.getElementById('optionPhone').classList.add('active');
-                document.getElementById('phoneControls').style.display = 'block';
+                document.getElementById('driverControls').style.display = currentTestMode === 'driver' ? 'block' : 'none';
+                document.getElementById('subControls').style.display = currentTestMode === 'sub' ? 'block' : 'none';
             } else {
                 document.getElementById('optionCar').classList.add('active');
-                document.getElementById('phoneControls').style.display = 'none';
+                document.getElementById('driverControls').style.display = 'none';
+                document.getElementById('subControls').style.display = 'none';
+                // Para qualquer reprodução
+                stopPulse();
+                stopSubPulse();
             }
         }
 
-        // ========== GERADOR DE PULSO ==========
+        // ========== GERADOR DE PULSO (DRIVER) ==========
         function playSinglePulse() {
             if (!audioCtx) return false;
             const now = audioCtx.currentTime;
@@ -536,7 +681,7 @@
         }
 
         function playPulse() {
-            if (currentSource !== 'phone') return;
+            if (currentSource !== 'phone' || currentTestMode !== 'driver') return;
             if (!audioCtx) {
                 alert('Clique em qualquer lugar para ativar o áudio.');
                 return;
@@ -572,7 +717,7 @@
         }
 
         function toggleLoop() {
-            if (currentSource !== 'phone') return;
+            if (currentSource !== 'phone' || currentTestMode !== 'driver') return;
             isLoopEnabled = !isLoopEnabled;
             const loopBtn = document.getElementById('loopPulseBtn');
             if (isLoopEnabled) {
@@ -591,10 +736,123 @@
             const statusDiv = document.getElementById('pulseStatus');
             if (isPulsePlaying) {
                 if (isLoopEnabled) {
-                    statusDiv.innerHTML = '🔁 Reproduzindo em LOOP';
+                    statusDiv.innerHTML = '🔁 Reproduzindo em LOOP (1kHz)';
                     statusDiv.style.color = 'var(--green)';
                 } else {
-                    statusDiv.innerHTML = '▶ Reproduzindo (pulso único)';
+                    statusDiv.innerHTML = '▶ Reproduzindo (pulso único 1kHz)';
+                    statusDiv.style.color = 'var(--gold)';
+                }
+            } else {
+                statusDiv.innerHTML = '⏸ Parado';
+                statusDiv.style.color = 'var(--text-muted)';
+            }
+        }
+
+        // ========== GERADOR DE TOM PARA SUBWOOFER ==========
+        function updateSubFreq(value) {
+            currentSubFreq = parseInt(value);
+            document.getElementById('subFreqSlider').value = currentSubFreq;
+            document.getElementById('subFreqValue').innerHTML = currentSubFreq + ' Hz';
+            
+            if (isSubPlaying && subOscillator) {
+                subOscillator.frequency.value = currentSubFreq;
+            }
+        }
+
+        function setSubFreq(freq) {
+            updateSubFreq(freq);
+        }
+
+        function startSubTone() {
+            if (!audioCtx) return false;
+            
+            if (subOscillator) {
+                try { subOscillator.stop(); } catch(e) {}
+            }
+            
+            subOscillator = audioCtx.createOscillator();
+            subGain = audioCtx.createGain();
+            subOscillator.type = 'sine';
+            subOscillator.frequency.value = currentSubFreq;
+            subOscillator.connect(subGain);
+            subGain.connect(audioCtx.destination);
+            subGain.gain.value = 0.2;
+            subOscillator.start();
+            return true;
+        }
+
+        function stopSubTone() {
+            if (subOscillator) {
+                try { subOscillator.stop(); } catch(e) {}
+                subOscillator = null;
+            }
+        }
+
+        function playSubPulse() {
+            if (currentSource !== 'phone' || currentTestMode !== 'sub') return;
+            if (!audioCtx) {
+                alert('Clique em qualquer lugar para ativar o áudio.');
+                return;
+            }
+            
+            if (isSubPlaying && isSubLoopEnabled) {
+                stopSubPulse();
+                return;
+            }
+            
+            isSubPlaying = true;
+            updateSubUI();
+            
+            if (isSubLoopEnabled) {
+                if (subInterval) clearInterval(subInterval);
+                startSubTone();
+                subInterval = setInterval(() => {
+                    if (isSubPlaying) {
+                        // Pequeno fade para evitar clique
+                        if (subGain) subGain.gain.value = 0.2;
+                    }
+                }, 100);
+            } else {
+                startSubTone();
+                if (currentPulseTimeout) clearTimeout(currentPulseTimeout);
+                currentPulseTimeout = setTimeout(() => {
+                    if (!isSubLoopEnabled) stopSubPulse();
+                }, 800);
+            }
+        }
+
+        function stopSubPulse() {
+            isSubPlaying = false;
+            if (subInterval) clearInterval(subInterval);
+            if (currentPulseTimeout) clearTimeout(currentPulseTimeout);
+            stopSubTone();
+            updateSubUI();
+        }
+
+        function toggleSubLoop() {
+            if (currentSource !== 'phone' || currentTestMode !== 'sub') return;
+            isSubLoopEnabled = !isSubLoopEnabled;
+            const loopBtn = document.getElementById('loopSubBtn');
+            if (isSubLoopEnabled) {
+                loopBtn.classList.add('active');
+                if (isSubPlaying) {
+                    stopSubPulse();
+                    playSubPulse();
+                }
+            } else {
+                loopBtn.classList.remove('active');
+                if (isSubPlaying && subInterval) stopSubPulse();
+            }
+        }
+
+        function updateSubUI() {
+            const statusDiv = document.getElementById('subStatus');
+            if (isSubPlaying) {
+                if (isSubLoopEnabled) {
+                    statusDiv.innerHTML = `🔁 Reproduzindo em LOOP (${currentSubFreq}Hz)`;
+                    statusDiv.style.color = 'var(--green)';
+                } else {
+                    statusDiv.innerHTML = `▶ Reproduzindo (${currentSubFreq}Hz)`;
                     statusDiv.style.color = 'var(--gold)';
                 }
             } else {
@@ -844,7 +1102,9 @@
         }
         generateAudioFile();
         
-        // Inicializar lista de microfones
+        // Inicializar
+        updateSensitivity(25);
+        updateSubFreq(60);
         updateMicList();
         
         // Pré-inicializar áudio
