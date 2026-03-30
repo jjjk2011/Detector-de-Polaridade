@@ -126,11 +126,32 @@
                     </select>
                 </div>
 
-                <div onclick="openReport()" class="bg-ab-card p-6 rounded-[2.5rem] border border-ab-border border-dashed flex flex-col justify-center items-center text-center cursor-pointer hover:border-ab-cyan transition-all">
-                    <div id="verdictBox" class="text-[8px] font-black uppercase px-4 py-1.5 rounded-full mb-4">Análise</div>
-                    <p class="text-[8px] text-slate-500 uppercase font-black mb-1 italic">Vrms Limiter</p>
-                    <div class="display-vrms text-white mb-4"><span id="resVolts">0</span><span class="text-xs text-ab-cyan ml-1 italic">V</span></div>
-                    <p class="text-[8px] text-slate-600 font-bold uppercase">Ver Relatório ➔</p>
+<div class="bg-ab-card p-6 rounded-[2.5rem] border border-ab-border flex flex-col justify-between min-h-[400px]">
+                    <div id="statusBadge" onclick="openReport()" class="cursor-pointer text-center py-2 rounded-full font-black text-[9px] uppercase tracking-widest border border-ab-green/50 text-ab-green bg-ab-green/10 mb-6 transition-all">✓ SISTEMA OTIMIZADO</div>
+                    
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center border-b border-ab-border/50 pb-2">
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Carga Resultante</span>
+                            <span class="text-xl font-black text-white"><span id="resImp">1.0</span> <span class="text-ab-cyan">Ω</span></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-ab-border/50 pb-2">
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Potência Total Exigida</span>
+                            <span class="text-xl font-black text-white"><span id="resTotalPwr">4800</span> <span class="text-ab-cyan font-light">W</span></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 p-6 bg-ab-bg rounded-[2rem] border border-ab-border text-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-ab-cyan/5"></div>
+                        <p class="text-[9px] font-black text-ab-cyan uppercase tracking-[0.2em] mb-2 relative">Vrms (Ajuste Limiter)</p>
+                        <div class="flex items-baseline justify-center gap-2 relative">
+                            <span id="resVolts" class="text-6xl font-black text-white italic">69</span>
+                            <span class="text-3xl font-black text-white italic">V</span>
+                        </div>
+                    </div>
+
+                    <p onclick="openReport()" class="text-center text-[8px] font-black text-slate-600 uppercase tracking-widest mt-6 cursor-pointer hover:text-ab-cyan transition-colors">
+                        Clique para ver o relatório técnico ➔
+                    </p>
                 </div>
             </div>
 
