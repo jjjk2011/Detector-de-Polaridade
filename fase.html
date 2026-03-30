@@ -201,7 +201,21 @@
             font-size: 0.7rem;
             cursor: pointer;
             transition: all 0.2s;
-            width: 100%;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            font-weight: 700;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+        .btn-outline:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
         }
         .btn-icon {
             background: white;
@@ -214,7 +228,6 @@
             cursor: pointer;
             transition: all 0.1s;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            margin: 0 auto 0.75rem auto;
         }
         .btn-icon:active {
             transform: scale(0.94);
@@ -318,6 +331,47 @@
             background: rgba(239,68,68,0.2);
             color: var(--red);
         }
+        .status-info {
+            background: rgba(6,182,212,0.2);
+            color: var(--cyan);
+        }
+
+        .pulse-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .loop-toggle {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.55rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+        .loop-toggle.active {
+            background: var(--purple);
+            color: white;
+            border-color: var(--purple);
+        }
+        .stop-pulse {
+            background: var(--bg-dark);
+            border: 1px solid var(--red);
+            border-radius: 2rem;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.55rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--red);
+        }
+        .stop-pulse:hover {
+            background: var(--red);
+            color: white;
+        }
 
         @keyframes pulse-ring {
             0% { transform: scale(0.95); opacity: 0.7; }
@@ -338,6 +392,20 @@
             transform: translate(-50%, -50%) scale(0.95);
             animation: pulse-ring 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
             pointer-events: none;
+        }
+        .pulse-playing-icon {
+            animation: none !important;
+        }
+        .pulse-playing-icon::after {
+            display: none;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .playing-loop {
+            animation: spin 1s linear infinite;
         }
 
         @media (max-width: 550px) {
@@ -413,16 +481,29 @@
                     <span>Para verificação de polaridade</span>
                 </div>
                 <div class="grid-2">
-                    <!-- Pulso de teste com áudio externo -->
+                    <!-- Pulso de teste com controle completo -->
                     <div style="background: var(--bg-dark); border-radius: 1rem; padding: 1rem; text-align: center;">
-                        <div id="pulseBtn" class="btn-icon" onclick="playPulse()">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                        <div id="pulseBtn" class="btn-icon" onclick="togglePulsePlayback()">
+                            <svg id="pulseIcon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M8 5v14l11-7z"/>
                             </svg>
                         </div>
-                        <p style="font-weight: 800; font-size: 0.7rem;">PULSO DE TESTE</p>
-                        <p style="font-size: 0.55rem; color: var(--text-muted);" id="pulseDescription">1kHz • 200ms</p>
+                        <p style="font-weight: 800; font-size: 0.7rem; margin-top: 0.5rem;">PULSO DE TESTE</p>
+                        <p style="font-size: 0.55rem; color: var(--text-muted);" id="pulseDescription">500ms • Intervalado</p>
                         <p style="font-size: 0.5rem; color: var(--purple); margin-top: 0.25rem;" id="pulseSource">🎵 Áudio externo</p>
+                        
+                        <!-- Controles adicionais do pulso -->
+                        <div class="pulse-controls">
+                            <div id="loopToggle" class="loop-toggle" onclick="toggleLoop()">
+                                🔁 LOOP OFF
+                            </div>
+                            <div id="stopPulseBtn" class="stop-pulse" onclick="stopPulse()">
+                                ⏹ PARAR
+                            </div>
+                        </div>
+                        <div id="pulseStatus" style="font-size: 0.5rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            ⏸ Parado
+                        </div>
                     </div>
 
                     <!-- Tom contínuo -->
@@ -437,7 +518,7 @@
                                 <input type="number" id="freqInput" value="60" step="1" style="width: 70px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.5rem; color: white; text-align: center;">
                             </div>
                         </div>
-                        <button id="btnTone" class="btn-secondary" onclick="toggleTone()">
+                        <button id="btnTone" class="btn-secondary" onclick="toggleTone()" style="width: 100%;">
                             ▶ INICIAR TOM
                         </button>
                         <p style="font-size: 0.5rem; color: var(--text-muted); text-align: center; margin-top: 0.5rem;">
@@ -458,10 +539,11 @@
             <div class="tips">
                 <p>1️⃣ <strong>Ative o scanner</strong> e permita o acesso ao microfone.</p>
                 <p>2️⃣ <strong>Aproxime o celular</strong> (10-30cm) do alto-falante que deseja testar.</p>
-                <p>3️⃣ <strong>Clique no pulso de teste</strong> (1kHz) e observe o círculo:</p>
+                <p>3️⃣ <strong>Clique no botão PLAY do pulso de teste</strong> (1kHz) e observe o círculo:</p>
                 <p style="margin-left: 1rem;">🟢 <strong>Verde +</strong> = Fase correta (positivo no terminal positivo)</p>
                 <p style="margin-left: 1rem;">🔴 <strong>Vermelho -</strong> = Fase invertida (troque os cabos)</p>
-                <p>4️⃣ Para testar <strong>subwoofers</strong>, use o tom contínuo em frequências baixas (40-80Hz).</p>
+                <p>4️⃣ <strong>Para parar o pulso</strong>, clique no botão ⏹ PARAR ou no PLAY novamente.</p>
+                <p>5️⃣ <strong>Ative o LOOP</strong> para repetição contínua do pulso (útil para testar vários falantes).</p>
                 <p>💡 <strong>Dica:</strong> O scanner detecta automaticamente o sinal e mostra o resultado por 1.5 segundos.</p>
             </div>
         </div>
@@ -469,60 +551,47 @@
 
     <script>
         // ========== CONFIGURAÇÃO DO ÁUDIO EXTERNO ==========
-        // Nome do arquivo de áudio (mesmo do projeto original)
         const AUDIO_FILE_PATH = '/audio/AudioBase_Polaridade_Intervalado_500ms.wav';
-        // Fallback: caminho alternativo caso esteja na raiz
         const AUDIO_FILE_PATH_ALT = '/AudioBase_Polaridade_Intervalado_500ms.wav';
         
         let externalAudio = null;
         let audioLoaded = false;
         let audioLoadError = false;
         let useExternalAudio = false;
+        let isPulsePlaying = false;
+        let isLoopEnabled = false;
+        let pulseInterval = null;
+        let internalPulseTimeout = null;
 
         // Tentar carregar o arquivo de áudio externo
         function loadExternalAudio() {
             return new Promise((resolve) => {
                 externalAudio = new Audio();
                 
-                // Tentar primeiro caminho
-                externalAudio.src = AUDIO_FILE_PATH;
-                
                 externalAudio.addEventListener('canplaythrough', () => {
-                    console.log('Áudio externo carregado com sucesso:', AUDIO_FILE_PATH);
+                    console.log('Áudio externo carregado com sucesso');
                     audioLoaded = true;
                     audioLoadError = false;
                     useExternalAudio = true;
-                    updateAudioStatus('success', '✅ Áudio externo carregado', 'Pulso com arquivo .wav');
+                    updateAudioStatus('success', '✅ Áudio externo carregado', 'Pulso com arquivo .wav', '500ms • Intervalado');
                     resolve(true);
                 });
                 
                 externalAudio.addEventListener('error', () => {
-                    console.log('Falha ao carregar:', AUDIO_FILE_PATH);
-                    // Tentar caminho alternativo
-                    externalAudio.src = AUDIO_FILE_PATH_ALT;
-                    
-                    externalAudio.addEventListener('canplaythrough', () => {
-                        console.log('Áudio externo carregado com sucesso:', AUDIO_FILE_PATH_ALT);
-                        audioLoaded = true;
-                        audioLoadError = false;
-                        useExternalAudio = true;
-                        updateAudioStatus('success', '✅ Áudio externo carregado', 'Pulso com arquivo .wav');
-                        resolve(true);
-                    });
-                    
-                    externalAudio.addEventListener('error', () => {
-                        console.log('Áudio externo não encontrado. Usando gerador interno.');
-                        audioLoaded = false;
-                        audioLoadError = true;
-                        useExternalAudio = false;
-                        updateAudioStatus('warning', '⚠️ Áudio externo não encontrado', 'Usando gerador interno (Web Audio API)');
-                        resolve(false);
-                    });
+                    console.log('Falha ao carregar áudio externo');
+                    audioLoaded = false;
+                    audioLoadError = true;
+                    useExternalAudio = false;
+                    updateAudioStatus('warning', '⚠️ Áudio externo não encontrado', 'Usando gerador interno', '1kHz • 200ms');
+                    resolve(false);
                 });
+                
+                externalAudio.src = AUDIO_FILE_PATH;
+                externalAudio.load();
             });
         }
 
-        function updateAudioStatus(type, message, pulseDesc) {
+        function updateAudioStatus(type, message, sourceDesc, pulseDesc) {
             const badge = document.getElementById('audioStatusBadge');
             const pulseDescEl = document.getElementById('pulseDescription');
             const pulseSourceEl = document.getElementById('pulseSource');
@@ -530,16 +599,189 @@
             badge.textContent = message;
             badge.className = `audio-status status-${type}`;
             
-            if (pulseDescEl) {
-                if (useExternalAudio) {
-                    pulseDescEl.textContent = '500ms • Intervalado';
-                    pulseSourceEl.innerHTML = '📀 Áudio: AudioBase_Polaridade_Intervalado_500ms.wav';
-                    pulseSourceEl.style.color = 'var(--green)';
-                } else {
-                    pulseDescEl.textContent = '1kHz • 200ms';
-                    pulseSourceEl.innerHTML = '⚡ Gerador interno (Web Audio API)';
-                    pulseSourceEl.style.color = 'var(--gold)';
+            if (pulseDescEl) pulseDescEl.textContent = pulseDesc;
+            if (pulseSourceEl) {
+                pulseSourceEl.innerHTML = sourceDesc;
+                pulseSourceEl.style.color = type === 'success' ? 'var(--green)' : 'var(--gold)';
+            }
+        }
+
+        // ========== CONTROLE DO PULSO ==========
+        function togglePulsePlayback() {
+            if (isPulsePlaying) {
+                stopPulse();
+            } else {
+                startPulse();
+            }
+        }
+
+        function startPulse() {
+            if (isPulsePlaying) return;
+            
+            isPulsePlaying = true;
+            updatePulseUI();
+            
+            if (useExternalAudio && audioLoaded && externalAudio) {
+                playExternalPulse();
+            } else {
+                playInternalPulse();
+            }
+        }
+
+        function playExternalPulse() {
+            if (!externalAudio) return;
+            
+            externalAudio.currentTime = 0;
+            externalAudio.play().catch(e => {
+                console.log('Erro ao tocar áudio externo, usando fallback:', e);
+                playInternalPulse();
+            });
+            
+            // Efeito visual
+            const pulseBtn = document.getElementById('pulseBtn');
+            pulseBtn.classList.add('playing-pulse');
+            
+            if (isLoopEnabled) {
+                externalAudio.addEventListener('ended', onExternalAudioEnd);
+            } else {
+                externalAudio.removeEventListener('ended', onExternalAudioEnd);
+                externalAudio.addEventListener('ended', () => {
+                    if (!isLoopEnabled) {
+                        stopPulse();
+                    }
+                }, { once: true });
+            }
+        }
+
+        function onExternalAudioEnd() {
+            if (isLoopEnabled && isPulsePlaying) {
+                externalAudio.currentTime = 0;
+                externalAudio.play().catch(e => console.log('Loop error:', e));
+            }
+        }
+
+        function playInternalPulse() {
+            if (!audioCtx) {
+                initAudio();
+            }
+            
+            const playSinglePulse = () => {
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 1000;
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            };
+            
+            playSinglePulse();
+            
+            // Efeito visual
+            const pulseBtn = document.getElementById('pulseBtn');
+            pulseBtn.classList.add('playing-pulse');
+            setTimeout(() => pulseBtn.classList.remove('playing-pulse'), 250);
+            
+            if (isLoopEnabled) {
+                if (pulseInterval) clearInterval(pulseInterval);
+                pulseInterval = setInterval(() => {
+                    if (isPulsePlaying) {
+                        const now = audioCtx.currentTime;
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = 1000;
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        gain.gain.setValueAtTime(0.25, now);
+                        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+                        osc.start(now);
+                        osc.stop(now + 0.2);
+                        
+                        pulseBtn.classList.add('playing-pulse');
+                        setTimeout(() => pulseBtn.classList.remove('playing-pulse'), 250);
+                    }
+                }, 800);
+            } else {
+                if (internalPulseTimeout) clearTimeout(internalPulseTimeout);
+                internalPulseTimeout = setTimeout(() => {
+                    if (!isLoopEnabled) {
+                        stopPulse();
+                    }
+                }, 300);
+            }
+        }
+
+        function stopPulse() {
+            isPulsePlaying = false;
+            
+            if (externalAudio) {
+                externalAudio.pause();
+                externalAudio.currentTime = 0;
+                externalAudio.removeEventListener('ended', onExternalAudioEnd);
+            }
+            
+            if (pulseInterval) {
+                clearInterval(pulseInterval);
+                pulseInterval = null;
+            }
+            
+            if (internalPulseTimeout) {
+                clearTimeout(internalPulseTimeout);
+                internalPulseTimeout = null;
+            }
+            
+            const pulseBtn = document.getElementById('pulseBtn');
+            pulseBtn.classList.remove('playing-pulse');
+            updatePulseUI();
+        }
+
+        function toggleLoop() {
+            isLoopEnabled = !isLoopEnabled;
+            const loopToggle = document.getElementById('loopToggle');
+            
+            if (isLoopEnabled) {
+                loopToggle.textContent = '🔁 LOOP ON';
+                loopToggle.classList.add('active');
+                
+                if (isPulsePlaying && useExternalAudio && externalAudio) {
+                    externalAudio.loop = true;
                 }
+            } else {
+                loopToggle.textContent = '🔁 LOOP OFF';
+                loopToggle.classList.remove('active');
+                
+                if (externalAudio) {
+                    externalAudio.loop = false;
+                }
+                
+                if (isPulsePlaying && !useExternalAudio) {
+                    if (pulseInterval) {
+                        clearInterval(pulseInterval);
+                        pulseInterval = null;
+                    }
+                    startPulse();
+                }
+            }
+        }
+
+        function updatePulseUI() {
+            const pulseBtn = document.getElementById('pulseBtn');
+            const pulseIcon = document.getElementById('pulseIcon');
+            const pulseStatus = document.getElementById('pulseStatus');
+            
+            if (isPulsePlaying) {
+                pulseIcon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/>';
+                pulseStatus.innerHTML = isLoopEnabled ? '🔁 Reproduzindo em loop' : '▶ Reproduzindo (pulso único)';
+                pulseStatus.style.color = 'var(--green)';
+            } else {
+                pulseIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+                pulseStatus.innerHTML = '⏸ Parado';
+                pulseStatus.style.color = 'var(--text-muted)';
             }
         }
 
@@ -733,50 +975,7 @@
             }
         }
 
-        // ========== GERADOR DE SINAIS ==========
-        function playPulse() {
-            initAudio();
-            
-            if (useExternalAudio && externalAudio && audioLoaded) {
-                // Usar arquivo de áudio externo
-                try {
-                    externalAudio.currentTime = 0;
-                    externalAudio.play().catch(e => {
-                        console.log('Erro ao tocar áudio externo, usando fallback:', e);
-                        playInternalPulse();
-                    });
-                } catch(e) {
-                    playInternalPulse();
-                }
-            } else {
-                playInternalPulse();
-            }
-            
-            // Efeito visual
-            const pulseBtn = document.getElementById('pulseBtn');
-            pulseBtn.classList.add('playing-pulse');
-            setTimeout(() => pulseBtn.classList.remove('playing-pulse'), 250);
-        }
-
-        function playInternalPulse() {
-            if (!audioCtx) {
-                alert('Clique em qualquer lugar da página primeiro para ativar o áudio.');
-                return;
-            }
-            
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = 1000;
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0.25, now);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
-            osc.start(now);
-            osc.stop(now + 0.2);
-        }
-
+        // ========== TOM CONTÍNUO ==========
         function toggleTone() {
             initAudio();
             const freq = parseFloat(document.getElementById('freqInput').value);
@@ -826,8 +1025,6 @@
 
         // Inicialização
         updateFreq(60);
-        
-        // Carregar áudio externo
         loadExternalAudio();
 
         // Service Worker
