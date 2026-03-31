@@ -2,818 +2,167 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0a0d14">
-    <link rel="manifest" href="manifest.json">
-    <title>AudioBase Pro | Detector de Polaridade</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polarity Scan | AudioBase Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-dark: #0a0d14;
-            --card-bg: #161b22;
-            --border: #30363d;
-            --cyan: #06b6d4;
-            --purple: #a855f7;
-            --green: #22c55e;
-            --gold: #f59e0b;
-            --red: #ef4444;
-            --orange: #f97316;
-            --text-muted: #8b949e;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: #c9d1d9;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            min-height: 100vh;
-            padding: 1rem;
-            padding-bottom: 1rem;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 2rem;
-            padding: 0.5rem 1rem;
-            text-decoration: none;
-            color: var(--cyan);
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            transition: all 0.2s;
-        }
-        .back-btn:hover {
-            transform: translateX(-4px);
-            border-color: var(--cyan);
-        }
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #fff 0%, var(--purple) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .subtitle {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            margin-top: 0.25rem;
-        }
-
-        /* Cards */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 1.5rem;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .card-title {
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-            letter-spacing: 1px;
-        }
-
-        /* Canvas do Osciloscópio */
-        canvas {
-            width: 100%;
-            height: 100px;
-            background: #000;
-            border-radius: 1rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--border);
-        }
-
-        /* Resultado */
-        .result-area {
-            text-align: center;
-            padding: 1rem;
-            border-radius: 1.5rem;
-            border: 2px solid;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
-        .result-positive {
-            border-color: var(--green);
-            background: rgba(34,197,94,0.1);
-        }
-        .result-negative {
-            border-color: var(--red);
-            background: rgba(239,68,68,0.1);
-        }
-        .result-icon {
-            font-size: 3rem;
-            font-weight: 900;
-            margin-bottom: 0.25rem;
-        }
-        .result-text {
-            font-size: 1.2rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* Dots de progresso */
-        .progress-dots {
-            display: flex;
-            justify-content: center;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-        }
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--border);
-            transition: all 0.2s;
-        }
-        .dot.active {
-            background: var(--green);
-            box-shadow: 0 0 10px var(--green);
-        }
-
-        /* Status message */
-        .status-msg {
-            text-align: center;
-            font-size: 0.65rem;
-            font-weight: 600;
-            padding: 0.5rem;
-            border-radius: 1rem;
-        }
-        .status-waiting {
-            background: rgba(245,158,11,0.1);
-            color: var(--gold);
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        .status-listening {
-            background: rgba(6,182,212,0.1);
-            color: var(--cyan);
-            animation: pulse 1s ease-in-out infinite;
-        }
-        .status-complete {
-            background: rgba(34,197,94,0.1);
-            color: var(--green);
-            animation: none;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-
-        /* Botão Principal */
-        .btn-main {
-            width: 100%;
-            background: linear-gradient(135deg, var(--purple) 0%, #8b5cf6 100%);
-            color: white;
-            border: none;
-            border-radius: 2rem;
-            padding: 1rem;
-            font-weight: 800;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            cursor: pointer;
-            margin-top: 0.5rem;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        .btn-main:active {
-            transform: scale(0.98);
-        }
-        .btn-main.stop {
-            background: linear-gradient(135deg, var(--red) 0%, #dc2626 100%);
-        }
-
-        /* Botões do Gerador */
-        .btn-gen {
-            background: #1f2937;
-            border: 1px solid var(--border);
-            border-radius: 1rem;
-            padding: 0.75rem;
-            font-weight: 700;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        .btn-gen:hover {
-            border-color: var(--cyan);
-            color: var(--cyan);
-        }
-        .btn-gen.playing {
-            border-color: var(--cyan);
-            color: var(--cyan);
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
-        }
-        .btn-gen.loop-active {
-            border-color: var(--green);
-            color: var(--green);
-            box-shadow: 0 0 15px rgba(34,197,94,0.2);
-        }
-
-        /* Grid */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-        }
-
-        /* Abas de modo */
-        .mode-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            background: rgba(0,0,0,0.3);
-            padding: 0.25rem;
-            border-radius: 1rem;
-        }
-        .mode-tab {
-            flex: 1;
-            text-align: center;
-            padding: 0.6rem;
-            border-radius: 0.75rem;
-            font-size: 0.7rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-muted);
-        }
-        .mode-tab.driver.active {
-            background: var(--purple);
-            color: white;
-        }
-        .mode-tab.sub.active {
-            background: var(--orange);
-            color: white;
-        }
-
-        /* Slider */
-        .slider-container {
-            margin-bottom: 1rem;
-        }
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.65rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
-        }
-        input[type="range"] {
-            width: 100%;
-            height: 4px;
-            -webkit-appearance: none;
-            background: var(--border);
-            border-radius: 2px;
-            outline: none;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--gold);
-            cursor: pointer;
-        }
-
-        /* Select */
-        .mic-selector label {
-            font-size: 0.65rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-        .mic-selector select {
-            width: 100%;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border);
-            border-radius: 1rem;
-            padding: 0.75rem;
-            color: white;
-            font-size: 0.8rem;
-            outline: none;
-            cursor: pointer;
-        }
-        .mic-selector select:focus {
-            border-color: var(--purple);
-        }
-
-        .hidden {
-            display: none;
-        }
+        body { background-color: #0a0d14; color: #c9d1d9; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 1.5rem; }
+        canvas { width: 100%; height: 120px; background: #000; border-radius: 1rem; border: 1px solid #30363d; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: #30363d; }
+        .dot.active { background: #22c55e; box-shadow: 0 0 15px #22c55e; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <a href="index.html" class="back-btn">← VOLTAR</a>
-            <h1>POLARITY CHECKER</h1>
-            <div class="subtitle">Detector de Fase & Gerador de Sinal</div>
-        </div>
+<body class="p-4">
+    <div class="max-w-md mx-auto space-y-4">
+        <header class="flex justify-between items-center py-4">
+            <a href="index.html" class="text-cyan-500 text-xs font-bold">← VOLTAR</a>
+            <h1 class="text-white font-black text-sm tracking-widest">POLARITY SCAN</h1>
+        </header>
 
-        <!-- Card: Visualizador -->
-        <div class="card">
+        <div class="card p-5">
             <canvas id="oscillo"></canvas>
             
-            <div id="resultArea" class="hidden result-area">
-                <div id="resultIcon" class="result-icon">?</div>
-                <div id="resultText" class="result-text">---</div>
+            <div id="resArea" class="hidden text-center p-6 rounded-2xl border-2 my-4 transition-all">
+                <div id="resIcon" class="text-5xl font-black mb-2"></div>
+                <div id="resText" class="text-xl font-black tracking-widest"></div>
             </div>
 
-            <div class="progress-dots">
-                <div id="dot0" class="dot"></div>
-                <div id="dot1" class="dot"></div>
-                <div id="dot2" class="dot"></div>
-            </div>
-            <div id="statusMsg" class="status-msg status-waiting">
-                🎤 CLIQUE NO BOTÃO ABAIXO PARA INICIAR
+            <div class="flex justify-center gap-3 my-6">
+                <div class="dot" id="dot0"></div>
+                <div class="dot" id="dot1"></div>
+                <div class="dot" id="dot2"></div>
             </div>
 
-            <button id="mainBtn" class="btn-main" onclick="toggleScanner()">
-                🎤 ATIVAR DETECTOR
+            <button id="mainBtn" onclick="toggleScanner()" class="w-full py-5 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl font-black text-white shadow-lg active:scale-95 transition-all uppercase tracking-widest">
+                🎤 Iniciar Detector
             </button>
         </div>
 
-        <!-- Card: Gerador de Sinal -->
-        <div class="card">
-            <div class="card-title">🔊 GERADOR DE SINAL (FONTE)</div>
-            <div class="grid-2">
-                <button id="btnPlayPulse" class="btn-gen" onclick="playSinglePulse()">
-                    ▶️ TOCAR PULSO
-                </button>
-                <button id="btnLoopPulse" class="btn-gen" onclick="toggleLoop()">
-                    🔁 LOOP PULSE
-                </button>
-            </div>
-            <p class="text-[9px] text-center text-gray-500 mt-2">O pulso muda automaticamente conforme o modo selecionado</p>
-        </div>
-
-        <!-- Card: Configuração -->
-        <div class="card">
-            <div class="card-title">⚙️ CONFIGURAÇÃO</div>
-            
-            <!-- Abas Driver/Sub -->
-            <div class="mode-tabs">
-                <div id="btnModeDriver" class="mode-tab driver active" onclick="setMode('driver')">
-                    🔊 DRIVERS / TWEETER
-                </div>
-                <div id="btnModeSub" class="mode-tab sub" onclick="setMode('sub')">
-                    🎵 SUBWOOFER
-                </div>
+        <div class="card p-5 space-y-4">
+            <div class="flex gap-2 p-1 bg-black/40 rounded-xl">
+                <button id="modeDriver" onclick="setMode('driver')" class="flex-1 py-3 rounded-lg text-[10px] font-black bg-purple-600 text-white transition">DRIVERS</button>
+                <button id="modeSub" onclick="setMode('sub')" class="flex-1 py-3 rounded-lg text-[10px] font-black text-gray-500 transition">SUBWOOFER</button>
             </div>
 
-            <!-- Sensibilidade -->
-            <div class="slider-container">
-                <div class="slider-label">
-                    <span>⚡ SENSIBILIDADE (TRIGGER)</span>
-                    <span id="sensVal">25%</span>
-                </div>
-                <input type="range" id="sensSlider" min="0" max="100" value="25" step="1">
-                <div class="text-right text-[9px] text-gray-500 mt-1">Aumente se tiver muito ruído de fundo</div>
-            </div>
-
-            <!-- Seleção de Microfone -->
-            <div class="mic-selector">
-                <label>🎙️ SELECIONE O MICROFONE</label>
-                <select id="micSelect">
-                    <option value="">Carregando dispositivos...</option>
-                </select>
-                <div class="text-center text-[9px] text-gray-500 mt-2">Dê toquinhos no celular para achar onde o sinal sobe mais</div>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="playPulse()" class="bg-gray-800 py-4 rounded-xl text-[10px] font-black border border-gray-700 active:bg-cyan-900">▶️ TESTE ÚNICO</button>
+                <button id="loopBtn" onclick="toggleLoop()" class="bg-gray-800 py-4 rounded-xl text-[10px] font-black border border-gray-700">🔁 LOOP (1s)</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ========== VARIÁVEIS ==========
-        let audioCtx = null;
-        let analyser = null;
-        let micSource = null;
-        let filterNode = null;
-        let animationId = null;
-        let isRunning = false;
-        let currentMode = 'driver';
-        let results = [];
-        let cooldown = false;
-        let isLooping = false;
-        let loopInterval = null;
-        let currentMicId = null;
+        let audioCtx, analyser, micSource, filterNode, animationId, isRunning = false, currentMode = 'driver', results = [], cooldown = false, isLooping = false, loopInt;
+        const canvas = document.getElementById('oscillo'), ctx = canvas.getContext('2d');
 
-        // Elementos DOM
-        const canvas = document.getElementById('oscillo');
-        const ctx = canvas.getContext('2d');
-        const sensSlider = document.getElementById('sensSlider');
-        const sensVal = document.getElementById('sensVal');
-        const micSelect = document.getElementById('micSelect');
-        const mainBtn = document.getElementById('mainBtn');
-        const statusMsg = document.getElementById('statusMsg');
-        const resultArea = document.getElementById('resultArea');
-        const resultIcon = document.getElementById('resultIcon');
-        const resultText = document.getElementById('resultText');
-        const dots = [document.getElementById('dot0'), document.getElementById('dot1'), document.getElementById('dot2')];
-        const btnPlayPulse = document.getElementById('btnPlayPulse');
-        const btnLoopPulse = document.getElementById('btnLoopPulse');
-
-        // ========== INICIALIZAÇÃO ==========
-        function initCanvas() {
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-        }
-        window.addEventListener('resize', initCanvas);
-        
-        // Listar microfones
-        async function updateMicList() {
-            try {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const inputs = devices.filter(d => d.kind === 'audioinput');
-                micSelect.innerHTML = '';
-                inputs.forEach((d, i) => {
-                    const opt = document.createElement('option');
-                    opt.value = d.deviceId;
-                    opt.text = d.label || `Microfone ${i+1}`;
-                    if (d.deviceId === currentMicId) opt.selected = true;
-                    micSelect.appendChild(opt);
-                });
-                if (inputs.length === 0) {
-                    micSelect.innerHTML = '<option>Nenhum microfone encontrado</option>';
-                }
-            } catch(e) { console.warn(e); }
+        function setMode(m) {
+            currentMode = m;
+            document.getElementById('modeDriver').className = m === 'driver' ? 'flex-1 py-3 rounded-lg text-[10px] font-black bg-purple-600 text-white' : 'flex-1 py-3 rounded-lg text-[10px] font-black text-gray-500';
+            document.getElementById('modeSub').className = m === 'sub' ? 'flex-1 py-3 rounded-lg text-[10px] font-black bg-orange-600 text-white' : 'flex-1 py-3 rounded-lg text-[10px] font-black text-gray-500';
+            if(isRunning) stopScanner();
         }
 
-        // ========== MODO DE TESTE ==========
-        function setMode(mode) {
-            currentMode = mode;
-            const driverBtn = document.getElementById('btnModeDriver');
-            const subBtn = document.getElementById('btnModeSub');
+        async function toggleScanner() {
+            if(isRunning) { stopScanner(); return; }
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, autoGainControl: false, noiseSuppression: false } });
             
-            if (mode === 'driver') {
-                driverBtn.classList.add('active');
-                subBtn.classList.remove('active');
+            micSource = audioCtx.createMediaStreamSource(stream);
+            analyser = audioCtx.createAnalyser();
+            filterNode = audioCtx.createBiquadFilter();
+            
+            // FILTRAGEM INTELIGENTE
+            if(currentMode === 'driver') {
+                filterNode.type = 'highpass'; filterNode.frequency.value = 1000;
             } else {
-                driverBtn.classList.remove('active');
-                subBtn.classList.add('active');
-            }
-            
-            // Se estiver em loop, reinicia para aplicar a nova frequência
-            if (isLooping) {
-                stopLoop();
-                startLoop();
-            }
-        }
-
-        // ========== GERADOR DE SINAL ==========
-        function playSinglePulse() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
+                filterNode.type = 'lowpass'; filterNode.frequency.value = 150;
             }
 
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.type = 'sine';
-            
-            // Configuração baseada no modo
-            if (currentMode === 'driver') {
-                // Driver/Tweeter: 1kHz, pulso curto
-                osc.frequency.value = 1000;
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.4, now + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
-                osc.start(now);
-                osc.stop(now + 0.13);
-            } else {
-                // Subwoofer: 50Hz, pulso mais longo
-                osc.frequency.value = 50;
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.5, now + 0.02);
-                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
-                osc.start(now);
-                osc.stop(now + 0.5);
-            }
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            // Feedback visual no botão
-            btnPlayPulse.classList.add('playing');
-            setTimeout(() => btnPlayPulse.classList.remove('playing'), 200);
-        }
-
-        function startLoop() {
-            if (loopInterval) clearInterval(loopInterval);
-            playSinglePulse();
-            loopInterval = setInterval(playSinglePulse, 1000);
-        }
-
-        function stopLoop() {
-            if (loopInterval) {
-                clearInterval(loopInterval);
-                loopInterval = null;
-            }
-        }
-
-        function toggleLoop() {
-            if (isLooping) {
-                stopLoop();
-                isLooping = false;
-                btnLoopPulse.classList.remove('loop-active');
-                btnLoopPulse.innerHTML = '🔁 LOOP PULSE';
-            } else {
-                isLooping = true;
-                startLoop();
-                btnLoopPulse.classList.add('loop-active');
-                btnLoopPulse.innerHTML = '⏹️ PARAR LOOP';
-            }
-        }
-
-        // ========== SCANNER ==========
-        function resetUI() {
-            resultArea.classList.add('hidden');
-            dots.forEach(dot => dot.classList.remove('active'));
-        }
-
-        function updateProgress(step) {
-            for (let i = 0; i < dots.length; i++) {
-                if (i < step) dots[i].classList.add('active');
-                else dots[i].classList.remove('active');
-            }
-        }
-
-        async function startScanner() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                await audioCtx.resume();
-            }
-            
-            try {
-                const deviceId = micSelect.value;
-                const constraints = {
-                    audio: {
-                        deviceId: deviceId && deviceId !== 'Nenhum microfone encontrado' ? { exact: deviceId } : undefined,
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false
-                    }
-                };
-                
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                await updateMicList();
-                
-                micSource = audioCtx.createMediaStreamSource(stream);
-                analyser = audioCtx.createAnalyser();
-                filterNode = audioCtx.createBiquadFilter();
-                
-                // Configurar filtro conforme modo
-                if (currentMode === 'driver') {
-                    filterNode.type = 'highpass';
-                    filterNode.frequency.value = 800;
-                } else {
-                    filterNode.type = 'lowpass';
-                    filterNode.frequency.value = 150;
-                }
-                
-                micSource.connect(filterNode);
-                filterNode.connect(analyser);
-                analyser.fftSize = 2048;
-                
-                isRunning = true;
-                results = [];
-                cooldown = false;
-                resetUI();
-                
-                mainBtn.innerHTML = '🔴 DESATIVAR DETECTOR';
-                mainBtn.classList.add('stop');
-                statusMsg.innerHTML = '🔇 Aguardando silêncio...';
-                statusMsg.className = 'status-msg status-waiting';
-                updateProgress(0);
-                
-                // Iniciar animação do osciloscópio e análise
-                drawOscillo();
-                analyzeAudio();
-                
-            } catch(err) {
-                console.error('Erro:', err);
-                alert('Erro ao acessar o microfone. Verifique as permissões.');
-                stopScanner();
-            }
-        }
-
-        function analyzeAudio() {
-            if (!isRunning || !analyser) return;
-            
-            const data = new Float32Array(analyser.fftSize);
-            analyser.getFloatTimeDomainData(data);
-            
-            // Encontrar pico do sinal
-            let maxVal = 0;
-            let maxIdx = 0;
-            for (let i = 0; i < data.length; i++) {
-                const abs = Math.abs(data[i]);
-                if (abs > maxVal) {
-                    maxVal = abs;
-                    maxIdx = i;
-                }
-            }
-            
-            // Threshold baseado na sensibilidade (0.05 a 0.55)
-            const sensitivity = parseInt(sensSlider.value) / 100;
-            const threshold = 0.05 + sensitivity * 0.5;
-            
-            if (maxVal > threshold && !cooldown && results.length < 3) {
-                const isPositive = data[maxIdx] > 0;
-                results.push(isPositive);
-                updateProgress(results.length);
-                
-                cooldown = true;
-                setTimeout(() => cooldown = false, 700);
-                
-                if (results.length === 1) {
-                    statusMsg.innerHTML = '🎧 Escutando...';
-                    statusMsg.className = 'status-msg status-listening';
-                }
-                
-                if (results.length >= 3) {
-                    finalizeResult();
-                    return;
-                }
-            }
-            
-            animationId = requestAnimationFrame(analyzeAudio);
-        }
-
-        function finalizeResult() {
-            const positives = results.filter(r => r === true).length;
-            const isPositive = positives >= 2;
-            
-            resultArea.classList.remove('hidden');
-            
-            if (isPositive) {
-                resultArea.className = 'result-area result-positive';
-                resultIcon.innerHTML = '⊕';
-                resultIcon.style.color = 'var(--green)';
-                resultText.innerHTML = 'POSITIVO';
-                resultText.style.color = 'var(--green)';
-            } else {
-                resultArea.className = 'result-area result-negative';
-                resultIcon.innerHTML = '⊖';
-                resultIcon.style.color = 'var(--red)';
-                resultText.innerHTML = 'INVERTIDO';
-                resultText.style.color = 'var(--red)';
-            }
-            
-            statusMsg.innerHTML = '✅ MEDIÇÃO COMPLETA';
-            statusMsg.className = 'status-msg status-complete';
-            
-            // Parar scanner automaticamente após resultado
-            stopScanner();
+            micSource.connect(filterNode); filterNode.connect(analyser);
+            analyser.fftSize = 2048;
+            isRunning = true; results = []; 
+            document.getElementById('mainBtn').innerText = '⏹ PARAR';
+            document.getElementById('mainBtn').classList.replace('from-purple-600', 'from-red-600');
+            document.getElementById('resArea').classList.add('hidden');
+            [0,1,2].forEach(i => document.getElementById('dot'+i).classList.remove('active'));
+            draw(); process();
         }
 
         function stopScanner() {
-            isRunning = false;
-            
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-                animationId = null;
-            }
-            
-            if (micSource) {
-                try { micSource.disconnect(); } catch(e) {}
-                micSource = null;
-            }
-            
-            if (filterNode) {
-                try { filterNode.disconnect(); } catch(e) {}
-                filterNode = null;
-            }
-            
-            if (analyser) {
-                try { analyser.disconnect(); } catch(e) {}
-                analyser = null;
-            }
-            
-            mainBtn.innerHTML = '🎤 ATIVAR DETECTOR';
-            mainBtn.classList.remove('stop');
-            
-            if (results.length === 0) {
-                statusMsg.innerHTML = '🎤 CLIQUE NO BOTÃO ABAIXO PARA INICIAR';
-                statusMsg.className = 'status-msg status-waiting';
-            }
-            
-            // Limpar canvas
-            if (ctx) {
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
+            isRunning = false; cancelAnimationFrame(animationId);
+            if(audioCtx) audioCtx.close();
+            document.getElementById('mainBtn').innerText = '🎤 INICIAR DETECTOR';
+            document.getElementById('mainBtn').classList.replace('from-red-600', 'from-purple-600');
         }
 
-        function toggleScanner() {
-            if (isRunning) {
-                stopScanner();
-            } else {
-                startScanner();
+        // GERADOR DE PULSO ASSIMÉTRICO (MELHORADO)
+        function playPulse() {
+            if(!audioCtx) audioCtx = new AudioContext();
+            const dur = 0.5, sr = audioCtx.sampleRate, buffer = audioCtx.createBuffer(1, sr * dur, sr), data = buffer.getChannelData(0);
+            for(let i=0; i<sr*dur; i++) {
+                let t = i/sr;
+                if(currentMode === 'driver') data[i] = Math.exp(-t*100) * Math.sin(2*Math.PI*1500*t);
+                else data[i] = Math.exp(-t*15) * Math.sin(2*Math.PI*50*t);
             }
+            const src = audioCtx.createBufferSource(); src.buffer = buffer;
+            src.connect(audioCtx.destination); src.start();
         }
 
-        // ========== OSCILOSCÓPIO ==========
-        function drawOscillo() {
-            if (!isRunning || !analyser) {
-                requestAnimationFrame(drawOscillo);
-                return;
+        function toggleLoop() {
+            isLooping = !isLooping;
+            document.getElementById('loopBtn').classList.toggle('border-cyan-500');
+            if(isLooping) loopInt = setInterval(playPulse, 1000);
+            else clearInterval(loopInt);
+        }
+
+        function process() {
+            if(!isRunning) return;
+            const data = new Float32Array(analyser.fftSize);
+            analyser.getFloatTimeDomainData(data);
+            let max = 0, idx = 0;
+            for(let i=0; i<data.length; i++) {
+                if(Math.abs(data[i]) > max) { max = Math.abs(data[i]); idx = i; }
             }
-            
+            if(max > 0.15 && !cooldown) {
+                results.push(data[idx] > 0);
+                document.getElementById('dot'+(results.length-1)).classList.add('active');
+                cooldown = true; setTimeout(() => cooldown = false, 700);
+                if(results.length >= 3) { finalize(); return; }
+            }
+            animationId = requestAnimationFrame(process);
+        }
+
+        function finalize() {
+            const pos = results.filter(r => r === true).length >= 2;
+            const area = document.getElementById('resArea');
+            area.classList.remove('hidden');
+            area.style.borderColor = pos ? '#22c55e' : '#ef4444';
+            area.style.backgroundColor = pos ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)';
+            document.getElementById('resIcon').innerText = pos ? '⊕' : '⊖';
+            document.getElementById('resIcon').style.color = pos ? '#22c55e' : '#ef4444';
+            document.getElementById('resText').innerText = pos ? 'POSITIVA' : 'INVERTIDA';
+            document.getElementById('resText').style.color = pos ? '#22c55e' : '#ef4444';
+            stopScanner();
+        }
+
+        function draw() {
+            if(!isRunning) return;
+            requestAnimationFrame(draw);
             const data = new Uint8Array(analyser.frequencyBinCount);
             analyser.getByteTimeDomainData(data);
-            
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.lineWidth = 2; ctx.strokeStyle = currentMode === 'driver' ? '#a855f7' : '#f97316';
             ctx.beginPath();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = currentMode === 'driver' ? '#a855f7' : '#f97316';
-            
-            const sliceWidth = canvas.width / data.length;
-            let x = 0;
-            
-            for (let i = 0; i < data.length; i++) {
-                const v = data[i] / 128.0;
-                const y = (v * canvas.height / 2) + (canvas.height / 2);
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-                x += sliceWidth;
+            let x = 0, slice = canvas.width / data.length;
+            for(let i=0; i<data.length; i++) {
+                let y = (data[i]/128.0) * canvas.height/2;
+                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                x += slice;
             }
             ctx.stroke();
-            
-            requestAnimationFrame(drawOscillo);
         }
-
-        // ========== EVENTOS ==========
-        sensSlider.addEventListener('input', (e) => {
-            sensVal.innerText = e.target.value + '%';
-        });
-        
-        micSelect.addEventListener('change', (e) => {
-            currentMicId = e.target.value;
-            if (isRunning) {
-                stopScanner();
-                setTimeout(() => startScanner(), 300);
-            }
-        });
-        
-        // Inicializar
-        initCanvas();
-        updateMicList();
-        
-        // Ativar áudio no primeiro clique
-        document.body.addEventListener('click', () => {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }, { once: true });
-        
-        // Service Worker (se existir)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(e => console.log('SW error'));
-        }
+        window.onload = () => { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; };
     </script>
 </body>
 </html>
