@@ -2,884 +2,106 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0a0d14">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icons/icon-192.png">
-    <title>AudioBase Pro | Power RMS Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Calc | AudioBase Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-dark: #0a0d14;
-            --card-bg: #161b22;
-            --border: #30363d;
-            --cyan: #06b6d4;
-            --purple: #a855f7;
-            --green: #22c55e;
-            --gold: #f59e0b;
-            --red: #ef4444;
-            --orange: #f97316;
-            --text-muted: #8b949e;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: #c9d1d9;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            min-height: 100vh;
-            padding: 1.5rem;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 2rem;
-            padding: 0.5rem 1rem;
-            text-decoration: none;
-            color: var(--cyan);
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-            transition: all 0.2s;
-        }
-        .back-btn:hover {
-            transform: translateX(-4px);
-            border-color: var(--cyan);
-        }
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #fff 0%, var(--cyan) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .subtitle {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-top: 0.5rem;
-        }
-
-        /* Tabs de seleção */
-        .mode-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            background: var(--card-bg);
-            padding: 0.5rem;
-            border-radius: 3rem;
-            border: 1px solid var(--border);
-        }
-        .mode-tab {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            border-radius: 2rem;
-            font-weight: 800;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-        }
-        .mode-tab.active {
-            background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(6,182,212,0.3);
-        }
-        .mode-tab.pa.active {
-            background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan) 100%);
-        }
-        .mode-tab.car.active {
-            background: linear-gradient(135deg, var(--orange) 0%, var(--gold) 100%);
-        }
-        .mode-tab:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Cards */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.25rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--border);
-        }
-        .card-header .icon {
-            font-size: 1.5rem;
-        }
-        .card-header h2 {
-            font-size: 1.1rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .card-header .badge {
-            margin-left: auto;
-            font-size: 0.6rem;
-            background: rgba(6,182,212,0.1);
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
-            color: var(--cyan);
-        }
-
-        /* Grids */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1rem;
-        }
-        .grid-4 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-        }
-
-        /* Inputs */
-        .input-group {
-            margin-bottom: 1rem;
-        }
-        .input-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
-        }
-        .input-number, select {
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: 1rem;
-            padding: 0.75rem 1rem;
-            color: white;
-            font-weight: 700;
-            font-size: 1rem;
-            width: 100%;
-            outline: none;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .input-number:focus, select:focus {
-            border-color: var(--cyan);
-        }
-        .input-unit {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-left: 0.5rem;
-        }
-
-        /* Resultados principais */
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        .result-item {
-            background: var(--bg-dark);
-            border-radius: 1rem;
-            padding: 1rem;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-        .result-label {
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
-        }
-        .result-value {
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: white;
-            margin-top: 0.5rem;
-        }
-        .result-unit {
-            font-size: 0.7rem;
-            color: var(--cyan);
-        }
-
-        /* Status Badge */
-        .status-badge {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--bg-dark);
-            border-radius: 1rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .status-badge:hover {
-            transform: scale(0.99);
-        }
-        .status-icon {
-            font-size: 1.5rem;
-        }
-        .status-text {
-            font-weight: 800;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-        }
-        .status-detail {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-        }
-        .status-badge.ok { border-left: 4px solid var(--green); }
-        .status-badge.warning { border-left: 4px solid var(--gold); }
-        .status-badge.danger { border-left: 4px solid var(--red); }
-
-        /* Vrms Destaque */
-        .vrms-card {
-            background: linear-gradient(135deg, rgba(6,182,212,0.1) 0%, rgba(168,85,247,0.1) 100%);
-            border: 1px solid rgba(6,182,212,0.3);
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            text-align: center;
-            margin: 1rem 0;
-        }
-        .vrms-value {
-            font-size: 3rem;
-            font-weight: 900;
-            font-family: monospace;
-            color: white;
-            line-height: 1;
-            margin: 0.5rem 0;
-        }
-
-        /* Dicas específicas por modo */
-        .tips {
-            background: rgba(245,158,11,0.05);
-            border-left: 3px solid var(--gold);
-            border-radius: 0.75rem;
-            padding: 0.75rem;
-            margin-top: 1rem;
-        }
-        .tips.car-tips {
-            border-left-color: var(--orange);
-            background: rgba(249,115,22,0.05);
-        }
-        .tips.pa-tips {
-            border-left-color: var(--cyan);
-            background: rgba(6,182,212,0.05);
-        }
-        .tips p {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            line-height: 1.4;
-        }
-        .tips strong {
-            color: var(--gold);
-        }
-        .tips.car-tips strong {
-            color: var(--orange);
-        }
-        .tips.pa-tips strong {
-            color: var(--cyan);
-        }
-
-        /* Tabela de referência */
-        .ref-table {
-            width: 100%;
-            font-size: 0.7rem;
-            border-collapse: collapse;
-        }
-        .ref-table th, .ref-table td {
-            padding: 0.5rem;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-        }
-        .ref-table th {
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        @media (max-width: 800px) {
-            .grid-2, .grid-3, .grid-4, .results-grid {
-                grid-template-columns: 1fr;
-            }
-            .vrms-value {
-                font-size: 2rem;
-            }
-        }
+        body { background-color: #0a0d14; color: #c9d1d9; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 1.5rem; }
+        input, select { background: #0a0d14 !important; border: 1px solid #30363d !important; color: white !important; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <a href="/" class="back-btn">← VOLTAR AO MENU</a>
-            <h1>POWER RMS CALCULATOR</h1>
-            <p class="subtitle">Calcule a potência real do sistema • P.A. ou Automotivo</p>
-        </div>
+<body class="p-4 pb-20">
+    <div class="max-w-md mx-auto space-y-4">
+        <header class="flex justify-between items-center py-4">
+            <a href="index.html" class="text-cyan-500 text-xs font-bold">← VOLTAR</a>
+            <h1 class="text-white font-black text-sm tracking-widest uppercase">Power Calculator</h1>
+        </header>
 
-        <!-- Seleção de Modo -->
-        <div class="mode-tabs">
-            <button class="mode-tab pa active" id="modePa" onclick="setMode('pa')">
-                🎤 LINHA P.A.
-                <span style="font-size:0.6rem;">Professional Audio</span>
-            </button>
-            <button class="mode-tab car" id="modeCar" onclick="setMode('car')">
-                🚗 AUTOMOTIVO
-                <span style="font-size:0.6rem;">Car Audio</span>
-            </button>
-        </div>
-
-        <!-- Configuração dos Falantes -->
-        <div class="card">
-            <div class="card-header">
-                <span class="icon" id="modeIcon">🔊</span>
-                <h2 id="modeTitle">CONFIGURAÇÃO P.A.</h2>
-                <span class="badge" id="modeBadge">Professional Audio</span>
-            </div>
-
-            <div class="grid-3">
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>📦 QUANTIDADE</span>
-                        <span>nº de unidades</span>
-                    </div>
-                    <input type="number" id="speakerQty" value="2" min="1" step="1" class="input-number">
-                </div>
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>⚡ IMPEDÂNCIA (Ω)</span>
-                        <span>por unidade</span>
-                    </div>
-                    <input type="number" id="speakerImp" value="8" step="0.5" class="input-number">
-                </div>
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>💪 POTÊNCIA RMS (W)</span>
-                        <span>por unidade</span>
-                    </div>
-                    <input type="number" id="speakerPower" value="1600" step="100" class="input-number">
-                </div>
-            </div>
-
-            <div class="grid-2">
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>🔗 LIGAÇÃO</span>
-                        <span>série ou paralelo</span>
-                    </div>
-                    <select id="connectionType">
-                        <option value="parallel">⚡ PARALELO - Divide impedância</option>
-                        <option value="series">🔗 SÉRIE - Soma impedância</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>🎯 SENSIBILIDADE (dB SPL)</span>
-                        <span>1W/1m</span>
-                    </div>
-                    <input type="number" id="sensitivity" value="98" step="1" class="input-number">
-                </div>
-            </div>
-        </div>
-
-        <!-- Amplificador -->
-        <div class="card">
-            <div class="card-header">
-                <span class="icon">🔌</span>
-                <h2>AMPLIFICADOR</h2>
-                <span class="badge" id="ampBadge">Configuração recomendada</span>
-            </div>
-
-            <div class="grid-2">
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>📊 POTÊNCIA POR CANAL (W)</span>
-                        <span>@ impedância nominal</span>
-                    </div>
-                    <input type="number" id="ampPower" value="3000" step="100" class="input-number">
-                </div>
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>⚠️ IMPEDÂNCIA MÍNIMA (Ω)</span>
-                        <span>suportada pelo amp</span>
-                    </div>
-                    <input type="number" id="ampMinImp" value="2" step="0.5" class="input-number">
-                </div>
-            </div>
-
-            <div class="grid-2">
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>🎛️ MODO DE OPERAÇÃO</span>
-                        <span>stereo ou bridge</span>
-                    </div>
-                    <select id="ampMode">
-                        <option value="stereo">🎵 STEREO (2 canais independentes)</option>
-                        <option value="bridge">⚡ BRIDGE (1 canal com potência dobrada)</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <div class="input-label">
-                        <span>📈 HEADROOM DESEJADO</span>
-                        <span>margem de segurança</span>
-                    </div>
-                    <select id="headroom">
-                        <option value="1.2">20% - Mínimo recomendado</option>
-                        <option value="1.5">50% - Seguro</option>
-                        <option value="2.0">100% - Alto headroom</option>
-                        <option value="1.0">0% - Sem folga (risco)</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Resultados Principais -->
-        <div class="card">
-            <div class="card-header">
-                <span class="icon">📊</span>
-                <h2>RESULTADOS DO SISTEMA</h2>
-                <span class="badge">Cálculo em tempo real</span>
-            </div>
-
-            <div class="results-grid">
-                <div class="result-item">
-                    <div class="result-label">IMPEDÂNCIA RESULTANTE</div>
-                    <div class="result-value"><span id="totalImp">4.0</span><span class="result-unit"> Ω</span></div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">POTÊNCIA TOTAL RMS</div>
-                    <div class="result-value"><span id="totalPower">3200</span><span class="result-unit"> W</span></div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">POTÊNCIA POR CANAL</div>
-                    <div class="result-value"><span id="powerPerChannel">1600</span><span class="result-unit"> W</span></div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">SPL MÁXIMO ESTIMADO</div>
-                    <div class="result-value"><span id="splMax">128</span><span class="result-unit"> dB</span></div>
-                </div>
-            </div>
-
-            <!-- Status do Sistema -->
-            <div id="statusCard" class="status-badge ok" onclick="openReportModal()">
-                <div class="status-icon">✅</div>
+        <div class="card p-6 space-y-5">
+            <h3 class="text-[10px] font-black text-cyan-500 tracking-widest uppercase">Alto-Falantes</h3>
+            <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <div class="status-text" id="statusText">SISTEMA OTIMIZADO</div>
-                    <div class="status-detail" id="statusDetail">Projeto dentro dos parâmetros de segurança</div>
+                    <label class="text-[9px] font-bold text-gray-500 block mb-1 uppercase">Quantidade</label>
+                    <input type="number" id="qty" value="2" class="w-full p-3 rounded-xl font-bold outline-none focus:border-cyan-500">
                 </div>
-                <div class="status-detail">📋 Ver relatório →</div>
+                <div>
+                    <label class="text-[9px] font-bold text-gray-500 block mb-1 uppercase">Impedância (Ω)</label>
+                    <input type="number" id="imp" value="8" class="w-full p-3 rounded-xl font-bold outline-none focus:border-cyan-500">
+                </div>
             </div>
-
-            <!-- Vrms para Limiter -->
-            <div class="vrms-card" id="vrmsCard">
-                <div class="vrms-label">🔧 AJUSTE DO LIMITER (VRMS)</div>
-                <div class="vrms-value"><span id="vrmsValue">113</span> <span style="font-size: 1rem;">V RMS</span></div>
-                <div class="vrms-note" id="vrmsNote">Valor para configurar o limitador do processador DSP</div>
+            <div>
+                <label class="text-[9px] font-bold text-gray-500 block mb-1 uppercase">Potência RMS (Cada)</label>
+                <input type="number" id="pwr" value="500" class="w-full p-3 rounded-xl font-bold outline-none focus:border-cyan-500">
             </div>
-
-            <!-- Corrente e Recomendação de Cabo -->
-            <div class="grid-2">
-                <div class="result-item">
-                    <div class="result-label">CORRENTE MÁXIMA (A)</div>
-                    <div class="result-value"><span id="current">14.1</span><span class="result-unit"> A</span></div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label" id="cableLabel">CABO RECOMENDADO</div>
-                    <div class="result-value" id="cableRecommendation">10 AWG</div>
-                </div>
+            <div>
+                <label class="text-[9px] font-bold text-gray-500 block mb-1 uppercase">Tipo de Ligação</label>
+                <select id="link" class="w-full p-3 rounded-xl font-bold outline-none">
+                    <option value="par">Paralelo (Divide Ω)</option>
+                    <option value="ser">Série (Soma Ω)</option>
+                </select>
             </div>
         </div>
 
-        <!-- Dicas Específicas por Modo -->
-        <div class="card" id="tipsCard">
-            <div class="card-header">
-                <span class="icon">💡</span>
-                <h2>DICAS PROFISSIONAIS</h2>
-                <span class="badge" id="tipsBadge">P.A. Sound Engineering</span>
+        <div class="card p-6 bg-gradient-to-br from-cyan-900/20 to-transparent border-cyan-500/30">
+            <h3 class="text-[10px] font-black text-cyan-500 tracking-widest uppercase mb-4">Resultado do Sistema</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="text-center p-3 bg-black/40 rounded-2xl">
+                    <p class="text-[8px] text-gray-500 uppercase font-bold">Impedância Final</p>
+                    <p id="resImp" class="text-xl font-black text-white">4.0 <span class="text-xs">Ω</span></p>
+                </div>
+                <div class="text-center p-3 bg-black/40 rounded-2xl">
+                    <p class="text-[8px] text-gray-500 uppercase font-bold">Potência Total</p>
+                    <p id="resPwr" class="text-xl font-black text-white">1000 <span class="text-xs">W</span></p>
+                </div>
             </div>
-            <div id="tipsContent" class="tips pa-tips">
-                <p>🎯 <strong>P.A. Professional:</strong> Sempre mantenha 20-50% de headroom. Utilize limiters no DSP para proteger os falantes. Verifique a impedância mínima do amplificador.</p>
-                <p>🔊 <strong>SPL em P.A.:</strong> Para áreas externas, considere +6dB de ganho por dobra de distância. Use sistemas de delay para grandes públicos.</p>
-                <p>⚡ <strong>Cabos:</strong> Para distâncias acima de 20m, utilize cabos de bitola 10 AWG ou superior para minimizar perdas.</p>
-            </div>
-        </div>
 
-        <!-- Tabela de Referência por Modo -->
-        <div class="card">
-            <div class="card-header">
-                <span class="icon">📚</span>
-                <h2>TABELA DE REFERÊNCIA</h2>
-                <span class="badge" id="refBadge">Potência vs Vrms vs Corrente</span>
+            <div class="mt-4 p-5 bg-cyan-500 rounded-2xl text-black text-center">
+                <p class="text-[10px] font-black uppercase tracking-widest opacity-70">Ajuste do Limiter</p>
+                <p id="resVrms" class="text-4xl font-black">63.2</p>
+                <p class="text-[10px] font-black uppercase mt-1">Volts RMS (Vrms)</p>
             </div>
-            <table class="ref-table" id="refTable">
-                <thead>
-                    <tr><th>Impedância (Ω)</th><th>100W</th><th>500W</th><th>1000W</th><th>2000W</th><th>5000W</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>2 Ω</td><td>14.1V / 7.1A</td><td>31.6V / 15.8A</td><td>44.7V / 22.4A</td><td>63.2V / 31.6A</td><td>100V / 50A</td></tr>
-                    <tr><td>4 Ω</td><td>20V / 5A</td><td>44.7V / 11.2A</td><td>63.2V / 15.8A</td><td>89.4V / 22.4A</td><td>141V / 35.4A</td></tr>
-                    <tr><td>8 Ω</td><td>28.3V / 3.5A</td><td>63.2V / 7.9A</td><td>89.4V / 11.2A</td><td>126.5V / 15.8A</td><td>200V / 25A</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 
-    <!-- Modal de Relatório -->
-    <div id="reportModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center; padding:1rem;">
-        <div style="background:var(--card-bg); max-width:500px; width:100%; border-radius:1.5rem; padding:1.5rem;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
-                <h3 style="color:var(--cyan); font-weight:800;" id="reportTitle">📋 RELATÓRIO TÉCNICO - P.A.</h3>
-                <button onclick="closeReportModal()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+            <div class="mt-4 grid grid-cols-2 gap-4 text-center">
+                <div>
+                    <p class="text-[8px] text-gray-500 uppercase font-bold">Corrente Máx.</p>
+                    <p id="resAmp" class="text-sm font-black text-white">15.8 A</p>
+                </div>
+                <div>
+                    <p class="text-[8px] text-gray-500 uppercase font-bold">Cabo Recom.</p>
+                    <p id="resCable" class="text-sm font-black text-white">4.0 mm²</p>
+                </div>
             </div>
-            <div id="reportContent"></div>
-            <button onclick="closeReportModal()" style="width:100%; background:var(--border); border:none; padding:0.75rem; border-radius:1rem; color:white; font-weight:bold; margin-top:1rem;">FECHAR</button>
         </div>
     </div>
 
     <script>
-        // Modo atual
-        let currentMode = 'pa'; // 'pa' ou 'car'
-        
-        // Elementos DOM
-        const speakerQty = document.getElementById('speakerQty');
-        const speakerImp = document.getElementById('speakerImp');
-        const speakerPower = document.getElementById('speakerPower');
-        const connectionType = document.getElementById('connectionType');
-        const ampPower = document.getElementById('ampPower');
-        const ampMinImp = document.getElementById('ampMinImp');
-        const ampMode = document.getElementById('ampMode');
-        const headroomSelect = document.getElementById('headroom');
-        const sensitivityInput = document.getElementById('sensitivity');
+        function calc() {
+            const q = parseFloat(document.getElementById('qty').value) || 1;
+            const i = parseFloat(document.getElementById('imp').value) || 4;
+            const p = parseFloat(document.getElementById('pwr').value) || 0;
+            const l = document.getElementById('link').value;
 
-        // Elementos de resultado
-        const totalImpSpan = document.getElementById('totalImp');
-        const totalPowerSpan = document.getElementById('totalPower');
-        const powerPerChannelSpan = document.getElementById('powerPerChannel');
-        const vrmsSpan = document.getElementById('vrmsValue');
-        const currentSpan = document.getElementById('current');
-        const splMaxSpan = document.getElementById('splMax');
-        const cableRecommendationSpan = document.getElementById('cableRecommendation');
-        const statusTextSpan = document.getElementById('statusText');
-        const statusDetailSpan = document.getElementById('statusDetail');
-        const statusCard = document.getElementById('statusCard');
-        const vrmsCard = document.getElementById('vrmsCard');
-        const vrmsNote = document.getElementById('vrmsNote');
+            const finalImp = l === 'par' ? i / q : i * q;
+            const finalPwr = p * q;
+            const vrms = Math.sqrt(finalPwr * finalImp);
+            const amps = finalPwr / vrms || 0;
 
-        // Elementos de UI do modo
-        const modeIcon = document.getElementById('modeIcon');
-        const modeTitle = document.getElementById('modeTitle');
-        const modeBadge = document.getElementById('modeBadge');
-        const ampBadge = document.getElementById('ampBadge');
-        const tipsCard = document.getElementById('tipsCard');
-        const tipsContent = document.getElementById('tipsContent');
-        const tipsBadge = document.getElementById('tipsBadge');
-        const refBadge = document.getElementById('refBadge');
-        const cableLabel = document.getElementById('cableLabel');
-
-        let currentReportData = { status: "", detail: "" };
-
-        // Função para definir o modo
-        function setMode(mode) {
-            currentMode = mode;
+            document.getElementById('resImp').innerText = finalImp.toFixed(1) + " Ω";
+            document.getElementById('resPwr').innerText = finalPwr.toFixed(0) + " W";
+            document.getElementById('resVrms').innerText = vrms.toFixed(1);
+            document.getElementById('resAmp').innerText = amps.toFixed(1) + " A";
             
-            // Atualizar estilo das tabs
-            document.getElementById('modePa').classList.remove('active');
-            document.getElementById('modeCar').classList.remove('active');
-            if (mode === 'pa') {
-                document.getElementById('modePa').classList.add('active');
-            } else {
-                document.getElementById('modeCar').classList.add('active');
-            }
-            
-            // Atualizar interface
-            if (mode === 'pa') {
-                modeIcon.innerHTML = '🎤';
-                modeTitle.innerHTML = 'CONFIGURAÇÃO P.A.';
-                modeBadge.innerHTML = 'Professional Audio';
-                ampBadge.innerHTML = 'Configuração P.A.';
-                tipsBadge.innerHTML = 'P.A. Sound Engineering';
-                refBadge.innerHTML = 'Potência vs Vrms vs Corrente (P.A.)';
-                cableLabel.innerHTML = 'CABO RECOMENDADO (P.A.)';
-                vrmsNote.innerHTML = 'Valor para configurar o limitador do processador DSP';
-                tipsContent.className = 'tips pa-tips';
-                tipsContent.innerHTML = `
-                    <p>🎯 <strong>P.A. Professional:</strong> Sempre mantenha 20-50% de headroom. Utilize limiters no DSP para proteger os falantes. Verifique a impedância mínima do amplificador.</p>
-                    <p>🔊 <strong>SPL em P.A.:</strong> Para áreas externas, considere +6dB de ganho por dobra de distância. Use sistemas de delay para grandes públicos.</p>
-                    <p>⚡ <strong>Cabos:</strong> Para distâncias acima de 20m, utilize cabos de bitola 10 AWG ou superior para minimizar perdas.</p>
-                    <p>🎛️ <strong>Crossovers:</strong> Utilize filtros ativos para separar frequências entre subs, médios e agudos. Evite sobrecarga em frequências indesejadas.</p>
-                `;
-            } else {
-                modeIcon.innerHTML = '🚗';
-                modeTitle.innerHTML = 'CONFIGURAÇÃO AUTOMOTIVA';
-                modeBadge.innerHTML = 'Car Audio';
-                ampBadge.innerHTML = 'Configuração Automotiva';
-                tipsBadge.innerHTML = 'Car Audio Specialist';
-                refBadge.innerHTML = 'Potência vs Vrms vs Corrente (Automotivo)';
-                cableLabel.innerHTML = 'CABO RECOMENDADO (Auto)';
-                vrmsNote.innerHTML = 'Valor para configurar o limitador ou ajuste de ganho';
-                tipsContent.className = 'tips car-tips';
-                tipsContent.innerHTML = `
-                    <p>🚗 <strong>Automotivo:</strong> Atenção à tensão da bateria (12.6V nominal, 14.4V com motor ligado). Use cabos de bitola adequada para evitar quedas de tensão.</p>
-                    <p>🔊 <strong>SPL em Automotivo:</strong> O ganho acústico do carro pode adicionar até +10dB em baixas frequências. Cuidado com ressonâncias indesejadas.</p>
-                    <p>⚡ <strong>Cabos:</strong> Para sistemas de alta potência, utilize cabos 0 AWG ou 2 AWG para alimentação. Cabos de alto-falante: 10-12 AWG para subs, 14-16 AWG para médios/agudos.</p>
-                    <p>🎛️ <strong>Bateria:</strong> Sistemas acima de 1000W RMS podem necessitar de bateria adicional ou capacitor. Verifique o alternador do veículo.</p>
-                `;
-            }
-            
-            // Recalcular
-            calculateSystem();
+            let cable = "1.5";
+            if(amps > 10) cable = "2.5";
+            if(amps > 15) cable = "4.0";
+            if(amps > 25) cable = "6.0";
+            if(amps > 40) cable = "10.0";
+            document.getElementById('resCable').innerText = cable + " mm²";
         }
 
-        // Calcular recomendação de cabo baseado na corrente
-        function getCableRecommendation(current, mode) {
-            // Tabela AWG (American Wire Gauge) para cobre
-            const awgTable = [
-                { maxCurrent: 5, awg: "16 AWG" },
-                { maxCurrent: 10, awg: "14 AWG" },
-                { maxCurrent: 15, awg: "12 AWG" },
-                { maxCurrent: 20, awg: "10 AWG" },
-                { maxCurrent: 30, awg: "8 AWG" },
-                { maxCurrent: 40, awg: "6 AWG" },
-                { maxCurrent: 55, awg: "4 AWG" },
-                { maxCurrent: 75, awg: "2 AWG" },
-                { maxCurrent: 100, awg: "1 AWG" },
-                { maxCurrent: 150, awg: "0 AWG" },
-                { maxCurrent: 200, awg: "00 AWG (2/0)" }
-            ];
-            
-            let recommended = "10 AWG";
-            for (let i = 0; i < awgTable.length; i++) {
-                if (current <= awgTable[i].maxCurrent) {
-                    recommended = awgTable[i].awg;
-                    break;
-                }
-                recommended = awgTable[awgTable.length-1].awg;
-            }
-            
-            if (mode === 'car') {
-                // Automotivo: recomendações mais conservadoras devido ao ambiente
-                if (current <= 10) return "12 AWG (Auto)";
-                if (current <= 20) return "10 AWG (Auto)";
-                if (current <= 40) return "8 AWG (Auto)";
-                if (current <= 60) return "4 AWG (Auto)";
-                if (current <= 100) return "2 AWG (Auto)";
-                return "0 AWG (Auto) - Verifique alternador";
-            }
-            
-            return recommended + " (cobre puro)";
-        }
-
-        function calculateSystem() {
-            // Valores de entrada
-            const qty = parseFloat(speakerQty.value) || 1;
-            const impUnit = parseFloat(speakerImp.value) || 4;
-            const powerUnit = parseFloat(speakerPower.value) || 0;
-            const conn = connectionType.value;
-            const ampPowerValue = parseFloat(ampPower.value) || 0;
-            const ampMinImpValue = parseFloat(ampMinImp.value) || 2;
-            const mode = ampMode.value;
-            const headroom = parseFloat(headroomSelect.value) || 1.2;
-            const sensitivity = parseFloat(sensitivityInput.value) || 98;
-
-            // Cálculo da impedância resultante
-            let totalImp = conn === 'parallel' ? impUnit / qty : impUnit * qty;
-            totalImp = Math.max(0.5, totalImp);
-
-            // Potência total e por canal
-            const totalPower = powerUnit * qty;
-            const powerPerChannel = mode === 'bridge' ? totalPower : totalPower / 2;
-
-            // Vrms e Corrente
-            const vrms = Math.sqrt(totalPower * totalImp);
-            const current = Math.sqrt(totalPower / totalImp);
-
-            // SPL Máximo estimado
-            const splMax = sensitivity + (10 * Math.log10(totalPower));
-
-            // Verificações de compatibilidade
-            const effectiveMinImp = mode === 'bridge' ? ampMinImpValue * 2 : ampMinImpValue;
-            const requiredPower = powerPerChannel;
-            const availablePower = ampPowerValue;
-            const hasHeadroom = availablePower >= requiredPower * headroom;
-
-            let status = "SISTEMA OTIMIZADO";
-            let statusClass = "ok";
-            let statusIcon = "✅";
-            let statusDetail = "";
-            let reportDetail = "";
-
-            if (totalImp < effectiveMinImp) {
-                status = "IMPEDÂNCIA CRÍTICA";
-                statusClass = "danger";
-                statusIcon = "⚠️";
-                statusDetail = `Carga ${totalImp.toFixed(1)}Ω abaixo do mínimo (${effectiveMinImp}Ω)`;
-                reportDetail = `A impedância da carga (${totalImp.toFixed(1)}Ω) está abaixo do mínimo suportado pelo amplificador (${effectiveMinImp}Ω). Isso pode causar superaquecimento, ativação de proteção térmica ou danos permanentes. ${currentMode === 'car' ? 'Em automotivo, isso pode danificar o amplificador e a bateria.' : 'Em P.A., isso pode acionar proteção e interromper o show.'}`;
-            } else if (!hasHeadroom) {
-                const requiredPowerWithHeadroom = requiredPower * headroom;
-                status = "HEADROOM INSUFICIENTE";
-                statusClass = "warning";
-                statusIcon = "⚠️";
-                statusDetail = `Amplificador ${availablePower}W < necessário ${Math.ceil(requiredPowerWithHeadroom)}W`;
-                reportDetail = `O amplificador oferece ${availablePower}W por canal, mas o sistema requer ${Math.ceil(requiredPower)}W RMS. Com a folga de ${Math.round((headroom-1)*100)}% recomendada, seriam necessários ${Math.ceil(requiredPowerWithHeadroom)}W. Risco de clipping e danos aos falantes. ${currentMode === 'car' ? 'Em automotivo, isso causa distorção e pode queimar os alto-falantes.' : 'Em P.A., clipping pode danificar vias agudas e comprimir o sinal.'}`;
-            } else {
-                const headroomPercent = ((availablePower / requiredPower) - 1) * 100;
-                status = "SISTEMA OTIMIZADO";
-                statusClass = "ok";
-                statusIcon = "✅";
-                statusDetail = `Folga de ${headroomPercent.toFixed(0)}% • Carga ${totalImp.toFixed(1)}Ω`;
-                reportDetail = `Projeto dentro dos parâmetros de segurança. Impedância: ${totalImp.toFixed(1)}Ω | Potência necessária: ${Math.ceil(requiredPower)}W/canal | Amplificador: ${availablePower}W/canal | Folga: ${headroomPercent.toFixed(0)}%`;
-            }
-
-            // Atualizar resultados na tela
-            totalImpSpan.innerText = totalImp.toFixed(1);
-            totalPowerSpan.innerText = Math.ceil(totalPower);
-            powerPerChannelSpan.innerText = Math.ceil(powerPerChannel);
-            vrmsSpan.innerText = Math.ceil(vrms);
-            currentSpan.innerText = current.toFixed(1);
-            splMaxSpan.innerText = Math.ceil(splMax);
-            cableRecommendationSpan.innerText = getCableRecommendation(current, currentMode);
-
-            // Atualizar status card
-            statusTextSpan.innerText = status;
-            statusDetailSpan.innerText = statusDetail;
-            statusCard.className = `status-badge ${statusClass}`;
-            statusCard.querySelector('.status-icon').innerHTML = statusIcon;
-
-            // Atualizar cor do Vrms card baseado no modo
-            if (currentMode === 'car') {
-                vrmsCard.style.background = "linear-gradient(135deg, rgba(249,115,22,0.1) 0%, rgba(245,158,11,0.1) 100%)";
-                vrmsCard.style.border = "1px solid rgba(249,115,22,0.3)";
-            } else {
-                vrmsCard.style.background = "linear-gradient(135deg, rgba(6,182,212,0.1) 0%, rgba(168,85,247,0.1) 100%)";
-                vrmsCard.style.border = "1px solid rgba(6,182,212,0.3)";
-            }
-
-            // Guardar dados para o relatório
-            currentReportData = {
-                mode: currentMode,
-                status: status,
-                detail: reportDetail || statusDetail,
-                totalImp: totalImp.toFixed(1),
-                totalPower: Math.ceil(totalPower),
-                powerPerChannel: Math.ceil(powerPerChannel),
-                vrms: Math.ceil(vrms),
-                current: current.toFixed(1),
-                splMax: Math.ceil(splMax),
-                requiredPower: Math.ceil(requiredPower),
-                availablePower: availablePower,
-                headroomPercent: ((availablePower / requiredPower) - 1) * 100,
-                cable: getCableRecommendation(current, currentMode)
-            };
-        }
-
-        function openReportModal() {
-            const modal = document.getElementById('reportModal');
-            const content = document.getElementById('reportContent');
-            const reportTitle = document.getElementById('reportTitle');
-            
-            const modeText = currentMode === 'pa' ? 'P.A. Professional' : 'Automotivo Car Audio';
-            reportTitle.innerHTML = currentMode === 'pa' ? '📋 RELATÓRIO TÉCNICO - P.A.' : '📋 RELATÓRIO TÉCNICO - AUTOMOTIVO';
-            
-            content.innerHTML = `
-                <div style="background:var(--bg-dark); padding:1rem; border-radius:1rem; margin-bottom:1rem;">
-                    <p style="color:${currentMode === 'pa' ? 'var(--cyan)' : 'var(--orange)'}; font-weight:bold; margin-bottom:0.5rem;">📊 STATUS DO PROJETO - ${modeText}</p>
-                    <p style="font-weight:bold; margin-bottom:0.5rem;">${currentReportData.status}</p>
-                    <p style="font-size:0.7rem; color:var(--text-muted);">${currentReportData.detail}</p>
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1rem;">
-                    <div style="background:var(--bg-dark); padding:0.75rem; border-radius:0.75rem;">
-                        <p style="font-size:0.6rem; color:var(--text-muted);">IMPEDÂNCIA</p>
-                        <p style="font-weight:bold;">${currentReportData.totalImp} Ω</p>
-                    </div>
-                    <div style="background:var(--bg-dark); padding:0.75rem; border-radius:0.75rem;">
-                        <p style="font-size:0.6rem; color:var(--text-muted);">POTÊNCIA TOTAL</p>
-                        <p style="font-weight:bold;">${currentReportData.totalPower} W</p>
-                    </div>
-                    <div style="background:var(--bg-dark); padding:0.75rem; border-radius:0.75rem;">
-                        <p style="font-size:0.6rem; color:var(--text-muted);">VRMS (LIMITER)</p>
-                        <p style="font-weight:bold; color:${currentMode === 'pa' ? 'var(--cyan)' : 'var(--orange)'};">${currentReportData.vrms} V</p>
-                    </div>
-                    <div style="background:var(--bg-dark); padding:0.75rem; border-radius:0.75rem;">
-                        <p style="font-size:0.6rem; color:var(--text-muted);">CORRENTE MÁXIMA</p>
-                        <p style="font-weight:bold;">${currentReportData.current} A</p>
-                    </div>
-                    <div style="background:var(--bg-dark); padding:0.75rem; border-radius:0.75rem;">
-                        <p style="font-size:0.6rem; color:var(--text-muted);">SPL MÁXIMO</p>
-                        <p style="font-weight:bold;">${currentReportData.splMax} dB</p>
-                    </div>
-                    <div style="background:var(--bg-dark); padding:0.75rem; border-radius:0.75rem;">
-                        <p style="font-size:0.6rem; color:var(--text-muted);">CABO RECOMENDADO</p>
-                        <p style="font-weight:bold;">${currentReportData.cable}</p>
-                    </div>
-                </div>
-                <div style="background:rgba(245,158,11,0.1); padding:0.75rem; border-radius:0.75rem;">
-                    <p style="color:var(--gold); font-weight:bold; font-size:0.7rem;">🔧 RECOMENDAÇÕES ${currentMode === 'pa' ? 'P.A.' : 'AUTOMOTIVAS'}</p>
-                    <ul style="font-size:0.65rem; color:var(--text-muted); margin-top:0.5rem; padding-left:1rem;">
-                        <li>Configure o limitador do DSP em ${currentReportData.vrms} V RMS</li>
-                        <li>Utilize cabos ${currentReportData.cable} para alimentação e conexões</li>
-                        ${currentMode === 'car' ? '<li>Verifique a tensão da bateria (12.6V+) e o alternador (14.4V com motor ligado)</li>' : '<li>Verifique a ventilação do rack para dissipação térmica adequada</li>'}
-                        <li>Realize medição com analisador de espectro para ajuste fino</li>
-                    </ul>
-                </div>
-            `;
-            
-            modal.style.display = 'flex';
-        }
-
-        function closeReportModal() {
-            document.getElementById('reportModal').style.display = 'none';
-        }
-
-        // Adicionar event listeners
-        const inputs = [speakerQty, speakerImp, speakerPower, connectionType, ampPower, ampMinImp, ampMode, headroomSelect, sensitivityInput];
-        inputs.forEach(input => {
-            input.addEventListener('input', calculateSystem);
-            input.addEventListener('change', calculateSystem);
-        });
-
-        // Inicializar
-        calculateSystem();
-
-        // Service Worker para PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(e => console.log('SW error:', e));
-        }
+        document.querySelectorAll('input, select').forEach(el => el.oninput = calc);
+        calc();
     </script>
 </body>
 </html>
