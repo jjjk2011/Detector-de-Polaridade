@@ -58,26 +58,26 @@
             font-size: 0.7rem;
             font-weight: bold;
             margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        .back-btn:hover {
+            transform: translateX(-4px);
+            border-color: var(--cyan);
         }
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 900;
             background: linear-gradient(135deg, #fff 0%, var(--purple) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .badge-mode {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            background: rgba(168,85,247,0.1);
-            border: 1px solid rgba(168,85,247,0.3);
-            border-radius: 2rem;
-            padding: 0.2rem 0.6rem;
+        .subtitle {
             font-size: 0.6rem;
-            font-weight: bold;
-            color: var(--purple);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-top: 0.25rem;
         }
 
         /* Cards */
@@ -90,7 +90,7 @@
         }
 
         .card-title {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             font-weight: 800;
             text-transform: uppercase;
             color: var(--text-muted);
@@ -103,7 +103,7 @@
             width: 100%;
             height: 100px;
             background: #000;
-            border-radius: 0.75rem;
+            border-radius: 1rem;
             margin-bottom: 1rem;
             border: 1px solid var(--border);
         }
@@ -136,11 +136,6 @@
             text-transform: uppercase;
             letter-spacing: 2px;
         }
-        .result-sub {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-        }
 
         /* Dots de progresso */
         .progress-dots {
@@ -164,7 +159,7 @@
         /* Status message */
         .status-msg {
             text-align: center;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             padding: 0.5rem;
             border-radius: 1rem;
@@ -182,6 +177,7 @@
         .status-complete {
             background: rgba(34,197,94,0.1);
             color: var(--green);
+            animation: none;
         }
         @keyframes pulse {
             0%, 100% { opacity: 1; }
@@ -200,7 +196,7 @@
             font-size: 0.8rem;
             text-transform: uppercase;
             cursor: pointer;
-            margin: 1rem 0;
+            margin-top: 0.5rem;
             transition: all 0.2s;
             display: flex;
             align-items: center;
@@ -211,7 +207,45 @@
             transform: scale(0.98);
         }
         .btn-main.stop {
-            background: linear-gradient(135deg, var(--red) 0%, #dc2626 100);
+            background: linear-gradient(135deg, var(--red) 0%, #dc2626 100%);
+        }
+
+        /* Botões do Gerador */
+        .btn-gen {
+            background: #1f2937;
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            font-weight: 700;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-gen:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+        .btn-gen.playing {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+        }
+        .btn-gen.loop-active {
+            border-color: var(--green);
+            color: var(--green);
+            box-shadow: 0 0 15px rgba(34,197,94,0.2);
+        }
+
+        /* Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
         }
 
         /* Abas de modo */
@@ -250,7 +284,7 @@
         .slider-label {
             display: flex;
             justify-content: space-between;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             text-transform: uppercase;
             color: var(--text-muted);
@@ -275,7 +309,7 @@
 
         /* Select */
         .mic-selector label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             text-transform: uppercase;
             color: var(--text-muted);
@@ -291,6 +325,10 @@
             color: white;
             font-size: 0.8rem;
             outline: none;
+            cursor: pointer;
+        }
+        .mic-selector select:focus {
+            border-color: var(--purple);
         }
 
         .hidden {
@@ -302,24 +340,19 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="back-btn">← VOLTAR</a>
-            <h1>DETECTOR DE POLARIDADE</h1>
-            <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.5rem;">
-                <span id="badgeMode" class="badge-mode">🔊 Drivers / Tweeters</span>
-            </div>
+            <h1>POLARITY CHECKER</h1>
+            <div class="subtitle">Detector de Fase & Gerador de Sinal</div>
         </div>
 
-        <!-- Card Principal -->
+        <!-- Card: Visualizador -->
         <div class="card">
-            <canvas id="oscillo" width="500" height="100"></canvas>
+            <canvas id="oscillo"></canvas>
             
-            <!-- Área de Resultado -->
-            <div id="resultArea" class="result-area hidden">
+            <div id="resultArea" class="hidden result-area">
                 <div id="resultIcon" class="result-icon">?</div>
                 <div id="resultText" class="result-text">---</div>
-                <div class="result-sub">Leitura Concluída</div>
             </div>
 
-            <!-- Progresso e Status -->
             <div class="progress-dots">
                 <div id="dot0" class="dot"></div>
                 <div id="dot1" class="dot"></div>
@@ -329,10 +362,23 @@
                 🎤 CLIQUE NO BOTÃO ABAIXO PARA INICIAR
             </div>
 
-            <!-- Botão Principal -->
             <button id="mainBtn" class="btn-main" onclick="toggleScanner()">
                 🎤 ATIVAR DETECTOR
             </button>
+        </div>
+
+        <!-- Card: Gerador de Sinal -->
+        <div class="card">
+            <div class="card-title">🔊 GERADOR DE SINAL (FONTE)</div>
+            <div class="grid-2">
+                <button id="btnPlayPulse" class="btn-gen" onclick="playSinglePulse()">
+                    ▶️ TOCAR PULSO
+                </button>
+                <button id="btnLoopPulse" class="btn-gen" onclick="toggleLoop()">
+                    🔁 LOOP PULSE
+                </button>
+            </div>
+            <p class="text-[9px] text-center text-gray-500 mt-2">O pulso muda automaticamente conforme o modo selecionado</p>
         </div>
 
         <!-- Card: Configuração -->
@@ -381,6 +427,8 @@
         let currentMode = 'driver';
         let results = [];
         let cooldown = false;
+        let isLooping = false;
+        let loopInterval = null;
         let currentMicId = null;
 
         // Elementos DOM
@@ -394,8 +442,9 @@
         const resultArea = document.getElementById('resultArea');
         const resultIcon = document.getElementById('resultIcon');
         const resultText = document.getElementById('resultText');
-        const badgeMode = document.getElementById('badgeMode');
         const dots = [document.getElementById('dot0'), document.getElementById('dot1'), document.getElementById('dot2')];
+        const btnPlayPulse = document.getElementById('btnPlayPulse');
+        const btnLoopPulse = document.getElementById('btnLoopPulse');
 
         // ========== INICIALIZAÇÃO ==========
         function initCanvas() {
@@ -432,23 +481,84 @@
             if (mode === 'driver') {
                 driverBtn.classList.add('active');
                 subBtn.classList.remove('active');
-                badgeMode.innerHTML = '🔊 Drivers / Tweeters';
-                badgeMode.style.background = 'rgba(168,85,247,0.1)';
-                badgeMode.style.borderColor = 'rgba(168,85,247,0.3)';
-                badgeMode.style.color = 'var(--purple)';
             } else {
                 driverBtn.classList.remove('active');
                 subBtn.classList.add('active');
-                badgeMode.innerHTML = '🎵 Subwoofer';
-                badgeMode.style.background = 'rgba(249,115,22,0.1)';
-                badgeMode.style.borderColor = 'rgba(249,115,22,0.3)';
-                badgeMode.style.color = 'var(--orange)';
             }
             
-            // Se estiver rodando, reinicia para aplicar o filtro
-            if (isRunning) {
-                stopScanner();
-                setTimeout(() => startScanner(), 300);
+            // Se estiver em loop, reinicia para aplicar a nova frequência
+            if (isLooping) {
+                stopLoop();
+                startLoop();
+            }
+        }
+
+        // ========== GERADOR DE SINAL ==========
+        function playSinglePulse() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            
+            // Configuração baseada no modo
+            if (currentMode === 'driver') {
+                // Driver/Tweeter: 1kHz, pulso curto
+                osc.frequency.value = 1000;
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.4, now + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.13);
+            } else {
+                // Subwoofer: 50Hz, pulso mais longo
+                osc.frequency.value = 50;
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.5, now + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            // Feedback visual no botão
+            btnPlayPulse.classList.add('playing');
+            setTimeout(() => btnPlayPulse.classList.remove('playing'), 200);
+        }
+
+        function startLoop() {
+            if (loopInterval) clearInterval(loopInterval);
+            playSinglePulse();
+            loopInterval = setInterval(playSinglePulse, 1000);
+        }
+
+        function stopLoop() {
+            if (loopInterval) {
+                clearInterval(loopInterval);
+                loopInterval = null;
+            }
+        }
+
+        function toggleLoop() {
+            if (isLooping) {
+                stopLoop();
+                isLooping = false;
+                btnLoopPulse.classList.remove('loop-active');
+                btnLoopPulse.innerHTML = '🔁 LOOP PULSE';
+            } else {
+                isLooping = true;
+                startLoop();
+                btnLoopPulse.classList.add('loop-active');
+                btnLoopPulse.innerHTML = '⏹️ PARAR LOOP';
             }
         }
 
@@ -477,7 +587,7 @@
                 const deviceId = micSelect.value;
                 const constraints = {
                     audio: {
-                        deviceId: deviceId !== 'Nenhum microfone encontrado' && deviceId ? { exact: deviceId } : undefined,
+                        deviceId: deviceId && deviceId !== 'Nenhum microfone encontrado' ? { exact: deviceId } : undefined,
                         echoCancellation: false,
                         noiseSuppression: false,
                         autoGainControl: false
@@ -543,9 +653,9 @@
                 }
             }
             
-            // Threshold baseado na sensibilidade
+            // Threshold baseado na sensibilidade (0.05 a 0.55)
             const sensitivity = parseInt(sensSlider.value) / 100;
-            const threshold = 0.03 + sensitivity * 0.5;
+            const threshold = 0.05 + sensitivity * 0.5;
             
             if (maxVal > threshold && !cooldown && results.length < 3) {
                 const isPositive = data[maxIdx] > 0;
@@ -553,7 +663,7 @@
                 updateProgress(results.length);
                 
                 cooldown = true;
-                setTimeout(() => cooldown = false, 600);
+                setTimeout(() => cooldown = false, 700);
                 
                 if (results.length === 1) {
                     statusMsg.innerHTML = '🎧 Escutando...';
@@ -619,11 +729,6 @@
                 analyser = null;
             }
             
-            if (audioCtx) {
-                audioCtx.close().catch(e => console.log('ctx closed'));
-                audioCtx = null;
-            }
-            
             mainBtn.innerHTML = '🎤 ATIVAR DETECTOR';
             mainBtn.classList.remove('stop');
             
@@ -668,7 +773,7 @@
             
             for (let i = 0; i < data.length; i++) {
                 const v = data[i] / 128.0;
-                const y = v * canvas.height / 2;
+                const y = (v * canvas.height / 2) + (canvas.height / 2);
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
                 x += sliceWidth;
