@@ -41,7 +41,6 @@
             margin: 0 auto;
         }
 
-        /* Header */
         .header {
             text-align: center;
             margin-bottom: 1.5rem;
@@ -80,7 +79,6 @@
             color: var(--purple);
         }
 
-        /* Cards */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -98,7 +96,6 @@
             letter-spacing: 1px;
         }
 
-        /* Info box */
         .info-box {
             background: rgba(168,85,247,0.05);
             border-left: 3px solid var(--purple);
@@ -111,7 +108,6 @@
             gap: 0.5rem;
         }
 
-        /* Grid 2 colunas */
         .signal-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -152,7 +148,6 @@
             text-decoration: none;
         }
 
-        /* Abas para modo de teste */
         .test-mode-tabs {
             display: flex;
             gap: 0.5rem;
@@ -180,7 +175,6 @@
             background: var(--orange);
         }
 
-        /* Controles do pulso */
         .pulse-controls {
             display: flex;
             gap: 0.5rem;
@@ -217,24 +211,6 @@
             margin-bottom: 0.5rem;
         }
 
-        /* Status do áudio externo */
-        .audio-status {
-            font-size: 0.55rem;
-            text-align: center;
-            padding: 0.25rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .audio-status.success {
-            background: rgba(34,197,94,0.1);
-            color: var(--green);
-        }
-        .audio-status.warning {
-            background: rgba(245,158,11,0.1);
-            color: var(--gold);
-        }
-
-        /* Controles de frequência para Sub */
         .freq-controls {
             margin-top: 0.5rem;
             padding-top: 0.5rem;
@@ -268,12 +244,7 @@
             font-size: 0.6rem;
             cursor: pointer;
         }
-        .freq-preset:hover {
-            border-color: var(--orange);
-            color: var(--orange);
-        }
 
-        /* Seleção de Microfone */
         .mic-selector {
             margin-bottom: 1rem;
         }
@@ -308,7 +279,6 @@
             gap: 0.25rem;
         }
 
-        /* Slider de Sensibilidade */
         .sensitivity-control {
             margin-bottom: 1rem;
         }
@@ -353,7 +323,6 @@
             text-align: right;
         }
 
-        /* Nível de Sinal */
         .signal-level {
             margin-bottom: 1rem;
         }
@@ -372,7 +341,6 @@
             height: 8px;
             overflow: hidden;
             margin-bottom: 0.5rem;
-            position: relative;
         }
         .level-bar-fill {
             height: 100%;
@@ -388,7 +356,6 @@
             color: var(--text-muted);
         }
 
-        /* Resultado */
         .result-area {
             text-align: center;
             margin: 1rem 0;
@@ -445,7 +412,6 @@
             color: var(--purple);
         }
 
-        /* Status de Escuta */
         .listening-status {
             text-align: center;
             padding: 0.5rem;
@@ -463,16 +429,11 @@
             color: var(--cyan);
             animation: pulse-text 1s ease-in-out infinite;
         }
-        .listening-status.success {
-            background: rgba(34,197,94,0.1);
-            color: var(--green);
-        }
         @keyframes pulse-text {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.6; }
         }
 
-        /* Progresso da Leitura */
         .reading-progress {
             text-align: center;
             font-size: 0.65rem;
@@ -496,7 +457,6 @@
             transform: scale(1.2);
         }
 
-        /* Botão Ativar Detector */
         .btn-activate {
             width: 100%;
             background: linear-gradient(135deg, var(--purple) 0%, #8b5cf6 100%);
@@ -533,7 +493,6 @@
             font-size: 2rem;
             font-weight: bold;
             border: 3px solid var(--border);
-            transition: all 0.3s;
         }
         .polarity-circle-aux.positive {
             border-color: var(--green);
@@ -641,7 +600,7 @@
                 <div style="height: 4px; background: var(--border); border-radius: 2px; margin-top: 0.5rem; width: 100%; overflow: hidden;">
                     <div id="micTestBar" style="width: 0%; height: 100%; background: var(--purple); transition: width 0.05s;"></div>
                 </div>
-                <p class="text-[9px] text-muted-foreground text-center mt-1">Dê toquinhos no celular para achar onde o sinal sobe mais.</p>
+                <p class="text-[9px] text-center mt-1" style="color: var(--text-muted);">Dê toquinhos no celular para achar onde o sinal sobe mais.</p>
             </div>
 
             <!-- Fonte de Sinal -->
@@ -661,8 +620,10 @@
                 </div>
             </div>
 
-            <!-- Status do áudio externo -->
-            <div id="externalAudioStatus" class="audio-status warning">🎵 Carregando áudio externo...</div>
+            <!-- Status do áudio -->
+            <div class="audio-status" style="font-size: 0.55rem; text-align: center; padding: 0.25rem; margin-bottom: 0.5rem; background: rgba(34,197,94,0.1); color: var(--green);">
+                ✅ Gerador de pulso ativo (1kHz / 200ms) com controle de LOOP
+            </div>
 
             <!-- Abas: Driver / Subwoofer -->
             <div class="test-mode-tabs">
@@ -682,7 +643,7 @@
                     <button id="loopPulseBtn" class="pulse-btn loop" onclick="toggleLoop()">🔁 LOOP</button>
                 </div>
                 <div id="pulseStatus" class="pulse-status">⏸ Parado</div>
-                <div id="pulseSourceInfo" class="audio-status" style="font-size: 0.5rem; margin-top: 0.25rem;"></div>
+                <div style="font-size: 0.5rem; text-align: center; color: var(--text-muted);">Sinal: 1kHz • 200ms</div>
             </div>
 
             <!-- Controles do Subwoofer -->
@@ -713,48 +674,6 @@
     </div>
 
     <script>
-        // ========== CONFIGURAÇÃO DO ÁUDIO EXTERNO ==========
-        const AUDIO_FILE_PATH = '/audio/AudioBase_Polaridade_Intervalado_500ms.wav';
-        const AUDIO_FILE_PATH_ALT = '/AudioBase_Polaridade_Intervalado_500ms.wav';
-        
-        let externalAudio = null;
-        let audioLoaded = false;
-        let useExternalAudio = false;
-        
-        // Tentar carregar o arquivo de áudio externo
-        function loadExternalAudio() {
-            return new Promise((resolve) => {
-                externalAudio = new Audio();
-                
-                externalAudio.addEventListener('canplaythrough', () => {
-                    console.log('Áudio externo carregado com sucesso');
-                    audioLoaded = true;
-                    useExternalAudio = true;
-                    updateAudioStatus('success', '✅ Áudio externo carregado (500ms intervalado)', '🎵 Usando arquivo .wav');
-                    resolve(true);
-                });
-                
-                externalAudio.addEventListener('error', () => {
-                    console.log('Falha ao carregar áudio externo, usando gerador interno');
-                    audioLoaded = false;
-                    useExternalAudio = false;
-                    updateAudioStatus('warning', '⚠️ Áudio externo não encontrado', '⚡ Usando gerador interno (1kHz/200ms)');
-                    resolve(false);
-                });
-                
-                externalAudio.src = AUDIO_FILE_PATH;
-                externalAudio.load();
-            });
-        }
-        
-        function updateAudioStatus(type, message, sourceInfo) {
-            const statusDiv = document.getElementById('externalAudioStatus');
-            const sourceInfoDiv = document.getElementById('pulseSourceInfo');
-            statusDiv.textContent = message;
-            statusDiv.className = `audio-status ${type}`;
-            if (sourceInfoDiv) sourceInfoDiv.textContent = sourceInfo;
-        }
-
         // ========== ELEMENTOS ==========
         let audioCtx = null;
         let mediaStream = null;
@@ -768,7 +687,7 @@
         let readingStep = 0;
         let currentPolarityResult = null;
         
-        // Pulso (Driver) - com áudio externo
+        // Pulso (Driver)
         let isPulsePlaying = false;
         let isLoopEnabled = false;
         let pulseInterval = null;
@@ -845,14 +764,12 @@
             const now = new Date();
             const dateStr = now.toLocaleString('pt-BR');
             const resultText = currentPolarityResult === 'positive' ? 'POSITIVO - EM FASE' : 'NEGATIVO - INVERTIDO';
-            const modeText = currentTestMode === 'driver' ? 'Driver/Tweeter' : `Subwoofer (${currentSubFreq}Hz)`;
-            const sourceText = useExternalAudio ? 'Áudio externo (WAV)' : 'Gerador interno';
+            const modeText = currentTestMode === 'driver' ? 'Driver/Tweeter (1kHz)' : `Subwoofer (${currentSubFreq}Hz)`;
             
             const measurementData = {
                 date: dateStr,
                 result: resultText,
                 mode: modeText,
-                source: sourceText,
                 sensitivity: sensitivityPercent + '%'
             };
             
@@ -1097,18 +1014,8 @@
             }
         }
 
-        // ========== PULSO DRIVER (COM ÁUDIO EXTERNO) ==========
-        function playExternalPulse() {
-            if (!externalAudio) return false;
-            externalAudio.currentTime = 0;
-            externalAudio.play().catch(e => {
-                console.log('Erro no áudio externo, usando fallback:', e);
-                playInternalPulse();
-            });
-            return true;
-        }
-
-        function playInternalPulse() {
+        // ========== PULSO DRIVER (GERADO INTERNAMENTE) ==========
+        function playSinglePulse() {
             if (!audioCtx) return false;
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
@@ -1124,17 +1031,9 @@
             return true;
         }
 
-        function playSinglePulse() {
-            if (useExternalAudio && audioLoaded && externalAudio) {
-                return playExternalPulse();
-            } else {
-                return playInternalPulse();
-            }
-        }
-
         function playPulse() {
             if (currentSource !== 'phone' || currentTestMode !== 'driver') return;
-            if (!audioCtx && !useExternalAudio) {
+            if (!audioCtx) {
                 alert('Clique em qualquer lugar para ativar o áudio.');
                 return;
             }
@@ -1149,13 +1048,9 @@
             if (isLoopEnabled) {
                 if (pulseInterval) clearInterval(pulseInterval);
                 playSinglePulse();
-                if (useExternalAudio && externalAudio) {
-                    externalAudio.loop = true;
-                } else {
-                    pulseInterval = setInterval(() => {
-                        if (isPulsePlaying) playInternalPulse();
-                    }, 800);
-                }
+                pulseInterval = setInterval(() => {
+                    if (isPulsePlaying) playSinglePulse();
+                }, 800);
             } else {
                 playSinglePulse();
                 if (currentPulseTimeout) clearTimeout(currentPulseTimeout);
@@ -1169,11 +1064,6 @@
             isPulsePlaying = false;
             if (pulseInterval) clearInterval(pulseInterval);
             if (currentPulseTimeout) clearTimeout(currentPulseTimeout);
-            if (externalAudio) {
-                externalAudio.pause();
-                externalAudio.currentTime = 0;
-                externalAudio.loop = false;
-            }
             updatePulseUI();
         }
 
@@ -1189,7 +1079,6 @@
                 }
             } else {
                 loopBtn.classList.remove('active');
-                if (externalAudio) externalAudio.loop = false;
                 if (isPulsePlaying && pulseInterval) stopPulse();
             }
         }
@@ -1198,10 +1087,10 @@
             const statusDiv = document.getElementById('pulseStatus');
             if (isPulsePlaying) {
                 if (isLoopEnabled) {
-                    statusDiv.innerHTML = useExternalAudio ? '🔁 Reproduzindo em LOOP (áudio externo)' : '🔁 Reproduzindo em LOOP (1kHz)';
+                    statusDiv.innerHTML = '🔁 Reproduzindo em LOOP (1kHz)';
                     statusDiv.style.color = 'var(--green)';
                 } else {
-                    statusDiv.innerHTML = useExternalAudio ? '▶ Reproduzindo (pulso único - áudio externo)' : '▶ Reproduzindo (pulso único 1kHz)';
+                    statusDiv.innerHTML = '▶ Reproduzindo (pulso único 1kHz)';
                     statusDiv.style.color = 'var(--gold)';
                 }
             } else {
@@ -1298,24 +1187,63 @@
             document.getElementById('sensitivityValue').innerText = sensitivityPercent + '%';
         }
 
-        // ========== EVENTOS ==========
-        document.getElementById('micSelect').addEventListener('change', (e) => changeMic(e.target.value));
-        
+        // ========== GERAR ARQUIVO PARA DOWNLOAD ==========
         function generateAudioFile() {
-            const blob = new Blob(["-- Áudio de teste --"], {type: 'audio/wav'});
+            // Gerar um arquivo WAV simples para download
+            const sampleRate = 44100;
+            const duration = 0.5;
+            const numSamples = sampleRate * duration;
+            const audioData = new Float32Array(numSamples);
+            
+            for (let i = 0; i < numSamples; i++) {
+                const t = i / sampleRate;
+                audioData[i] = Math.sin(2 * Math.PI * 1000 * t);
+                if (t > 0.2) audioData[i] *= Math.max(0, 1 - (t - 0.2) / 0.3);
+            }
+            
+            const wavBuffer = new ArrayBuffer(44 + numSamples * 2);
+            const view = new DataView(wavBuffer);
+            
+            // WAV header
+            const writeString = (offset, string) => {
+                for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+            };
+            
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + numSamples * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, numSamples * 2, true);
+            
+            for (let i = 0; i < numSamples; i++) {
+                const sample = Math.max(-1, Math.min(1, audioData[i]));
+                const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                view.setInt16(44 + i * 2, intSample, true);
+            }
+            
+            const blob = new Blob([wavBuffer], { type: 'audio/wav' });
             const url = URL.createObjectURL(blob);
             const link = document.getElementById('carDownloadLink');
             link.href = url;
-            link.download = 'AudioBase_Polaridade_Teste.wav';
+            link.download = 'AudioBase_Polaridade_Teste_1kHz.wav';
         }
+        
         generateAudioFile();
+
+        // ========== EVENTOS ==========
+        document.getElementById('micSelect').addEventListener('change', (e) => changeMic(e.target.value));
         
         updateSensitivity(25);
         updateSubFreq(60);
         updateMicList();
-        
-        // Carregar áudio externo
-        loadExternalAudio();
         
         document.body.addEventListener('click', () => {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
