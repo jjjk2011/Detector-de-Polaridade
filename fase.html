@@ -371,43 +371,61 @@
             color: var(--text-muted);
         }
 
-        /* Resultado / Círculo de Polaridade */
-        .polarity-container {
-            display: flex;
-            justify-content: center;
+        /* Resultado - Nova área com POSITIVO/NEGATIVO */
+        .result-area {
+            text-align: center;
             margin: 1rem 0;
-        }
-        .polarity-circle {
-            width: 10rem;
-            height: 10rem;
-            border-radius: 9999px;
-            border: 8px solid var(--bg-dark);
-            background: rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            padding: 1rem;
+            border-radius: 1.5rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
             transition: all 0.3s ease;
         }
-        .polarity-circle.positive {
+        .result-area.positive {
             border-color: var(--green);
-            background: radial-gradient(circle at center, rgba(34,197,94,0.2) 0%, rgba(34,197,94,0.05) 100%);
-            box-shadow: 0 0 30px rgba(34,197,94,0.4);
+            background: radial-gradient(circle at center, rgba(34,197,94,0.1) 0%, transparent 70%);
         }
-        .polarity-circle.negative {
+        .result-area.negative {
             border-color: var(--red);
-            background: radial-gradient(circle at center, rgba(239,68,68,0.2) 0%, rgba(239,68,68,0.05) 100%);
-            box-shadow: 0 0 30px rgba(239,68,68,0.4);
+            background: radial-gradient(circle at center, rgba(239,68,68,0.1) 0%, transparent 70%);
         }
-        .polarity-symbol {
-            font-size: 3rem;
+        .result-status {
+            font-size: 2rem;
             font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 0.25rem;
         }
-        .polarity-text {
-            font-size: 0.65rem;
-            font-weight: 800;
+        .result-status.positive {
+            color: var(--green);
+        }
+        .result-status.negative {
+            color: var(--red);
+        }
+        .result-description {
+            font-size: 0.8rem;
+            font-weight: 600;
             text-transform: uppercase;
-            margin-top: 0.25rem;
+        }
+        .result-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .result-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+        .result-btn:hover {
+            border-color: var(--purple);
+            color: var(--purple);
         }
 
         /* Status de Escuta */
@@ -487,13 +505,39 @@
             background: linear-gradient(135deg, var(--red) 0%, #dc2626 100%);
         }
 
+        /* Círculo auxiliar para visualização */
+        .polarity-circle-aux {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            border: 3px solid var(--border);
+            transition: all 0.3s;
+        }
+        .polarity-circle-aux.positive {
+            border-color: var(--green);
+            background: rgba(34,197,94,0.2);
+            color: var(--green);
+        }
+        .polarity-circle-aux.negative {
+            border-color: var(--red);
+            background: rgba(239,68,68,0.2);
+            color: var(--red);
+        }
+
         .hidden {
             display: none;
         }
 
         @media (max-width: 500px) {
-            .polarity-circle { width: 8rem; height: 8rem; }
-            .polarity-symbol { font-size: 2.5rem; }
+            .result-status { font-size: 1.5rem; }
+            .result-buttons { gap: 0.5rem; }
+            .result-btn { padding: 0.4rem 0.8rem; font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -538,21 +582,18 @@
                 </div>
             </div>
 
-            <!-- Resultado - Círculo de Polaridade -->
-            <div class="polarity-container">
-                <div id="polarityCircle" class="polarity-circle">
-                    <div id="circleDefault" style="text-align: center;">
-                        <div class="polarity-symbol" style="color: var(--text-muted);">⚡</div>
-                        <div class="polarity-text" style="color: var(--text-muted);">AGUARDANDO</div>
-                    </div>
-                    <div id="circleResult" style="display: none; text-align: center;">
-                        <div id="polaritySymbol" class="polarity-symbol"></div>
-                        <div id="polarityText" class="polarity-text"></div>
-                    </div>
+            <!-- ÁREA DE RESULTADO (POSITIVO/NEGATIVO) -->
+            <div id="resultArea" class="result-area" style="display: none;">
+                <div class="polarity-circle-aux" id="resultCircleAux">⚡</div>
+                <div class="result-status" id="resultStatusText">POSITIVO</div>
+                <div class="result-description" id="resultDescriptionText">EM FASE</div>
+                <div class="result-buttons">
+                    <button class="result-btn" onclick="repeatMeasurement()">🔄 Repetir Medição</button>
+                    <button class="result-btn" onclick="saveMeasurement()">💾 Salvar Medição</button>
                 </div>
             </div>
 
-            <!-- Status de Escuta -->
+            <!-- Status de Escuta (aparece quando não há resultado) -->
             <div id="listeningStatus" class="listening-status waiting">
                 🎧 Aguardando silêncio...
             </div>
@@ -671,6 +712,7 @@
         let levelInterval = null;
         let readingInterval = null;
         let readingStep = 0;
+        let currentPolarityResult = null; // 'positive' ou 'negative'
         
         // Pulso (Driver)
         let isPulsePlaying = false;
@@ -695,9 +737,100 @@
         // Fonte de sinal
         let currentSource = 'phone';
 
-        // ========== FUNÇÕES DE DETECÇÃO (COPIADAS DO MODELO FUNCIONAL) ==========
+        // ========== FUNÇÕES DE RESULTADO ==========
         
-        // Atualiza os 3 pontos de progresso
+        function showResult(isPositive) {
+            const resultArea = document.getElementById('resultArea');
+            const listeningStatus = document.getElementById('listeningStatus');
+            const resultStatus = document.getElementById('resultStatusText');
+            const resultDescription = document.getElementById('resultDescriptionText');
+            const resultCircleAux = document.getElementById('resultCircleAux');
+            
+            // Esconder status de escuta e mostrar resultado
+            listeningStatus.style.display = 'none';
+            resultArea.style.display = 'block';
+            
+            if (isPositive) {
+                resultArea.className = 'result-area positive';
+                resultStatus.className = 'result-status positive';
+                resultStatus.innerText = 'POSITIVO';
+                resultDescription.innerText = 'EM FASE';
+                resultCircleAux.className = 'polarity-circle-aux positive';
+                resultCircleAux.innerHTML = '+';
+                currentPolarityResult = 'positive';
+            } else {
+                resultArea.className = 'result-area negative';
+                resultStatus.className = 'result-status negative';
+                resultStatus.innerText = 'NEGATIVO';
+                resultDescription.innerText = 'INVERTIDO';
+                resultCircleAux.className = 'polarity-circle-aux negative';
+                resultCircleAux.innerHTML = '-';
+                currentPolarityResult = 'negative';
+            }
+        }
+        
+        function hideResult() {
+            const resultArea = document.getElementById('resultArea');
+            const listeningStatus = document.getElementById('listeningStatus');
+            
+            resultArea.style.display = 'none';
+            listeningStatus.style.display = 'block';
+            currentPolarityResult = null;
+        }
+        
+        function repeatMeasurement() {
+            // Esconde o resultado e volta ao modo de escuta
+            hideResult();
+            
+            // Se ainda estiver escaneando, mantém
+            if (isScanning) {
+                const statusDiv = document.getElementById('listeningStatus');
+                statusDiv.innerHTML = '🎧 Aguardando silêncio...';
+                statusDiv.className = 'listening-status waiting';
+            } else {
+                // Se não estiver escaneando, ativa novamente
+                toggleScanner();
+            }
+        }
+        
+        function saveMeasurement() {
+            if (!currentPolarityResult) return;
+            
+            const now = new Date();
+            const dateStr = now.toLocaleString('pt-BR');
+            const resultText = currentPolarityResult === 'positive' ? 'POSITIVO - EM FASE' : 'NEGATIVO - INVERTIDO';
+            const modeText = currentTestMode === 'driver' ? 'Driver/Tweeter (1kHz)' : `Subwoofer (${currentSubFreq}Hz)`;
+            
+            const measurementData = {
+                date: dateStr,
+                result: resultText,
+                mode: modeText,
+                sensitivity: sensitivityPercent + '%'
+            };
+            
+            // Salvar no localStorage
+            let savedMeasurements = localStorage.getItem('polarityMeasurements');
+            if (savedMeasurements) {
+                savedMeasurements = JSON.parse(savedMeasurements);
+            } else {
+                savedMeasurements = [];
+            }
+            savedMeasurements.unshift(measurementData);
+            localStorage.setItem('polarityMeasurements', JSON.stringify(savedMeasurements));
+            
+            // Feedback visual
+            const saveBtn = event.target;
+            const originalText = saveBtn.innerText;
+            saveBtn.innerText = '✓ SALVO!';
+            setTimeout(() => {
+                saveBtn.innerText = originalText;
+            }, 1500);
+            
+            console.log('Medição salva:', measurementData);
+        }
+
+        // ========== FUNÇÕES DE DETECÇÃO ==========
+        
         function updateProgressDots(step) {
             const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
             for (let i = 0; i < dots.length; i++) {
@@ -709,7 +842,6 @@
             }
         }
 
-        // Inicia a leitura com 3 pontos
         function startReadingProgress() {
             readingStep = 0;
             const progressDiv = document.getElementById('readingProgress');
@@ -739,7 +871,6 @@
             }, 800);
         }
 
-        // Atualiza nível de sinal
         function updateSignalLevel(percent) {
             const levelFill = document.getElementById('levelFill');
             const levelPercentDisplay = document.getElementById('levelPercentDisplay');
@@ -747,40 +878,7 @@
             levelPercentDisplay.innerText = `${percent}%`;
         }
 
-        // Mostra resultado da polaridade
-        function showPolarityResult(isPositive) {
-            const circle = document.getElementById('polarityCircle');
-            const defaultDiv = document.getElementById('circleDefault');
-            const resultDiv = document.getElementById('circleResult');
-            const symbolSpan = document.getElementById('polaritySymbol');
-            const textSpan = document.getElementById('polarityText');
-            
-            defaultDiv.style.display = 'none';
-            resultDiv.style.display = 'block';
-            
-            if (isPositive) {
-                circle.className = "polarity-circle positive";
-                symbolSpan.innerHTML = "+";
-                symbolSpan.style.color = "var(--green)";
-                textSpan.innerHTML = "FASE CORRETA";
-                textSpan.style.color = "var(--green)";
-            } else {
-                circle.className = "polarity-circle negative";
-                symbolSpan.innerHTML = "-";
-                symbolSpan.style.color = "var(--red)";
-                textSpan.innerHTML = "FASE INVERTIDA";
-                textSpan.style.color = "var(--red)";
-            }
-            
-            if (resetTimeout) clearTimeout(resetTimeout);
-            resetTimeout = setTimeout(() => {
-                circle.className = "polarity-circle";
-                defaultDiv.style.display = 'block';
-                resultDiv.style.display = 'none';
-            }, 2000);
-        }
-
-        // ========== SCANNER PRINCIPAL (LÓGICA DO MODELO) ==========
+        // ========== SCANNER PRINCIPAL ==========
         
         async function updateMicList() {
             try {
@@ -817,7 +915,6 @@
                 const percent = Math.min(100, Math.floor(max * 100));
                 updateSignalLevel(percent);
                 
-                // Atualizar barra do teste de toque
                 const testBar = document.getElementById('micTestBar');
                 if (testBar) testBar.style.width = `${percent}%`;
             }, 50);
@@ -848,15 +945,12 @@
                 const source = audioCtx.createMediaStreamSource(mediaStream);
                 source.connect(analyser);
                 
-                // Calibração inicial - Aguardando silêncio
                 const statusDiv = document.getElementById('listeningStatus');
                 statusDiv.innerHTML = '🔇 Aguardando silêncio...';
                 statusDiv.className = 'listening-status waiting';
                 
-                // Inicia a leitura com 3 pontos
                 startReadingProgress();
                 
-                // Calcular ruído ambiente
                 const buffer = new Float32Array(analyser.fftSize);
                 await new Promise(r => setTimeout(r, 500));
                 analyser.getFloatTimeDomainData(buffer);
@@ -880,14 +974,12 @@
             }
         }
 
-        // Loop principal de análise de polaridade
         function analyzeAudioLoop() {
             if (!isScanning || !analyser) return;
             
             const buffer = new Float32Array(analyser.fftSize);
             analyser.getFloatTimeDomainData(buffer);
             
-            // Encontrar o pico do sinal
             let maxVal = 0;
             let maxIdx = 0;
             for (let i = 0; i < buffer.length; i++) {
@@ -898,15 +990,21 @@
                 }
             }
             
-            // Calcular threshold baseado na sensibilidade
             const threshold = 0.03 + (sensitivityPercent / 100) * 0.47;
             
-            // Se o sinal for forte o suficiente
             if (maxVal > threshold) {
+                if (resetTimeout) clearTimeout(resetTimeout);
                 const peak = buffer[maxIdx];
-                // Se o pico for positivo = fase correta, negativo = invertida
                 const isPositive = peak > 0;
-                showPolarityResult(isPositive);
+                
+                // Mostrar resultado
+                showResult(isPositive);
+                
+                // Pausar a detecção por 2 segundos para não mostrar múltiplos resultados
+                if (resetTimeout) clearTimeout(resetTimeout);
+                resetTimeout = setTimeout(() => {
+                    // Não faz nada, mantém o resultado visível
+                }, 2000);
             }
             
             scanAnimation = requestAnimationFrame(analyzeAudioLoop);
@@ -924,16 +1022,12 @@
             btn.innerHTML = '🎤 ATIVAR DETECTOR';
             btn.classList.remove('active');
             
-            const circle = document.getElementById('polarityCircle');
-            const defaultDiv = document.getElementById('circleDefault');
-            const resultDiv = document.getElementById('circleResult');
-            circle.className = "polarity-circle";
-            defaultDiv.style.display = 'block';
-            resultDiv.style.display = 'none';
+            hideResult();
             
             const statusDiv = document.getElementById('listeningStatus');
             statusDiv.innerHTML = '🎧 Aguardando silêncio...';
             statusDiv.className = 'listening-status waiting';
+            statusDiv.style.display = 'block';
             
             document.getElementById('readingProgress').classList.add('hidden');
             updateSignalLevel(0);
@@ -964,7 +1058,6 @@
                 audioCtx.resume();
             }
             
-            // Tocar um beep curto para teste
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -977,7 +1070,6 @@
             osc.start(now);
             osc.stop(now + 0.15);
             
-            // Feedback visual
             const btn = document.getElementById('touchTestBtn');
             btn.style.background = 'rgba(168,85,247,0.2)';
             setTimeout(() => btn.style.background = '', 300);
@@ -1221,7 +1313,6 @@
             changeMic(e.target.value);
         });
         
-        // Gerar arquivo de áudio para download
         function generateAudioFile() {
             const blob = new Blob(["-- Áudio de teste --"], {type: 'audio/wav'});
             const url = URL.createObjectURL(blob);
@@ -1231,18 +1322,15 @@
         }
         generateAudioFile();
         
-        // Inicializar
         updateSensitivity(25);
         updateSubFreq(60);
         updateMicList();
         
-        // Pré-inicializar áudio
         document.body.addEventListener('click', () => {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }, { once: true });
         
-        // Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js').catch(e => console.log('SW error'));
         }
