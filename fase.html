@@ -494,46 +494,33 @@
         }
 
         // ========== GERADOR DE SINAL ==========
-        function playSinglePulse() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+       function playSinglePulse() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
 
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.type = 'sine';
-            
-            // Configuração baseada no modo
-            if (currentMode === 'driver') {
-                // Driver/Tweeter: 1kHz, pulso curto
-                osc.frequency.value = 1000;
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.4, now + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
-                osc.start(now);
-                osc.stop(now + 0.13);
-            } else {
-                // Subwoofer: 50Hz, pulso mais longo
-                osc.frequency.value = 50;
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.5, now + 0.02);
-                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
-                osc.start(now);
-                osc.stop(now + 0.5);
-            }
+    const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.5, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
 
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            // Feedback visual no botão
-            btnPlayPulse.classList.add('playing');
-            setTimeout(() => btnPlayPulse.classList.remove('playing'), 200);
+    // Cria um pulso assimétrico (mais forte no início positivo)
+    for (let i = 0; i < data.length; i++) {
+        if (currentMode === 'driver') {
+            // Pulso curto e agudo
+            data[i] = Math.exp(-i / 100) * Math.sin(i / 5); 
+        } else {
+            // Pulso mais longo e grave para Sub
+            data[i] = Math.exp(-i / 1000) * Math.sin(i / 50);
         }
+    }
+
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioCtx.destination);
+    source.start();
+
+    // Feedback visual
+    btnPlayPulse.classList.add('playing');
+    setTimeout(() => btnPlayPulse.classList.remove('playing'), 200);
+}
 
         function startLoop() {
             if (loopInterval) clearInterval(loopInterval);
