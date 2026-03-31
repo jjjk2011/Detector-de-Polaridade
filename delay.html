@@ -3,71 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delay TA | AudioBase Pro</title>
+    <title>AudioBase Pro | Delay Calc</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #0a0d14; color: #c9d1d9; }
+        body { background-color: #0a0d14; color: #c9d1d9; }
         .card { background: #161b22; border: 1px solid #30363d; border-radius: 1.5rem; }
-        input { background: #0a0d14 !important; border: 1px solid #30363d !important; color: white !important; font-weight: bold; }
+        input { background: #0a0d14 !important; border: 1px solid #30363d !important; color: white !important; outline: none; }
     </style>
 </head>
 <body class="p-4">
     <div class="max-w-md mx-auto space-y-4">
         <header class="flex justify-between items-center py-2">
-            <a href="index.html" class="text-cyan-500 text-[10px] font-bold uppercase tracking-widest">← Menu</a>
-            <h1 class="text-white font-black text-xs tracking-widest uppercase">Time Alignment</h1>
+            <a href="index.html" class="text-cyan-500 text-[10px] font-black uppercase tracking-widest">← Menu</a>
+            <h1 class="text-white font-black text-xs tracking-widest uppercase text-right">Time Alignment</h1>
         </header>
 
-        <div class="card p-6 space-y-6 shadow-xl">
+        <div class="card p-6 space-y-6">
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[9px] font-black text-gray-500 uppercase block mb-1 italic">Ref. Longe (m)</label>
-                    <input type="number" id="dL" value="5.0" step="0.1" class="w-full p-3 rounded-xl outline-none focus:border-amber-500">
+                    <label class="text-[9px] font-black text-gray-500 uppercase block mb-1">Caixa Longe (m)</label>
+                    <input type="number" id="long" value="5.0" step="0.1" class="w-full p-4 rounded-xl font-black text-lg">
                 </div>
                 <div>
-                    <label class="text-[9px] font-black text-gray-500 uppercase block mb-1 italic">Via Perto (m)</label>
-                    <input type="number" id="dP" value="1.0" step="0.1" class="w-full p-3 rounded-xl outline-none focus:border-amber-500">
+                    <label class="text-[9px] font-black text-gray-500 uppercase block mb-1">Caixa Perto (m)</label>
+                    <input type="number" id="near" value="1.0" step="0.1" class="w-full p-4 rounded-xl font-black text-lg">
                 </div>
             </div>
 
-            <div class="bg-amber-600/10 border border-amber-600/30 rounded-3xl p-8 text-center shadow-inner">
-                <p class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-2">Atrasar Via Próxima em:</p>
-                <p id="rMs" class="text-6xl font-black text-white italic">11.64</p>
-                <p class="text-[10px] font-black text-amber-500 uppercase mt-2">Milissegundos (ms)</p>
-            </div>
-
-            <div class="pt-4 border-t border-[#30363d]">
-                <div class="flex justify-between text-[9px] font-black text-gray-500 uppercase mb-2 italic">
-                    <span>🌡️ Temp: <span id="tV">20</span>°C</span>
-                    <span>V. Som: <span id="vS">343</span> m/s</span>
+            <div>
+                <div class="flex justify-between text-[9px] font-black text-gray-500 mb-2">
+                    <span>🌡️ TEMPERATURA AMBIENTE</span>
+                    <span id="tempVal">25°C</span>
                 </div>
-                <input type="range" id="tS" min="0" max="50" value="20" class="w-full h-1 bg-gray-700 rounded-lg appearance-none accent-amber-500">
+                <input type="range" id="temp" min="0" max="50" value="25" class="w-full h-1 bg-gray-700 rounded-lg appearance-none accent-cyan-500">
             </div>
         </div>
 
-        <!-- GUIA PARA LEIGOS -->
-        <div class="card p-6 bg-amber-500/5 border-amber-500/20">
-            <h3 class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-3">💡 Por que usar Delay?</h3>
-            <p class="text-[11px] text-gray-400 leading-relaxed italic">
-                Imagine uma corrida. O **Subwoofer** está longe e o **Midbass** está perto de você. O som da porta chega primeiro e o do subwoofer chega depois. 
-                <br><br>Isso faz o som parecer "atrasado" e sem impacto. O Delay "segura" o som que está perto para que todos cheguem no seu ouvido **ao mesmo tempo**.
+        <div class="card p-8 bg-gradient-to-br from-amber-500/10 to-transparent border-amber-500/20 text-center">
+            <p class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-2">Atraso Necessário</p>
+            <h2 id="resMs" class="text-6xl font-black text-white">11.6</h2>
+            <p class="text-[12px] font-bold text-white mt-1">Milisegundos (ms)</p>
+            
+            <div class="mt-6 pt-6 border-t border-white/5 grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-[8px] font-black text-gray-500 uppercase">Velocidade Som</p>
+                    <p id="resSpeed" class="text-xs font-bold">346 m/s</p>
+                </div>
+                <div>
+                    <p class="text-[8px] font-black text-gray-500 uppercase">Distância Relativa</p>
+                    <p id="resDist" class="text-xs font-bold">4.0 m</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
+            <p class="text-[9px] text-gray-500 leading-relaxed uppercase font-medium">
+                Dica: O atraso (delay) deve ser aplicado na via que está **mais próxima** do ouvinte para que o som chegue ao mesmo tempo que a via mais distante.
             </p>
         </div>
     </div>
 
     <script>
         function calc() {
-            let l = parseFloat(document.getElementById('dL').value) || 0;
-            let p = parseFloat(document.getElementById('dP').value) || 0;
-            const t = parseFloat(document.getElementById('tS').value);
-            document.getElementById('tV').innerText = t;
-            const vsound = 331.3 + (0.606 * t);
-            document.getElementById('vS').innerText = Math.round(vsound);
-            const diff = Math.abs(l - p);
-            const ms = (diff / vsound) * 1000;
-            document.getElementById('rMs').innerText = ms.toFixed(2);
+            const long = parseFloat(document.getElementById('long').value) || 0;
+            const near = parseFloat(document.getElementById('near').value) || 0;
+            const temp = parseFloat(document.getElementById('temp').value);
+            
+            document.getElementById('tempVal').innerText = temp + "°C";
+
+            // Velocidade do som: v = 331.3 + 0.606 * T
+            const speed = 331.3 + (0.606 * temp);
+            const dist = Math.abs(long - near);
+            const delay = (dist / speed) * 1000;
+
+            document.getElementById('resMs').innerText = delay.toFixed(1);
+            document.getElementById('resSpeed').innerText = speed.toFixed(0) + " m/s";
+            document.getElementById('resDist').innerText = dist.toFixed(1) + " m";
         }
-        document.querySelectorAll('input').forEach(e => e.oninput = calc);
+
+        document.querySelectorAll('input').forEach(el => el.oninput = calc);
         calc();
     </script>
 </body>
