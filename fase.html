@@ -8,21 +8,22 @@
     <style>
         body { background: #0a0d14; color: #c9d1d9; }
         .card { background: #161b22; border: 1px solid #30363d; border-radius: 1.5rem; }
-        canvas { width: 100%; height: 100px; background: #000; border-radius: 1rem; border: 1px solid #30363d; }
+        canvas { width: 100%; height: 120px; background: #000; border-radius: 1rem; border: 1px solid #30363d; }
         .dot { width: 12px; height: 12px; border-radius: 50%; background: #30363d; transition: 0.3s; }
         .dot.active { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        select { background: #0a0d14 !important; border: 1px solid #30363d !important; color: white !important; }
     </style>
 </head>
-<body class="p-4 pb-10">
+<body class="p-4">
     <div class="max-w-md mx-auto space-y-4">
         <header class="flex justify-between items-center py-2">
-            <a href="index.html" class="text-cyan-500 text-[10px] font-bold uppercase tracking-widest">← Voltar</a>
+            <a href="index.html" class="text-cyan-500 text-[10px] font-black">← Menu</a>
             <h1 class="text-white font-black text-xs tracking-widest uppercase">Polarity Scan</h1>
         </header>
 
         <div class="card p-5">
             <canvas id="oscillo"></canvas>
-            <div id="resArea" class="hidden text-center p-4 rounded-2xl border-2 my-4 transition-all">
+            <div id="resArea" class="hidden text-center p-4 rounded-2xl border-2 my-4">
                 <div id="resIcon" class="text-4xl font-bold"></div>
                 <div id="resText" class="text-lg font-black tracking-widest"></div>
             </div>
@@ -37,53 +38,40 @@
                 <button id="mDriver" onclick="setMode('driver')" class="flex-1 py-2 rounded-lg text-[10px] font-bold bg-purple-600 text-white">🔊 DRIVERS</button>
                 <button id="mSub" onclick="setMode('sub')" class="flex-1 py-2 rounded-lg text-[10px] font-bold text-gray-500">🎵 SUBWOOFER</button>
             </div>
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="playPulse()" class="bg-[#1f2937] py-3 rounded-xl text-[10px] font-bold border border-[#30363d]">▶️ TOCAR PULSO</button>
-                <button id="loopBtn" onclick="toggleLoop()" class="bg-[#1f2937] py-3 rounded-xl text-[10px] font-bold border border-[#30363d]">🔁 LOOP</button>
+            <div>
+                <label class="text-[10px] font-bold text-gray-500 block mb-2 uppercase">🎙️ Seleção de Mic</label>
+                <select id="micSelect" class="w-full p-3 rounded-xl text-xs outline-none"></select>
             </div>
             <div>
-                <div class="flex justify-between text-[10px] font-bold text-gray-500 mb-2 uppercase"><span>⚡ Sensibilidade</span><span id="sensVal">25%</span></div>
+                <div class="flex justify-between text-[10px] font-bold text-gray-500 mb-2 uppercase"><span>⚡ Trigger (Sensib.)</span><span id="sensVal">25%</span></div>
                 <input type="range" id="sensSlider" class="w-full h-1 bg-gray-700 rounded-lg appearance-none accent-purple-500" value="25">
             </div>
-        </header>
-
-        <!-- GUIA PARA LEIGOS -->
-        <div class="card p-6 bg-purple-500/5 border-purple-500/20">
-            <h3 class="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-3">💡 O que é Polaridade?</h3>
-            <p class="text-[11px] text-gray-400 leading-relaxed">
-                Imagine que dois amigos estão empurrando um carro. Se um empurra para frente e o outro para trás, o carro não sai do lugar. 
-                <br><br>No som é igual: se um falante "empurra" o ar e o outro "puxa", eles se cancelam e o **grave some**. Este detector garante que todos empurrem para o mesmo lado.
-            </p>
         </div>
     </div>
 
     <script>
-        let audioCtx, analyser, micSource, filterNode, aniId, isRunning = false, currentMode = 'driver', results = [], cooldown = false, isLooping = false, loopInt;
+        let audioCtx, analyser, micSource, aniId, isRunning = false, currentMode = 'driver', results = [], cooldown = false;
         const canvas = document.getElementById('oscillo'), ctx = canvas.getContext('2d');
 
-        async function init() {
+        async function initMics() {
             const devs = await navigator.mediaDevices.enumerateDevices();
-            document.getElementById('micSelect')?.innerHTML = devs.filter(d => d.kind === 'audioinput').map(d => `<option value="${d.deviceId}">${d.label || 'Microfone'}</option>`).join('');
+            document.getElementById('micSelect').innerHTML = devs.filter(d => d.kind === 'audioinput').map(d => `<option value="${d.deviceId}">${d.label || 'Microfone'}</option>`).join('');
         }
 
         function setMode(m) {
             currentMode = m;
             document.getElementById('mDriver').className = m === 'driver' ? 'flex-1 py-2 rounded-lg text-[10px] font-bold bg-purple-600 text-white' : 'flex-1 py-2 rounded-lg text-[10px] font-bold text-gray-500';
             document.getElementById('mSub').className = m === 'sub' ? 'flex-1 py-2 rounded-lg text-[10px] font-bold bg-orange-600 text-white' : 'flex-1 py-2 rounded-lg text-[10px] font-bold text-gray-500';
-            if(isRunning) stopScanner();
         }
 
         async function toggleScanner() {
             if(isRunning) { stopScanner(); return; }
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false } });
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: document.getElementById('micSelect').value, echoCancellation: false } });
             micSource = audioCtx.createMediaStreamSource(stream);
             analyser = audioCtx.createAnalyser();
-            filterNode = audioCtx.createBiquadFilter();
-            if(currentMode === 'driver') { filterNode.type = 'highpass'; filterNode.frequency.value = 1000; }
-            else { filterNode.type = 'lowpass'; filterNode.frequency.value = 150; }
-            micSource.connect(filterNode); filterNode.connect(analyser);
-            analyser.fftSize = 2048; isRunning = true; results = [];
+            micSource.connect(analyser);
+            isRunning = true; results = []; 
             document.getElementById('mainBtn').innerText = '⏹ Parar';
             document.getElementById('resArea').classList.add('hidden');
             [0,1,2].forEach(i => document.getElementById('dot'+i).classList.remove('active'));
@@ -95,53 +83,36 @@
             document.getElementById('mainBtn').innerText = '🎤 Ativar Detector';
         }
 
-        function playPulse() {
-            if(!audioCtx) audioCtx = new AudioContext();
-            const dur = 0.5, sr = audioCtx.sampleRate, buffer = audioCtx.createBuffer(1, sr * dur, sr), data = buffer.getChannelData(0);
-            for(let i=0; i<sr*dur; i++) {
-                let t = i/sr;
-                if(currentMode === 'driver') data[i] = Math.exp(-t*100) * Math.sin(2*Math.PI*1500*t);
-                else data[i] = Math.exp(-t*15) * Math.sin(2*Math.PI*50*t);
-            }
-            const src = audioCtx.createBufferSource(); src.buffer = buffer; src.connect(audioCtx.destination); src.start();
-        }
-
-        function toggleLoop() {
-            isLooping = !isLooping; document.getElementById('loopBtn').style.borderColor = isLooping ? '#a855f7' : '#30363d';
-            if(isLooping) loopInt = setInterval(playPulse, 1000); else clearInterval(loopInt);
-        }
-
         function process() {
             if(!isRunning) return;
-            const data = new Float32Array(analyser.fftSize); analyser.getFloatTimeDomainData(data);
+            const data = new Float32Array(analyser.fftSize);
+            analyser.getFloatTimeDomainData(data);
             let max = 0, idx = 0;
             for(let i=0; i<data.length; i++) { if(Math.abs(data[i]) > max) { max = Math.abs(data[i]); idx = i; } }
             const threshold = 0.05 + (document.getElementById('sensSlider').value / 100) * 0.5;
             if(max > threshold && !cooldown) {
-                results.push(data[idx] > 0); document.getElementById('dot'+(results.length-1)).classList.add('active');
-                cooldown = true; setTimeout(() => cooldown = false, 700);
-                if(results.length >= 3) { finalize(); return; }
+                results.push(data[idx] > 0);
+                document.getElementById('dot'+(results.length-1)).classList.add('active');
+                cooldown = true; setTimeout(() => cooldown = false, 600);
+                if(results.length >= 3) {
+                    const pos = results.filter(r => r === true).length >= 2;
+                    const area = document.getElementById('resArea');
+                    area.classList.remove('hidden');
+                    area.style.borderColor = pos ? '#22c55e' : '#ef4444';
+                    document.getElementById('resIcon').innerText = pos ? '⊕' : '⊖';
+                    document.getElementById('resText').innerText = pos ? 'POSITIVA' : 'INVERTIDA';
+                    stopScanner();
+                }
             }
             aniId = requestAnimationFrame(process);
         }
 
-        function finalize() {
-            const pos = results.filter(r => r === true).length >= 2;
-            const area = document.getElementById('resArea'); area.classList.remove('hidden');
-            area.style.borderColor = pos ? '#22c55e' : '#ef4444';
-            area.style.background = pos ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)';
-            document.getElementById('resIcon').innerText = pos ? '⊕' : '⊖';
-            document.getElementById('resIcon').style.color = pos ? '#22c55e' : '#ef4444';
-            document.getElementById('resText').innerText = pos ? 'POSITIVA' : 'INVERTIDA';
-            document.getElementById('resText').style.color = pos ? '#22c55e' : '#ef4444';
-            stopScanner();
-        }
-
         function draw() {
             if(!isRunning) return; requestAnimationFrame(draw);
-            const data = new Uint8Array(analyser.frequencyBinCount); analyser.getByteTimeDomainData(data);
+            const data = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteTimeDomainData(data);
             ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.lineWidth = 2; ctx.strokeStyle = currentMode === 'driver' ? '#a855f7' : '#f97316';
+            ctx.lineWidth = 2; ctx.strokeStyle = '#a855f7';
             ctx.beginPath(); let x = 0, slice = canvas.width / data.length;
             for(let i=0; i<data.length; i++) {
                 let y = (data[i]/128.0) * canvas.height/2;
@@ -150,7 +121,7 @@
             ctx.stroke();
         }
         document.getElementById('sensSlider').oninput = (e) => document.getElementById('sensVal').innerText = e.target.value + '%';
-        window.onload = () => { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; };
+        window.onload = initMics;
     </script>
 </body>
 </html>
