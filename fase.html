@@ -67,6 +67,18 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        .badge-mode {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(168,85,247,0.1);
+            border: 1px solid rgba(168,85,247,0.3);
+            border-radius: 2rem;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.6rem;
+            font-weight: bold;
+            color: var(--purple);
+        }
 
         /* Cards */
         .card {
@@ -86,7 +98,20 @@
             letter-spacing: 1px;
         }
 
-        /* Grid 2 colunas para fontes de sinal */
+        /* Info box */
+        .info-box {
+            background: rgba(168,85,247,0.05);
+            border-left: 3px solid var(--purple);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Grid 2 colunas */
         .signal-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -127,7 +152,7 @@
             text-decoration: none;
         }
 
-        /* Abas para modo de teste (Driver/Sub) */
+        /* Abas para modo de teste */
         .test-mode-tabs {
             display: flex;
             gap: 0.5rem;
@@ -225,7 +250,6 @@
             padding: 0.25rem 0.5rem;
             font-size: 0.6rem;
             cursor: pointer;
-            transition: all 0.2s;
         }
         .freq-preset:hover {
             border-color: var(--orange);
@@ -241,7 +265,8 @@
             font-weight: 600;
             text-transform: uppercase;
             color: var(--text-muted);
-            display: block;
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 0.5rem;
         }
         .mic-selector select {
@@ -253,6 +278,17 @@
             color: white;
             font-size: 0.8rem;
             outline: none;
+        }
+        .touch-test-btn {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.65rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
         }
 
         /* Slider de Sensibilidade */
@@ -297,6 +333,7 @@
             font-size: 0.55rem;
             color: var(--text-muted);
             margin-top: 0.25rem;
+            text-align: right;
         }
 
         /* Nível de Sinal */
@@ -304,6 +341,8 @@
             margin-bottom: 1rem;
         }
         .signal-level-label {
+            display: flex;
+            justify-content: space-between;
             font-size: 0.7rem;
             font-weight: 600;
             text-transform: uppercase;
@@ -316,6 +355,7 @@
             height: 8px;
             overflow: hidden;
             margin-bottom: 0.5rem;
+            position: relative;
         }
         .level-bar-fill {
             height: 100%;
@@ -369,11 +409,6 @@
             text-transform: uppercase;
             margin-top: 0.25rem;
         }
-        .polarity-subtext {
-            font-size: 0.5rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-        }
 
         /* Status de Escuta */
         .listening-status {
@@ -402,12 +437,28 @@
             50% { opacity: 0.6; }
         }
 
-        /* Progresso da Leitura */
+        /* Progresso da Leitura com 3 pontos */
         .reading-progress {
             text-align: center;
             font-size: 0.65rem;
             color: var(--text-muted);
             margin-top: 0.5rem;
+        }
+        .progress-dots {
+            display: inline-flex;
+            gap: 0.25rem;
+            margin-left: 0.25rem;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--purple);
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        .dot.active {
+            background: var(--green);
+            transform: scale(1.2);
         }
 
         /* Botão Ativar Detector */
@@ -424,6 +475,10 @@
             cursor: pointer;
             margin: 1rem 0;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
         .btn-activate:active {
             transform: scale(0.98);
@@ -447,6 +502,10 @@
         <div class="header">
             <a href="/" class="back-btn">← VOLTAR</a>
             <h1>DETECTOR DE POLARIDADE</h1>
+            <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.5rem;">
+                <span class="badge-mode">🔊 Drivers / Tweeters</span>
+                <span class="badge-mode" style="background: rgba(249,115,22,0.1); border-color: rgba(249,115,22,0.3); color: var(--orange);">🎵 Modo Trigger (com Pausa)</span>
+            </div>
         </div>
 
         <!-- Card: CAPTURA -->
@@ -455,7 +514,7 @@
             
             <!-- Botão Ativar Detector -->
             <button id="activateBtn" class="btn-activate" onclick="toggleScanner()">
-                🎤 ATIVAR DETECTOR
+                <span>🎤</span> ATIVAR DETECTOR
             </button>
 
             <!-- Sensibilidade (Trigger) -->
@@ -470,14 +529,16 @@
 
             <!-- Nível de Sinal -->
             <div class="signal-level">
-                <div class="signal-level-label">📊 NÍVEL DE SINAL</div>
+                <div class="signal-level-label">
+                    <span>📊 NÍVEL DE SINAL</span>
+                    <span id="levelPercentDisplay">0%</span>
+                </div>
                 <div class="level-bar-container">
                     <div id="levelFill" class="level-bar-fill"></div>
                 </div>
-                <div id="levelPercent" class="level-percent">0%</div>
             </div>
 
-            <!-- Resultado -->
+            <!-- Resultado - Círculo de Polaridade -->
             <div class="polarity-container">
                 <div id="polarityCircle" class="polarity-circle">
                     <div id="circleDefault" style="text-align: center;">
@@ -487,7 +548,6 @@
                     <div id="circleResult" style="display: none; text-align: center;">
                         <div id="polaritySymbol" class="polarity-symbol"></div>
                         <div id="polarityText" class="polarity-text"></div>
-                        <div id="polaritySubtext" class="polarity-subtext"></div>
                     </div>
                 </div>
             </div>
@@ -497,9 +557,14 @@
                 🎧 Aguardando silêncio...
             </div>
 
-            <!-- Progresso da Leitura -->
+            <!-- Progresso da Leitura com 3 pontos animados -->
             <div id="readingProgress" class="reading-progress hidden">
-                LENDO... <span id="readingCount">1</span>/3
+                LENDO...
+                <div class="progress-dots">
+                    <div id="dot1" class="dot"></div>
+                    <div id="dot2" class="dot"></div>
+                    <div id="dot3" class="dot"></div>
+                </div>
             </div>
         </div>
 
@@ -507,6 +572,29 @@
         <div class="card">
             <div class="card-title">⚙️ CONFIGURAÇÃO</div>
             
+            <!-- Info box -->
+            <div class="info-box">
+                <span>🔊</span>
+                <span>Utilize o "Teste do Toque" abaixo para encontrar o microfone correto do seu celular antes de medir.</span>
+            </div>
+
+            <!-- Seleção de Microfone -->
+            <div class="mic-selector">
+                <label>
+                    <span>🎙️ SELECIONE O MICROFONE</span>
+                    <span id="touchTestBtn" class="touch-test-btn" onclick="testMicrophone()">
+                        👆 Teste do Toque
+                    </span>
+                </label>
+                <select id="micSelect">
+                    <option value="">Carregando dispositivos...</option>
+                </select>
+                <div style="height: 4px; background: var(--border); border-radius: 2px; margin-top: 0.5rem; width: 100%; overflow: hidden;">
+                    <div id="micTestBar" style="width: 0%; height: 100%; background: var(--purple); transition: width 0.05s;"></div>
+                </div>
+                <p class="text-[9px] text-muted-foreground text-center mt-1">Dê toquinhos no celular para achar onde o sinal sobe mais.</p>
+            </div>
+
             <!-- Fonte de Sinal - 2 colunas lado a lado -->
             <div class="signal-grid">
                 <div id="optionPhone" class="signal-option active" onclick="selectSource('phone')">
@@ -553,7 +641,6 @@
                 </div>
                 <div id="subStatus" class="pulse-status">⏸ Parado</div>
                 
-                <!-- Controles de Frequência -->
                 <div class="freq-controls">
                     <div class="freq-label">
                         <span>📶 FREQUÊNCIA DO TOM</span>
@@ -567,19 +654,7 @@
                         <span class="freq-preset" onclick="setSubFreq(60)">60 Hz</span>
                         <span class="freq-preset" onclick="setSubFreq(80)">80 Hz</span>
                     </div>
-                    <div class="freq-label" style="margin-top: 0.5rem;">
-                        <span>🎵 TIPO DE ONDA</span>
-                        <span id="waveTypeDisplay">Senoide</span>
-                    </div>
                 </div>
-            </div>
-
-            <!-- Seleção de Microfone -->
-            <div class="mic-selector" style="margin-top: 1rem;">
-                <label>🎙️ SELECIONE O MICROFONE</label>
-                <select id="micSelect">
-                    <option value="">Carregando dispositivos...</option>
-                </select>
             </div>
         </div>
     </div>
@@ -594,6 +669,8 @@
         let resetTimeout = null;
         let currentMicId = null;
         let levelInterval = null;
+        let readingInterval = null;
+        let readingStep = 0;
         
         // Pulso (Driver)
         let isPulsePlaying = false;
@@ -610,37 +687,300 @@
         let currentSubFreq = 60;
         
         // Modo de teste
-        let currentTestMode = 'driver'; // 'driver' ou 'sub'
+        let currentTestMode = 'driver';
         
         // Sensibilidade
         let sensitivityPercent = 25;
         
-        // Leitura progressiva
-        let readingStep = 0;
-        let readingInterval = null;
-        
         // Fonte de sinal
         let currentSource = 'phone';
 
-        // ========== SELEÇÃO DE MODO DE TESTE ==========
-        function setTestMode(mode) {
-            currentTestMode = mode;
-            document.getElementById('modeDriver').classList.remove('active');
-            document.getElementById('modeSub').classList.remove('active');
-            
-            if (mode === 'driver') {
-                document.getElementById('modeDriver').classList.add('active');
-                document.getElementById('driverControls').style.display = 'block';
-                document.getElementById('subControls').style.display = 'none';
-                // Para qualquer som do sub
-                stopSubPulse();
-            } else {
-                document.getElementById('modeSub').classList.add('active');
-                document.getElementById('driverControls').style.display = 'none';
-                document.getElementById('subControls').style.display = 'block';
-                // Para qualquer som do driver
-                stopPulse();
+        // ========== FUNÇÕES DE DETECÇÃO (COPIADAS DO MODELO FUNCIONAL) ==========
+        
+        // Atualiza os 3 pontos de progresso
+        function updateProgressDots(step) {
+            const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
+            for (let i = 0; i < dots.length; i++) {
+                if (i < step) {
+                    dots[i].classList.add('active');
+                } else {
+                    dots[i].classList.remove('active');
+                }
             }
+        }
+
+        // Inicia a leitura com 3 pontos
+        function startReadingProgress() {
+            readingStep = 0;
+            const progressDiv = document.getElementById('readingProgress');
+            const statusDiv = document.getElementById('listeningStatus');
+            
+            progressDiv.classList.remove('hidden');
+            updateProgressDots(0);
+            
+            if (readingInterval) clearInterval(readingInterval);
+            readingInterval = setInterval(() => {
+                if (!isScanning) return;
+                readingStep++;
+                updateProgressDots(readingStep);
+                
+                if (readingStep >= 3) {
+                    clearInterval(readingInterval);
+                    readingInterval = null;
+                    progressDiv.classList.add('hidden');
+                    
+                    statusDiv.innerHTML = '🎧 Escutando...';
+                    statusDiv.className = 'listening-status listening';
+                    updateProgressDots(0);
+                } else {
+                    statusDiv.innerHTML = `🔇 Aguardando silêncio...`;
+                    statusDiv.className = 'listening-status waiting';
+                }
+            }, 800);
+        }
+
+        // Atualiza nível de sinal
+        function updateSignalLevel(percent) {
+            const levelFill = document.getElementById('levelFill');
+            const levelPercentDisplay = document.getElementById('levelPercentDisplay');
+            levelFill.style.width = `${percent}%`;
+            levelPercentDisplay.innerText = `${percent}%`;
+        }
+
+        // Mostra resultado da polaridade
+        function showPolarityResult(isPositive) {
+            const circle = document.getElementById('polarityCircle');
+            const defaultDiv = document.getElementById('circleDefault');
+            const resultDiv = document.getElementById('circleResult');
+            const symbolSpan = document.getElementById('polaritySymbol');
+            const textSpan = document.getElementById('polarityText');
+            
+            defaultDiv.style.display = 'none';
+            resultDiv.style.display = 'block';
+            
+            if (isPositive) {
+                circle.className = "polarity-circle positive";
+                symbolSpan.innerHTML = "+";
+                symbolSpan.style.color = "var(--green)";
+                textSpan.innerHTML = "FASE CORRETA";
+                textSpan.style.color = "var(--green)";
+            } else {
+                circle.className = "polarity-circle negative";
+                symbolSpan.innerHTML = "-";
+                symbolSpan.style.color = "var(--red)";
+                textSpan.innerHTML = "FASE INVERTIDA";
+                textSpan.style.color = "var(--red)";
+            }
+            
+            if (resetTimeout) clearTimeout(resetTimeout);
+            resetTimeout = setTimeout(() => {
+                circle.className = "polarity-circle";
+                defaultDiv.style.display = 'block';
+                resultDiv.style.display = 'none';
+            }, 2000);
+        }
+
+        // ========== SCANNER PRINCIPAL (LÓGICA DO MODELO) ==========
+        
+        async function updateMicList() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const inputs = devices.filter(d => d.kind === 'audioinput');
+                const select = document.getElementById('micSelect');
+                select.innerHTML = '';
+                inputs.forEach((d, i) => {
+                    const opt = document.createElement('option');
+                    opt.value = d.deviceId;
+                    opt.text = d.label || `Microfone ${i+1}`;
+                    if (d.deviceId === currentMicId) opt.selected = true;
+                    select.appendChild(opt);
+                });
+                if (inputs.length === 0) {
+                    select.innerHTML = '<option>Nenhum microfone encontrado</option>';
+                }
+            } catch(e) { console.warn(e); }
+        }
+
+        function startLevelIndicator() {
+            if (levelInterval) clearInterval(levelInterval);
+            if (!analyser) return;
+            
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            levelInterval = setInterval(() => {
+                if (!analyser) return;
+                analyser.getByteTimeDomainData(dataArray);
+                let max = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    const v = (dataArray[i] - 128) / 128;
+                    max = Math.max(max, Math.abs(v));
+                }
+                const percent = Math.min(100, Math.floor(max * 100));
+                updateSignalLevel(percent);
+                
+                // Atualizar barra do teste de toque
+                const testBar = document.getElementById('micTestBar');
+                if (testBar) testBar.style.width = `${percent}%`;
+            }, 50);
+        }
+
+        async function startScanner() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+            
+            try {
+                const constraints = {
+                    audio: {
+                        deviceId: currentMicId ? { exact: currentMicId } : undefined,
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false
+                    }
+                };
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                await updateMicList();
+                
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 2048;
+                const source = audioCtx.createMediaStreamSource(mediaStream);
+                source.connect(analyser);
+                
+                // Calibração inicial - Aguardando silêncio
+                const statusDiv = document.getElementById('listeningStatus');
+                statusDiv.innerHTML = '🔇 Aguardando silêncio...';
+                statusDiv.className = 'listening-status waiting';
+                
+                // Inicia a leitura com 3 pontos
+                startReadingProgress();
+                
+                // Calcular ruído ambiente
+                const buffer = new Float32Array(analyser.fftSize);
+                await new Promise(r => setTimeout(r, 500));
+                analyser.getFloatTimeDomainData(buffer);
+                let sum = 0;
+                for (let i = 0; i < buffer.length; i++) sum += Math.abs(buffer[i]);
+                const noiseFloor = sum / buffer.length;
+                window.noiseFloor = noiseFloor;
+                
+                isScanning = true;
+                const btn = document.getElementById('activateBtn');
+                btn.innerHTML = '🔴 DESATIVAR DETECTOR';
+                btn.classList.add('active');
+                
+                startLevelIndicator();
+                analyzeAudioLoop();
+                
+            } catch(err) {
+                console.error('Erro:', err);
+                alert('Erro ao acessar o microfone. Verifique as permissões.');
+                stopScanner();
+            }
+        }
+
+        // Loop principal de análise de polaridade
+        function analyzeAudioLoop() {
+            if (!isScanning || !analyser) return;
+            
+            const buffer = new Float32Array(analyser.fftSize);
+            analyser.getFloatTimeDomainData(buffer);
+            
+            // Encontrar o pico do sinal
+            let maxVal = 0;
+            let maxIdx = 0;
+            for (let i = 0; i < buffer.length; i++) {
+                const abs = Math.abs(buffer[i]);
+                if (abs > maxVal) {
+                    maxVal = abs;
+                    maxIdx = i;
+                }
+            }
+            
+            // Calcular threshold baseado na sensibilidade
+            const threshold = 0.03 + (sensitivityPercent / 100) * 0.47;
+            
+            // Se o sinal for forte o suficiente
+            if (maxVal > threshold) {
+                const peak = buffer[maxIdx];
+                // Se o pico for positivo = fase correta, negativo = invertida
+                const isPositive = peak > 0;
+                showPolarityResult(isPositive);
+            }
+            
+            scanAnimation = requestAnimationFrame(analyzeAudioLoop);
+        }
+
+        function stopScanner() {
+            isScanning = false;
+            if (scanAnimation) cancelAnimationFrame(scanAnimation);
+            if (levelInterval) clearInterval(levelInterval);
+            if (readingInterval) clearInterval(readingInterval);
+            if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+            if (resetTimeout) clearTimeout(resetTimeout);
+            
+            const btn = document.getElementById('activateBtn');
+            btn.innerHTML = '🎤 ATIVAR DETECTOR';
+            btn.classList.remove('active');
+            
+            const circle = document.getElementById('polarityCircle');
+            const defaultDiv = document.getElementById('circleDefault');
+            const resultDiv = document.getElementById('circleResult');
+            circle.className = "polarity-circle";
+            defaultDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+            
+            const statusDiv = document.getElementById('listeningStatus');
+            statusDiv.innerHTML = '🎧 Aguardando silêncio...';
+            statusDiv.className = 'listening-status waiting';
+            
+            document.getElementById('readingProgress').classList.add('hidden');
+            updateSignalLevel(0);
+        }
+
+        function toggleScanner() {
+            if (isScanning) {
+                stopScanner();
+            } else {
+                startScanner();
+            }
+        }
+
+        async function changeMic(deviceId) {
+            currentMicId = deviceId;
+            if (isScanning) {
+                await stopScanner();
+                setTimeout(() => startScanner(), 300);
+            }
+        }
+
+        // ========== TESTE DO TOQUE ==========
+        function testMicrophone() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            
+            // Tocar um beep curto para teste
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = 1500;
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+            osc.start(now);
+            osc.stop(now + 0.15);
+            
+            // Feedback visual
+            const btn = document.getElementById('touchTestBtn');
+            btn.style.background = 'rgba(168,85,247,0.2)';
+            setTimeout(() => btn.style.background = '', 300);
         }
 
         // ========== SELEÇÃO DE FONTE ==========
@@ -651,19 +991,40 @@
             
             if (source === 'phone') {
                 document.getElementById('optionPhone').classList.add('active');
-                document.getElementById('driverControls').style.display = currentTestMode === 'driver' ? 'block' : 'none';
-                document.getElementById('subControls').style.display = currentTestMode === 'sub' ? 'block' : 'none';
+                if (currentTestMode === 'driver') {
+                    document.getElementById('driverControls').style.display = 'block';
+                } else {
+                    document.getElementById('subControls').style.display = 'block';
+                }
             } else {
                 document.getElementById('optionCar').classList.add('active');
                 document.getElementById('driverControls').style.display = 'none';
                 document.getElementById('subControls').style.display = 'none';
-                // Para qualquer reprodução
                 stopPulse();
                 stopSubPulse();
             }
         }
 
-        // ========== GERADOR DE PULSO (DRIVER) ==========
+        // ========== MODO DE TESTE ==========
+        function setTestMode(mode) {
+            currentTestMode = mode;
+            document.getElementById('modeDriver').classList.remove('active');
+            document.getElementById('modeSub').classList.remove('active');
+            
+            if (mode === 'driver') {
+                document.getElementById('modeDriver').classList.add('active');
+                document.getElementById('driverControls').style.display = currentSource === 'phone' ? 'block' : 'none';
+                document.getElementById('subControls').style.display = 'none';
+                stopSubPulse();
+            } else {
+                document.getElementById('modeSub').classList.add('active');
+                document.getElementById('driverControls').style.display = 'none';
+                document.getElementById('subControls').style.display = currentSource === 'phone' ? 'block' : 'none';
+                stopPulse();
+            }
+        }
+
+        // ========== PULSO DRIVER ==========
         function playSinglePulse() {
             if (!audioCtx) return false;
             const now = audioCtx.currentTime;
@@ -748,12 +1109,11 @@
             }
         }
 
-        // ========== GERADOR DE TOM PARA SUBWOOFER ==========
+        // ========== SUBWOOFER ==========
         function updateSubFreq(value) {
             currentSubFreq = parseInt(value);
             document.getElementById('subFreqSlider').value = currentSubFreq;
             document.getElementById('subFreqValue').innerHTML = currentSubFreq + ' Hz';
-            
             if (isSubPlaying && subOscillator) {
                 subOscillator.frequency.value = currentSubFreq;
             }
@@ -765,11 +1125,9 @@
 
         function startSubTone() {
             if (!audioCtx) return false;
-            
             if (subOscillator) {
                 try { subOscillator.stop(); } catch(e) {}
             }
-            
             subOscillator = audioCtx.createOscillator();
             subGain = audioCtx.createGain();
             subOscillator.type = 'sine';
@@ -794,24 +1152,15 @@
                 alert('Clique em qualquer lugar para ativar o áudio.');
                 return;
             }
-            
             if (isSubPlaying && isSubLoopEnabled) {
                 stopSubPulse();
                 return;
             }
-            
             isSubPlaying = true;
             updateSubUI();
-            
             if (isSubLoopEnabled) {
                 if (subInterval) clearInterval(subInterval);
                 startSubTone();
-                subInterval = setInterval(() => {
-                    if (isSubPlaying) {
-                        // Pequeno fade para evitar clique
-                        if (subGain) subGain.gain.value = 0.2;
-                    }
-                }, 100);
             } else {
                 startSubTone();
                 if (currentPulseTimeout) clearTimeout(currentPulseTimeout);
@@ -865,226 +1214,6 @@
         function updateSensitivity(value) {
             sensitivityPercent = parseInt(value);
             document.getElementById('sensitivityValue').innerText = sensitivityPercent + '%';
-            window.customThreshold = 0.03 + (sensitivityPercent / 100) * 0.47;
-        }
-
-        // ========== SCANNER DE POLARIDADE ==========
-        async function updateMicList() {
-            try {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const inputs = devices.filter(d => d.kind === 'audioinput');
-                const select = document.getElementById('micSelect');
-                select.innerHTML = '';
-                inputs.forEach((d, i) => {
-                    const opt = document.createElement('option');
-                    opt.value = d.deviceId;
-                    opt.text = d.label || `Microfone ${i+1}`;
-                    if (d.deviceId === currentMicId) opt.selected = true;
-                    select.appendChild(opt);
-                });
-                if (inputs.length === 0) {
-                    select.innerHTML = '<option>Nenhum microfone encontrado</option>';
-                }
-            } catch(e) { console.warn(e); }
-        }
-
-        function startReadingProgress() {
-            readingStep = 0;
-            const progressDiv = document.getElementById('readingProgress');
-            const readingCountSpan = document.getElementById('readingCount');
-            progressDiv.classList.remove('hidden');
-            
-            if (readingInterval) clearInterval(readingInterval);
-            readingInterval = setInterval(() => {
-                readingStep++;
-                readingCountSpan.innerText = readingStep;
-                if (readingStep >= 3) {
-                    clearInterval(readingInterval);
-                    readingInterval = null;
-                    progressDiv.classList.add('hidden');
-                    
-                    const statusDiv = document.getElementById('listeningStatus');
-                    statusDiv.innerHTML = '✅ Calibração concluída!';
-                    statusDiv.className = 'listening-status success';
-                    setTimeout(() => {
-                        if (isScanning) {
-                            statusDiv.innerHTML = '🎧 Escutando...';
-                            statusDiv.className = 'listening-status listening';
-                        }
-                    }, 1000);
-                }
-            }, 800);
-        }
-
-        function startLevelIndicator() {
-            if (levelInterval) clearInterval(levelInterval);
-            if (!analyser) return;
-            
-            const dataArray = new Uint8Array(analyser.frequencyBinCount);
-            levelInterval = setInterval(() => {
-                if (!analyser) return;
-                analyser.getByteTimeDomainData(dataArray);
-                let max = 0;
-                for (let i = 0; i < dataArray.length; i++) {
-                    const v = (dataArray[i] - 128) / 128;
-                    max = Math.max(max, Math.abs(v));
-                }
-                const percent = Math.min(100, Math.floor(max * 100));
-                document.getElementById('levelFill').style.width = `${percent}%`;
-                document.getElementById('levelPercent').innerHTML = `${percent}%`;
-            }, 100);
-        }
-
-        async function startScanner() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                await audioCtx.resume();
-            }
-            
-            try {
-                const constraints = {
-                    audio: {
-                        deviceId: currentMicId ? { exact: currentMicId } : undefined,
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false
-                    }
-                };
-                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-                await updateMicList();
-                
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 2048;
-                const source = audioCtx.createMediaStreamSource(mediaStream);
-                source.connect(analyser);
-                
-                const statusDiv = document.getElementById('listeningStatus');
-                statusDiv.innerHTML = '🔇 Aguardando silêncio...';
-                statusDiv.className = 'listening-status waiting';
-                startReadingProgress();
-                
-                const buffer = new Float32Array(analyser.fftSize);
-                await new Promise(r => setTimeout(r, 500));
-                analyser.getFloatTimeDomainData(buffer);
-                let sum = 0;
-                for (let i = 0; i < buffer.length; i++) sum += Math.abs(buffer[i]);
-                const noiseFloor = sum / buffer.length;
-                window.noiseFloor = noiseFloor;
-                
-                isScanning = true;
-                const btn = document.getElementById('activateBtn');
-                btn.innerHTML = '🔴 DESATIVAR DETECTOR';
-                btn.classList.add('active');
-                
-                startLevelIndicator();
-                analyzeAudio();
-                
-            } catch(err) {
-                console.error('Erro:', err);
-                alert('Erro ao acessar o microfone. Verifique as permissões.');
-                stopScanner();
-            }
-        }
-
-        function analyzeAudio() {
-            if (!isScanning || !analyser) return;
-            
-            const buffer = new Float32Array(analyser.fftSize);
-            analyser.getFloatTimeDomainData(buffer);
-            
-            let maxVal = 0;
-            let maxIdx = 0;
-            for (let i = 0; i < buffer.length; i++) {
-                const abs = Math.abs(buffer[i]);
-                if (abs > maxVal) { maxVal = abs; maxIdx = i; }
-            }
-            
-            const threshold = window.customThreshold || (0.03 + (sensitivityPercent / 100) * 0.47);
-            
-            if (maxVal > threshold) {
-                if (resetTimeout) clearTimeout(resetTimeout);
-                
-                const peak = buffer[maxIdx];
-                const circle = document.getElementById('polarityCircle');
-                const defaultDiv = document.getElementById('circleDefault');
-                const resultDiv = document.getElementById('circleResult');
-                const symbolSpan = document.getElementById('polaritySymbol');
-                const textSpan = document.getElementById('polarityText');
-                const subtextSpan = document.getElementById('polaritySubtext');
-                
-                defaultDiv.style.display = 'none';
-                resultDiv.style.display = 'block';
-                
-                if (peak > 0) {
-                    circle.className = "polarity-circle positive";
-                    symbolSpan.innerHTML = "+";
-                    symbolSpan.style.color = "var(--green)";
-                    textSpan.innerHTML = "FASE CORRETA";
-                    textSpan.style.color = "var(--green)";
-                    subtextSpan.innerHTML = "Positivo no terminal positivo";
-                } else {
-                    circle.className = "polarity-circle negative";
-                    symbolSpan.innerHTML = "-";
-                    symbolSpan.style.color = "var(--red)";
-                    textSpan.innerHTML = "FASE INVERTIDA";
-                    textSpan.style.color = "var(--red)";
-                    subtextSpan.innerHTML = "Troque a polaridade dos cabos";
-                }
-                
-                resetTimeout = setTimeout(() => {
-                    circle.className = "polarity-circle";
-                    defaultDiv.style.display = 'block';
-                    resultDiv.style.display = 'none';
-                }, 1800);
-            }
-            
-            scanAnimation = requestAnimationFrame(analyzeAudio);
-        }
-
-        function stopScanner() {
-            isScanning = false;
-            if (scanAnimation) cancelAnimationFrame(scanAnimation);
-            if (levelInterval) clearInterval(levelInterval);
-            if (readingInterval) clearInterval(readingInterval);
-            if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-            if (resetTimeout) clearTimeout(resetTimeout);
-            
-            const btn = document.getElementById('activateBtn');
-            btn.innerHTML = '🎤 ATIVAR DETECTOR';
-            btn.classList.remove('active');
-            
-            const circle = document.getElementById('polarityCircle');
-            const defaultDiv = document.getElementById('circleDefault');
-            const resultDiv = document.getElementById('circleResult');
-            circle.className = "polarity-circle";
-            defaultDiv.style.display = 'block';
-            resultDiv.style.display = 'none';
-            
-            const statusDiv = document.getElementById('listeningStatus');
-            statusDiv.innerHTML = '🎧 Aguardando silêncio...';
-            statusDiv.className = 'listening-status waiting';
-            
-            document.getElementById('readingProgress').classList.add('hidden');
-            document.getElementById('levelFill').style.width = '0%';
-            document.getElementById('levelPercent').innerHTML = '0%';
-        }
-
-        function toggleScanner() {
-            if (isScanning) {
-                stopScanner();
-            } else {
-                startScanner();
-            }
-        }
-
-        async function changeMic(deviceId) {
-            currentMicId = deviceId;
-            if (isScanning) {
-                await stopScanner();
-                setTimeout(() => startScanner(), 300);
-            }
         }
 
         // ========== EVENTOS ==========
