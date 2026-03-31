@@ -4,241 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0a0d14">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="AudioBase Pro">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icons/icon-192.png">
-    <title>AudioBase Pro | Engenharia de Áudio</title>
+    <link rel="manifest" href="manifest.json">
+    <title>AudioBase Pro | Engineering System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-dark: #0a0d14;
-            --card-bg: #161b22;
-            --border: #30363d;
-            --cyan: #06b6d4;
-            --purple: #a855f7;
-            --green: #22c55e;
-            --gold: #f59e0b;
-            --red: #ef4444;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: #c9d1d9;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-
-        .container {
-            max-width: 600px;
-            width: 100%;
-        }
-
-        /* Header */
-        .logo {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        .logo h1 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: white;
-            letter-spacing: -0.5px;
-        }
-        .logo h1 span {
-            color: var(--cyan);
-            font-weight: 300;
-        }
-        .logo p {
-            font-size: 0.6rem;
-            font-weight: bold;
-            color: #4a5568;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            margin-top: 0.5rem;
-        }
-
-        /* Cards de navegação */
-        .nav-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            color: inherit;
-        }
-        .nav-card:hover {
-            transform: translateX(8px);
-            border-color: var(--cyan);
-        }
-        .nav-card:active {
-            transform: scale(0.98);
-        }
-
-        .nav-icon {
-            width: 3.5rem;
-            height: 3.5rem;
-            background: var(--bg-dark);
-            border-radius: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        .nav-card.delay .nav-icon { color: var(--gold); border: 1px solid rgba(245,158,11,0.3); }
-        .nav-card.projeto .nav-icon { color: var(--cyan); border: 1px solid rgba(6,182,212,0.3); }
-        .nav-card.fase .nav-icon { color: var(--purple); border: 1px solid rgba(168,85,247,0.3); }
-
-        .nav-content h2 {
-            font-size: 1.25rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            margin-bottom: 0.25rem;
-        }
-        .nav-content p {
-            font-size: 0.7rem;
-            color: #6c757d;
-        }
-        .nav-card.delay .nav-content h2 { color: var(--gold); }
-        .nav-card.projeto .nav-content h2 { color: var(--cyan); }
-        .nav-card.fase .nav-content h2 { color: var(--purple); }
-
-        /* Banner de instalação PWA */
-        .install-banner {
-            position: fixed;
-            bottom: 1rem;
-            left: 1rem;
-            right: 1rem;
-            background: var(--card-bg);
-            border: 1px solid var(--cyan);
-            border-radius: 1rem;
-            padding: 0.75rem 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            z-index: 100;
-            animation: fadeIn 0.3s ease;
-        }
-        .install-banner.hidden {
-            display: none;
-        }
-        .install-banner p {
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-        .install-banner button {
-            background: var(--cyan);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-weight: bold;
-            font-size: 0.7rem;
-            cursor: pointer;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 3rem;
-            padding: 1rem;
-            font-size: 0.55rem;
-            color: #2d3748;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-        }
+        body { background-color: #0a0d14; color: #c9d1d9; font-family: system-ui, sans-serif; }
+        .nav-card { background: #161b22; border: 1px solid #30363d; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-card:hover { transform: translateY(-5px); border-color: #06b6d4; box-shadow: 0 10px 20px rgba(6, 182, 212, 0.1); }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <h1>AUDIOBASE <span>PRO</span></h1>
-            <p>V 13.0 • PWA READY</p>
-        </div>
+<body class="min-h-screen flex flex-col items-center justify-center p-6">
+    <div class="max-w-md w-full">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-black text-white tracking-tighter">AUDIOBASE <span class="text-cyan-500">PRO</span></h1>
+            <p class="text-[10px] text-gray-500 uppercase tracking-[0.3em] mt-2 font-bold">Acoustic Engineering Suite • v14.0</p>
+        </header>
 
-        <a href="/delay.html" class="nav-card delay">
-            <div class="nav-icon">⏱️</div>
-            <div class="nav-content">
-                <h2>DELAY / TA</h2>
-                <p>Alinhamento de tempo • Cálculo de atraso entre vias</p>
-            </div>
-        </a>
+        <nav class="space-y-4">
+            <a href="delay.html" class="nav-card p-6 rounded-2xl flex items-center gap-5 block">
+                <div class="text-3xl">⏱️</div>
+                <div>
+                    <h2 class="text-amber-500 font-black text-lg">DELAY / TA</h2>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Alinhamento de Tempo Preciso</p>
+                </div>
+            </a>
 
-        <a href="/projeto.html" class="nav-card projeto">
-            <div class="nav-icon">📊</div>
-            <div class="nav-content">
-                <h2>PROJETO DO SISTEMA</h2>
-                <p>Impedância • Potência • Limiter • Compatibilidade com amp</p>
-            </div>
-        </a>
+            <a href="projeto.html" class="nav-card p-6 rounded-2xl flex items-center gap-5 block">
+                <div class="text-3xl">📊</div>
+                <div>
+                    <h2 class="text-cyan-500 font-black text-lg">POWER RMS</h2>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Impedância • Limiter • Cabos</p>
+                </div>
+            </a>
 
-        <a href="/fase.html" class="nav-card fase">
-            <div class="nav-icon">🔊</div>
-            <div class="nav-content">
-                <h2>SCANNER DE FASE</h2>
-                <p>Detecção de polaridade • Pulso de teste • Gerador de tom</p>
-            </div>
-        </a>
+            <a href="fase.html" class="nav-card p-6 rounded-2xl flex items-center gap-5 block border-l-4 border-l-purple-600">
+                <div class="text-3xl">🔊</div>
+                <div>
+                    <h2 class="text-purple-500 font-black text-lg">POLARITY SCAN</h2>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Detector de Fase em Tempo Real</p>
+                </div>
+            </a>
+        </nav>
 
-        <footer>
-            <p>AudioBase Pro • Engineering System</p>
+        <footer class="mt-16 text-center text-[9px] text-gray-600 uppercase tracking-widest font-bold">
+            Engineering Tool • No Internet Required
         </footer>
     </div>
 
-    <!-- Banner de instalação PWA -->
-    <div id="installBanner" class="install-banner hidden">
-        <p>📱 <strong>Instale o AudioBase Pro</strong><br>Use como app no seu dispositivo</p>
-        <button id="installBtn">INSTALAR</button>
-    </div>
-
     <script>
-        // PWA Install
-        let deferredPrompt = null;
-        const installBanner = document.getElementById('installBanner');
-        const installBtn = document.getElementById('installBtn');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBanner.classList.remove('hidden');
-        });
-
-        installBtn.addEventListener('click', async () => {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installBanner.classList.add('hidden');
-            }
-            deferredPrompt = null;
-        });
-
-        // Registrar Service Worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('SW registrado'))
-                .catch(err => console.log('SW falhou:', err));
+            navigator.serviceWorker.register('sw.js').then(() => console.log("PWA Active"));
         }
     </script>
 </body>
