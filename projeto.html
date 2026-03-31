@@ -8,85 +8,70 @@
     <style>
         body { background: #0a0d14; color: #c9d1d9; font-family: system-ui, sans-serif; }
         .card { background: #161b22; border: 1px solid #30363d; border-radius: 1.5rem; }
-        input, select { background: #0a0d14 !important; border: 1px solid #30363d !important; color: white !important; font-weight: bold; transition: 0.3s; }
-        input:focus { border-color: #06b6d4 !important; box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
+        input, select { background: #0a0d14 !important; border: 1px solid #30363d !important; color: white !important; font-weight: bold; }
         .report-item { border-left: 2px solid #30363d; padding-left: 12px; margin-bottom: 12px; }
     </style>
 </head>
 <body class="p-4 pb-20">
     <div class="max-w-md mx-auto space-y-4">
         <header class="flex justify-between items-center py-2">
-            <a href="index.html" class="text-cyan-500 text-[10px] font-black uppercase tracking-widest">← Menu Principal</a>
-            <h1 class="text-white font-black text-xs tracking-widest uppercase">Diagnóstico Pro</h1>
+            <a href="index.html" class="text-cyan-500 text-[10px] font-black uppercase tracking-widest">← Menu</a>
+            <h1 class="text-white font-black text-xs tracking-widest uppercase italic">Casamento de Sistema</h1>
         </header>
 
-        <!-- ENTRADA DE DADOS -->
+        <!-- INPUTS -->
         <div class="card p-6 space-y-4 shadow-xl">
-            <div class="flex items-center gap-2 mb-2">
-                <span class="bg-cyan-500/20 text-cyan-500 p-1.5 rounded-lg text-xs">🔊</span>
-                <h3 class="text-[10px] font-black text-white uppercase tracking-widest">Configuração do Set</h3>
-            </div>
-            
+            <h3 class="text-[10px] font-black text-cyan-500 uppercase tracking-widest">1. Alto-Falantes</h3>
             <div class="grid grid-cols-2 gap-4">
-                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Alto-Falantes</label><input type="number" id="qty" value="2" class="w-full p-3 rounded-xl outline-none"></div>
-                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Ohms (Cada)</label><input type="number" id="imp" value="4" class="w-full p-3 rounded-xl outline-none"></div>
+                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Qtd</label><input type="number" id="qty" value="2" class="w-full p-3 rounded-xl outline-none"></div>
+                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Ohms Unit.</label><input type="number" id="imp" value="4" class="w-full p-3 rounded-xl outline-none"></div>
             </div>
             <div class="grid grid-cols-2 gap-4">
-                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Watts RMS (Cada)</label><input type="number" id="pwr" value="500" class="w-full p-3 rounded-xl outline-none"></div>
+                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Watts (Cada)</label><input type="number" id="pwr" value="500" class="w-full p-3 rounded-xl outline-none"></div>
                 <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Ligação</label><select id="conn" class="w-full p-3 rounded-xl outline-none"><option value="par">Paralelo</option><option value="ser">Série</option></select></div>
             </div>
 
-            <div class="pt-4 border-t border-gray-800">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="bg-purple-500/20 text-purple-500 p-1.5 rounded-lg text-xs">🔌</span>
-                    <h3 class="text-[10px] font-black text-white uppercase tracking-widest">Dados do Amplificador</h3>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Potência (Canal)</label><input type="number" id="ampPwr" value="1200" class="w-full p-3 rounded-xl outline-none"></div>
-                    <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Imp. Mínima</label><input type="number" id="ampImp" value="2" class="w-full p-3 rounded-xl outline-none"></div>
-                </div>
+            <h3 class="text-[10px] font-black text-cyan-500 uppercase tracking-widest pt-4 border-t border-gray-800">2. Amplificador</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Watts RMS</label><input type="number" id="ampPwr" value="1200" class="w-full p-3 rounded-xl outline-none"></div>
+                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Ω Mínimo</label><input type="number" id="ampImp" value="2" class="w-full p-3 rounded-xl outline-none"></div>
             </div>
         </div>
 
-        <!-- RESULTADOS RÁPIDOS -->
-        <div id="statusHeader" class="card p-5 border-l-4 transition-all duration-500">
-            <div class="flex justify-between items-center">
-                <div class="text-center flex-1 border-r border-gray-800">
-                    <p class="text-[8px] font-bold text-gray-500 uppercase">Impedância Final</p>
-                    <p id="resImp" class="text-xl font-black italic">--</p>
+        <!-- RELATÓRIO DINÂMICO -->
+        <div id="matchCard" class="card p-6 border-l-4 border-l-green-500 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <p id="resImp" class="text-2xl font-black italic">2.0 Ω</p>
+                <div class="text-right">
+                    <p class="text-[9px] font-black text-gray-500 uppercase">Limiter Sugerido</p>
+                    <p id="resVrms" class="text-2xl font-black text-cyan-500 italic">44.7 V</p>
                 </div>
-                <div class="text-center flex-1 border-r border-gray-800">
-                    <p class="text-[8px] font-bold text-gray-500 uppercase">Potência Set</p>
-                    <p id="resPwr" class="text-xl font-black italic">--</p>
-                </div>
-                <div class="text-center flex-1">
-                    <p class="text-[8px] font-bold text-gray-500 uppercase">Vrms Limiter</p>
-                    <p id="resVrms" class="text-xl font-black text-cyan-500 italic">--</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- RELATÓRIO AUTOMATIZADO -->
-        <div class="card p-6 shadow-2xl overflow-hidden relative">
-            <div class="flex items-center gap-2 mb-6 border-b border-gray-800 pb-4">
-                <span class="text-lg">📋</span>
-                <h2 class="text-xs font-black text-white uppercase tracking-[0.2em]">Relatório de Compatibilidade</h2>
-            </div>
-
-            <div id="reportBox" class="space-y-6">
-                <!-- Injetado via JS -->
             </div>
             
-            <div class="mt-8 pt-4 border-t border-gray-800 flex justify-between items-center">
-                <p class="text-[8px] font-black text-gray-600 uppercase">Cálculo Baseado em RMS Real</p>
-                <div id="headroomTag" class="px-3 py-1 rounded-full text-[9px] font-black uppercase">--</div>
+            <div id="reportBox" class="space-y-4">
+                <!-- Injetado via JS -->
+            </div>
+        </div>
+
+        <!-- GUIA PARA LEIGOS + TABELA -->
+        <div class="card p-6 bg-cyan-500/5 border-cyan-500/20">
+            <h3 class="text-[10px] font-black text-cyan-500 uppercase tracking-widest mb-4 italic">💡 Dicas para Iniciantes</h3>
+            <div class="space-y-4 text-[11px] text-gray-400 leading-relaxed">
+                <p><b>O que são Ohms?</b> É a "resistência". Se a impedância do falante for menor que a do Amp, o amp faz força demais e queima!</p>
+                
+                <div class="bg-black/40 p-4 rounded-xl space-y-2 border border-white/5">
+                    <p class="text-white font-bold uppercase text-[9px]">Tabela Rápida de Cabos:</p>
+                    <div class="flex justify-between border-b border-gray-800 pb-1"><span>Até 150W</span><span class="text-cyan-500">1.5mm²</span></div>
+                    <div class="flex justify-between border-b border-gray-800 pb-1"><span>Até 400W</span><span class="text-cyan-500">2.5mm²</span></div>
+                    <div class="flex justify-between border-b border-gray-800 pb-1"><span>Até 800W</span><span class="text-cyan-500">4.0mm²</span></div>
+                    <div class="flex justify-between"><span>Até 1200W</span><span class="text-cyan-500">6.0mm²</span></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        function updateReport() {
-            // Coleta de dados
+        function update() {
             const qty = parseFloat(document.getElementById('qty').value) || 0;
             const imp = parseFloat(document.getElementById('imp').value) || 0;
             const pwr = parseFloat(document.getElementById('pwr').value) || 0;
@@ -94,93 +79,36 @@
             const ampPwr = parseFloat(document.getElementById('ampPwr').value) || 0;
             const ampImp = parseFloat(document.getElementById('ampImp').value) || 0;
 
-            // Cálculos Técnicos
-            const finalImp = conn === 'par' ? (imp / qty) : (imp * qty);
-            const totalSpeakerPwr = pwr * qty;
-            const vrms = Math.sqrt(totalSpeakerPwr * finalImp);
-            const amps = vrms / finalImp || 0;
-            const headroom = ((ampPwr / totalSpeakerPwr) - 1) * 100;
+            const fImp = conn === 'par' ? (imp/qty) : (imp*qty);
+            const totalPwr = pwr * qty;
+            const vrms = Math.sqrt(totalPwr * fImp);
+            const headroom = ((ampPwr/totalPwr)-1)*100;
 
-            // Atualiza Resumo Superior
-            document.getElementById('resImp').innerText = finalImp.toFixed(1) + " Ω";
-            document.getElementById('resPwr').innerText = totalSpeakerPwr + " W";
-            document.getElementById('resVrms').innerText = vrms.toFixed(1);
+            document.getElementById('resImp').innerText = fImp.toFixed(1) + " Ω";
+            document.getElementById('resVrms').innerText = vrms.toFixed(1) + " V";
 
-            // LOGICA DO RELATÓRIO AUTOMÁTICO
-            const reportBox = document.getElementById('reportBox');
-            const statusHeader = document.getElementById('statusHeader');
-            const headroomTag = document.getElementById('headroomTag');
+            const rBox = document.getElementById('reportBox');
+            const mCard = document.getElementById('matchCard');
             let html = "";
 
-            // 1. ANÁLISE DE IMPEDÂNCIA (CRÍTICO)
-            if (finalImp < ampImp) {
-                statusHeader.style.borderColor = "#ef4444";
-                html += `
-                    <div class="report-item border-red-500">
-                        <p class="text-red-500 font-black text-[10px] uppercase mb-1 italic">🔴 ERRO CRÍTICO: Casamento Impossível</p>
-                        <p class="text-[11px] text-gray-300 leading-relaxed">Sua impedância final de <b>${finalImp.toFixed(1)}Ω</b> está abaixo do mínimo de <b>${ampImp}Ω</b> do amplificador. O amp vai entrar em proteção térmica ou <b>queimar as saídas</b> em poucos minutos de uso.</p>
-                        <p class="text-[10px] text-red-400 mt-2 font-bold italic">➜ Sugestão: Mude a ligação para SÉRIE ou use falantes de maior impedância.</p>
-                    </div>`;
+            if(fImp < ampImp) {
+                mCard.style.borderColor = "#ef4444";
+                html += `<p class="text-red-500 font-black text-[11px] uppercase italic">🔴 ERRO: Impedância Muito Baixa!</p><p class="text-[10px] text-gray-400">O amplificador vai esquentar e queimar. Mude a ligação para Série.</p>`;
             } else {
-                statusHeader.style.borderColor = "#22c55e";
-                html += `
-                    <div class="report-item border-green-500">
-                        <p class="text-green-500 font-black text-[10px] uppercase mb-1 italic">✅ Impedância: OK</p>
-                        <p class="text-[11px] text-gray-300">O amplificador trabalhará folgado. A impedância de ${finalImp.toFixed(1)}Ω é estável para este canal.</p>
-                    </div>`;
+                mCard.style.borderColor = "#22c55e";
+                html += `<p class="text-green-500 font-black text-[11px] uppercase italic">✅ Casamento de Ohms Perfeito</p>`;
             }
 
-            // 2. ANÁLISE DE POTÊNCIA E CLIPPING
-            if (ampPwr < totalSpeakerPwr) {
-                html += `
-                    <div class="report-item border-amber-500">
-                        <p class="text-amber-500 font-black text-[10px] uppercase mb-1 italic">⚠️ RISCO: Falta de Potência (Underpower)</p>
-                        <p class="text-[11px] text-gray-300 leading-relaxed">Seu amplificador entrega ${ampPwr}W, mas os falantes pedem ${totalSpeakerPwr}W. Você terá que subir muito o ganho, gerando <b>Onda Quadrada (Clipping)</b>, que queima a bobina por calor excessivo.</p>
-                        <p class="text-[10px] text-amber-400 mt-2 font-bold italic">➜ Sugestão: Não ultrapasse 70% do volume ou use um amplificador mais forte.</p>
-                    </div>`;
-            } else if (headroom >= 20 && headroom <= 100) {
-                html += `
-                    <div class="report-item border-cyan-500">
-                        <p class="text-cyan-500 font-black text-[10px] uppercase mb-1 italic">💎 Performance: EXCELENTE</p>
-                        <p class="text-[11px] text-gray-300 leading-relaxed">Você tem uma folga (Headroom) de <b>${Math.round(headroom)}%</b>. Isso garante dinâmica musical, graves limpos e transientes perfeitos sem esforço do equipamento.</p>
-                    </div>`;
+            if(ampPwr < totalPwr) {
+                html += `<p class="text-amber-500 font-black text-[11px] uppercase italic mt-2">⚠️ Cuidado: Pouca Potência</p><p class="text-[10px] text-gray-400">Risco de Clipping (distorção). Isso queima o falante por calor.</p>`;
+            } else {
+                html += `<p class="text-cyan-500 font-black text-[11px] uppercase italic mt-2">💎 Headroom: ${Math.round(headroom)}%</p><p class="text-[10px] text-gray-400">Seu amplificador tem folga para tocar com qualidade.</p>`;
             }
 
-            // 3. RECOMENDAÇÃO DE CABEAMENTO
-            let cab = "1.5mm²";
-            if(amps > 12) cab = "2.5mm²";
-            if(amps > 20) cab = "4.0mm²";
-            if(amps > 35) cab = "6.0mm²";
-            if(amps > 50) cab = "10.0mm² ou superior";
-
-            html += `
-                <div class="report-item border-blue-500">
-                    <p class="text-blue-400 font-black text-[10px] uppercase mb-1 italic">⚡ Cabeamento e Corrente</p>
-                    <p class="text-[11px] text-gray-300">O sistema puxará <b>${amps.toFixed(1)} Amperes</b>. Recomendamos cabo de no mínimo <b>${cab}</b> para evitar perda de potência e aquecimento dos fios.</p>
-                </div>`;
-
-            // 4. INSTRUÇÃO DO LIMITER
-            html += `
-                <div class="bg-black/40 p-4 rounded-xl border border-gray-800">
-                    <p class="text-white font-black text-[10px] uppercase mb-2 italic">🛠️ Como configurar o DSP?</p>
-                    <p class="text-[10px] text-gray-400 leading-relaxed">Para proteger este set, configure o Limiter do seu processador para atuar em <b>${vrms.toFixed(1)} Volts</b>. Isso impedirá que o falante receba mais energia do que suporta.</p>
-                </div>`;
-
-            // Atualiza o Headroom Tag
-            headroomTag.innerText = `Headroom: ${Math.round(headroom)}%`;
-            headroomTag.style.background = headroom < 0 ? "#ef4444" : "#06b6d4";
-            headroomTag.style.color = "white";
-
-            reportBox.innerHTML = html;
+            rBox.innerHTML = html;
         }
-
-        // Eventos
-        document.querySelectorAll('input, select').forEach(e => {
-            e.addEventListener('input', updateReport);
-        });
-
-        // Início automático
-        updateReport();
+        document.querySelectorAll('input, select').forEach(e => e.oninput = update);
+        update();
     </script>
 </body>
 </html>
