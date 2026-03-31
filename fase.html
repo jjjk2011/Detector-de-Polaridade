@@ -217,6 +217,23 @@
             margin-bottom: 0.5rem;
         }
 
+        /* Status do áudio externo */
+        .audio-status {
+            font-size: 0.55rem;
+            text-align: center;
+            padding: 0.25rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .audio-status.success {
+            background: rgba(34,197,94,0.1);
+            color: var(--green);
+        }
+        .audio-status.warning {
+            background: rgba(245,158,11,0.1);
+            color: var(--gold);
+        }
+
         /* Controles de frequência para Sub */
         .freq-controls {
             margin-top: 0.5rem;
@@ -371,7 +388,7 @@
             color: var(--text-muted);
         }
 
-        /* Resultado - Nova área com POSITIVO/NEGATIVO */
+        /* Resultado */
         .result-area {
             text-align: center;
             margin: 1rem 0;
@@ -455,7 +472,7 @@
             50% { opacity: 0.6; }
         }
 
-        /* Progresso da Leitura com 3 pontos */
+        /* Progresso da Leitura */
         .reading-progress {
             text-align: center;
             font-size: 0.65rem;
@@ -505,7 +522,6 @@
             background: linear-gradient(135deg, var(--red) 0%, #dc2626 100%);
         }
 
-        /* Círculo auxiliar para visualização */
         .polarity-circle-aux {
             width: 80px;
             height: 80px;
@@ -556,12 +572,10 @@
         <div class="card">
             <div class="card-title">🎤 CAPTURA</div>
             
-            <!-- Botão Ativar Detector -->
             <button id="activateBtn" class="btn-activate" onclick="toggleScanner()">
                 <span>🎤</span> ATIVAR DETECTOR
             </button>
 
-            <!-- Sensibilidade (Trigger) -->
             <div class="sensitivity-control">
                 <div class="sensitivity-label">
                     <span>⚡ SENSIBILIDADE (TRIGGER)</span>
@@ -571,7 +585,6 @@
                 <div class="sensitivity-hint">Aumente se tiver muito ruído de fundo</div>
             </div>
 
-            <!-- Nível de Sinal -->
             <div class="signal-level">
                 <div class="signal-level-label">
                     <span>📊 NÍVEL DE SINAL</span>
@@ -582,7 +595,6 @@
                 </div>
             </div>
 
-            <!-- ÁREA DE RESULTADO (POSITIVO/NEGATIVO) -->
             <div id="resultArea" class="result-area" style="display: none;">
                 <div class="polarity-circle-aux" id="resultCircleAux">⚡</div>
                 <div class="result-status" id="resultStatusText">POSITIVO</div>
@@ -593,12 +605,10 @@
                 </div>
             </div>
 
-            <!-- Status de Escuta (aparece quando não há resultado) -->
             <div id="listeningStatus" class="listening-status waiting">
                 🎧 Aguardando silêncio...
             </div>
 
-            <!-- Progresso da Leitura com 3 pontos animados -->
             <div id="readingProgress" class="reading-progress hidden">
                 LENDO...
                 <div class="progress-dots">
@@ -613,13 +623,11 @@
         <div class="card">
             <div class="card-title">⚙️ CONFIGURAÇÃO</div>
             
-            <!-- Info box -->
             <div class="info-box">
                 <span>🔊</span>
                 <span>Utilize o "Teste do Toque" abaixo para encontrar o microfone correto do seu celular antes de medir.</span>
             </div>
 
-            <!-- Seleção de Microfone -->
             <div class="mic-selector">
                 <label>
                     <span>🎙️ SELECIONE O MICROFONE</span>
@@ -636,7 +644,7 @@
                 <p class="text-[9px] text-muted-foreground text-center mt-1">Dê toquinhos no celular para achar onde o sinal sobe mais.</p>
             </div>
 
-            <!-- Fonte de Sinal - 2 colunas lado a lado -->
+            <!-- Fonte de Sinal -->
             <div class="signal-grid">
                 <div id="optionPhone" class="signal-option active" onclick="selectSource('phone')">
                     <div class="signal-option-title">
@@ -652,6 +660,9 @@
                     <a id="carDownloadLink" href="#" class="download-link">📥 Baixar Faixa</a>
                 </div>
             </div>
+
+            <!-- Status do áudio externo -->
+            <div id="externalAudioStatus" class="audio-status warning">🎵 Carregando áudio externo...</div>
 
             <!-- Abas: Driver / Subwoofer -->
             <div class="test-mode-tabs">
@@ -671,6 +682,7 @@
                     <button id="loopPulseBtn" class="pulse-btn loop" onclick="toggleLoop()">🔁 LOOP</button>
                 </div>
                 <div id="pulseStatus" class="pulse-status">⏸ Parado</div>
+                <div id="pulseSourceInfo" class="audio-status" style="font-size: 0.5rem; margin-top: 0.25rem;"></div>
             </div>
 
             <!-- Controles do Subwoofer -->
@@ -701,6 +713,48 @@
     </div>
 
     <script>
+        // ========== CONFIGURAÇÃO DO ÁUDIO EXTERNO ==========
+        const AUDIO_FILE_PATH = '/audio/AudioBase_Polaridade_Intervalado_500ms.wav';
+        const AUDIO_FILE_PATH_ALT = '/AudioBase_Polaridade_Intervalado_500ms.wav';
+        
+        let externalAudio = null;
+        let audioLoaded = false;
+        let useExternalAudio = false;
+        
+        // Tentar carregar o arquivo de áudio externo
+        function loadExternalAudio() {
+            return new Promise((resolve) => {
+                externalAudio = new Audio();
+                
+                externalAudio.addEventListener('canplaythrough', () => {
+                    console.log('Áudio externo carregado com sucesso');
+                    audioLoaded = true;
+                    useExternalAudio = true;
+                    updateAudioStatus('success', '✅ Áudio externo carregado (500ms intervalado)', '🎵 Usando arquivo .wav');
+                    resolve(true);
+                });
+                
+                externalAudio.addEventListener('error', () => {
+                    console.log('Falha ao carregar áudio externo, usando gerador interno');
+                    audioLoaded = false;
+                    useExternalAudio = false;
+                    updateAudioStatus('warning', '⚠️ Áudio externo não encontrado', '⚡ Usando gerador interno (1kHz/200ms)');
+                    resolve(false);
+                });
+                
+                externalAudio.src = AUDIO_FILE_PATH;
+                externalAudio.load();
+            });
+        }
+        
+        function updateAudioStatus(type, message, sourceInfo) {
+            const statusDiv = document.getElementById('externalAudioStatus');
+            const sourceInfoDiv = document.getElementById('pulseSourceInfo');
+            statusDiv.textContent = message;
+            statusDiv.className = `audio-status ${type}`;
+            if (sourceInfoDiv) sourceInfoDiv.textContent = sourceInfo;
+        }
+
         // ========== ELEMENTOS ==========
         let audioCtx = null;
         let mediaStream = null;
@@ -712,9 +766,9 @@
         let levelInterval = null;
         let readingInterval = null;
         let readingStep = 0;
-        let currentPolarityResult = null; // 'positive' ou 'negative'
+        let currentPolarityResult = null;
         
-        // Pulso (Driver)
+        // Pulso (Driver) - com áudio externo
         let isPulsePlaying = false;
         let isLoopEnabled = false;
         let pulseInterval = null;
@@ -738,7 +792,6 @@
         let currentSource = 'phone';
 
         // ========== FUNÇÕES DE RESULTADO ==========
-        
         function showResult(isPositive) {
             const resultArea = document.getElementById('resultArea');
             const listeningStatus = document.getElementById('listeningStatus');
@@ -746,7 +799,6 @@
             const resultDescription = document.getElementById('resultDescriptionText');
             const resultCircleAux = document.getElementById('resultCircleAux');
             
-            // Esconder status de escuta e mostrar resultado
             listeningStatus.style.display = 'none';
             resultArea.style.display = 'block';
             
@@ -772,81 +824,61 @@
         function hideResult() {
             const resultArea = document.getElementById('resultArea');
             const listeningStatus = document.getElementById('listeningStatus');
-            
             resultArea.style.display = 'none';
             listeningStatus.style.display = 'block';
             currentPolarityResult = null;
         }
         
         function repeatMeasurement() {
-            // Esconde o resultado e volta ao modo de escuta
             hideResult();
-            
-            // Se ainda estiver escaneando, mantém
             if (isScanning) {
                 const statusDiv = document.getElementById('listeningStatus');
                 statusDiv.innerHTML = '🎧 Aguardando silêncio...';
                 statusDiv.className = 'listening-status waiting';
             } else {
-                // Se não estiver escaneando, ativa novamente
                 toggleScanner();
             }
         }
         
         function saveMeasurement() {
             if (!currentPolarityResult) return;
-            
             const now = new Date();
             const dateStr = now.toLocaleString('pt-BR');
             const resultText = currentPolarityResult === 'positive' ? 'POSITIVO - EM FASE' : 'NEGATIVO - INVERTIDO';
-            const modeText = currentTestMode === 'driver' ? 'Driver/Tweeter (1kHz)' : `Subwoofer (${currentSubFreq}Hz)`;
+            const modeText = currentTestMode === 'driver' ? 'Driver/Tweeter' : `Subwoofer (${currentSubFreq}Hz)`;
+            const sourceText = useExternalAudio ? 'Áudio externo (WAV)' : 'Gerador interno';
             
             const measurementData = {
                 date: dateStr,
                 result: resultText,
                 mode: modeText,
+                source: sourceText,
                 sensitivity: sensitivityPercent + '%'
             };
             
-            // Salvar no localStorage
             let savedMeasurements = localStorage.getItem('polarityMeasurements');
-            if (savedMeasurements) {
-                savedMeasurements = JSON.parse(savedMeasurements);
-            } else {
-                savedMeasurements = [];
-            }
+            savedMeasurements = savedMeasurements ? JSON.parse(savedMeasurements) : [];
             savedMeasurements.unshift(measurementData);
             localStorage.setItem('polarityMeasurements', JSON.stringify(savedMeasurements));
             
-            // Feedback visual
             const saveBtn = event.target;
             const originalText = saveBtn.innerText;
             saveBtn.innerText = '✓ SALVO!';
-            setTimeout(() => {
-                saveBtn.innerText = originalText;
-            }, 1500);
-            
-            console.log('Medição salva:', measurementData);
+            setTimeout(() => saveBtn.innerText = originalText, 1500);
         }
 
         // ========== FUNÇÕES DE DETECÇÃO ==========
-        
         function updateProgressDots(step) {
             const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
             for (let i = 0; i < dots.length; i++) {
-                if (i < step) {
-                    dots[i].classList.add('active');
-                } else {
-                    dots[i].classList.remove('active');
-                }
+                if (i < step) dots[i].classList.add('active');
+                else dots[i].classList.remove('active');
             }
         }
 
         function startReadingProgress() {
             readingStep = 0;
             const progressDiv = document.getElementById('readingProgress');
-            const statusDiv = document.getElementById('listeningStatus');
-            
             progressDiv.classList.remove('hidden');
             updateProgressDots(0);
             
@@ -855,16 +887,16 @@
                 if (!isScanning) return;
                 readingStep++;
                 updateProgressDots(readingStep);
-                
                 if (readingStep >= 3) {
                     clearInterval(readingInterval);
                     readingInterval = null;
                     progressDiv.classList.add('hidden');
-                    
+                    const statusDiv = document.getElementById('listeningStatus');
                     statusDiv.innerHTML = '🎧 Escutando...';
                     statusDiv.className = 'listening-status listening';
                     updateProgressDots(0);
                 } else {
+                    const statusDiv = document.getElementById('listeningStatus');
                     statusDiv.innerHTML = `🔇 Aguardando silêncio...`;
                     statusDiv.className = 'listening-status waiting';
                 }
@@ -872,14 +904,13 @@
         }
 
         function updateSignalLevel(percent) {
-            const levelFill = document.getElementById('levelFill');
-            const levelPercentDisplay = document.getElementById('levelPercentDisplay');
-            levelFill.style.width = `${percent}%`;
-            levelPercentDisplay.innerText = `${percent}%`;
+            document.getElementById('levelFill').style.width = `${percent}%`;
+            document.getElementById('levelPercentDisplay').innerText = `${percent}%`;
+            const testBar = document.getElementById('micTestBar');
+            if (testBar) testBar.style.width = `${percent}%`;
         }
 
         // ========== SCANNER PRINCIPAL ==========
-        
         async function updateMicList() {
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
@@ -893,16 +924,13 @@
                     if (d.deviceId === currentMicId) opt.selected = true;
                     select.appendChild(opt);
                 });
-                if (inputs.length === 0) {
-                    select.innerHTML = '<option>Nenhum microfone encontrado</option>';
-                }
+                if (inputs.length === 0) select.innerHTML = '<option>Nenhum microfone encontrado</option>';
             } catch(e) { console.warn(e); }
         }
 
         function startLevelIndicator() {
             if (levelInterval) clearInterval(levelInterval);
             if (!analyser) return;
-            
             const dataArray = new Uint8Array(analyser.frequencyBinCount);
             levelInterval = setInterval(() => {
                 if (!analyser) return;
@@ -912,21 +940,13 @@
                     const v = (dataArray[i] - 128) / 128;
                     max = Math.max(max, Math.abs(v));
                 }
-                const percent = Math.min(100, Math.floor(max * 100));
-                updateSignalLevel(percent);
-                
-                const testBar = document.getElementById('micTestBar');
-                if (testBar) testBar.style.width = `${percent}%`;
+                updateSignalLevel(Math.min(100, Math.floor(max * 100)));
             }, 50);
         }
 
         async function startScanner() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                await audioCtx.resume();
-            }
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
             
             try {
                 const constraints = {
@@ -945,19 +965,11 @@
                 const source = audioCtx.createMediaStreamSource(mediaStream);
                 source.connect(analyser);
                 
-                const statusDiv = document.getElementById('listeningStatus');
-                statusDiv.innerHTML = '🔇 Aguardando silêncio...';
-                statusDiv.className = 'listening-status waiting';
-                
                 startReadingProgress();
                 
                 const buffer = new Float32Array(analyser.fftSize);
                 await new Promise(r => setTimeout(r, 500));
                 analyser.getFloatTimeDomainData(buffer);
-                let sum = 0;
-                for (let i = 0; i < buffer.length; i++) sum += Math.abs(buffer[i]);
-                const noiseFloor = sum / buffer.length;
-                window.noiseFloor = noiseFloor;
                 
                 isScanning = true;
                 const btn = document.getElementById('activateBtn');
@@ -968,7 +980,6 @@
                 analyzeAudioLoop();
                 
             } catch(err) {
-                console.error('Erro:', err);
                 alert('Erro ao acessar o microfone. Verifique as permissões.');
                 stopScanner();
             }
@@ -976,37 +987,19 @@
 
         function analyzeAudioLoop() {
             if (!isScanning || !analyser) return;
-            
             const buffer = new Float32Array(analyser.fftSize);
             analyser.getFloatTimeDomainData(buffer);
-            
-            let maxVal = 0;
-            let maxIdx = 0;
+            let maxVal = 0, maxIdx = 0;
             for (let i = 0; i < buffer.length; i++) {
                 const abs = Math.abs(buffer[i]);
-                if (abs > maxVal) {
-                    maxVal = abs;
-                    maxIdx = i;
-                }
+                if (abs > maxVal) { maxVal = abs; maxIdx = i; }
             }
-            
             const threshold = 0.03 + (sensitivityPercent / 100) * 0.47;
-            
             if (maxVal > threshold) {
                 if (resetTimeout) clearTimeout(resetTimeout);
-                const peak = buffer[maxIdx];
-                const isPositive = peak > 0;
-                
-                // Mostrar resultado
-                showResult(isPositive);
-                
-                // Pausar a detecção por 2 segundos para não mostrar múltiplos resultados
-                if (resetTimeout) clearTimeout(resetTimeout);
-                resetTimeout = setTimeout(() => {
-                    // Não faz nada, mantém o resultado visível
-                }, 2000);
+                showResult(buffer[maxIdx] > 0);
+                resetTimeout = setTimeout(() => {}, 2000);
             }
-            
             scanAnimation = requestAnimationFrame(analyzeAudioLoop);
         }
 
@@ -1021,24 +1014,19 @@
             const btn = document.getElementById('activateBtn');
             btn.innerHTML = '🎤 ATIVAR DETECTOR';
             btn.classList.remove('active');
-            
             hideResult();
             
             const statusDiv = document.getElementById('listeningStatus');
             statusDiv.innerHTML = '🎧 Aguardando silêncio...';
             statusDiv.className = 'listening-status waiting';
             statusDiv.style.display = 'block';
-            
             document.getElementById('readingProgress').classList.add('hidden');
             updateSignalLevel(0);
         }
 
         function toggleScanner() {
-            if (isScanning) {
-                stopScanner();
-            } else {
-                startScanner();
-            }
+            if (isScanning) stopScanner();
+            else startScanner();
         }
 
         async function changeMic(deviceId) {
@@ -1051,12 +1039,8 @@
 
         // ========== TESTE DO TOQUE ==========
         function testMicrophone() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
@@ -1083,11 +1067,8 @@
             
             if (source === 'phone') {
                 document.getElementById('optionPhone').classList.add('active');
-                if (currentTestMode === 'driver') {
-                    document.getElementById('driverControls').style.display = 'block';
-                } else {
-                    document.getElementById('subControls').style.display = 'block';
-                }
+                if (currentTestMode === 'driver') document.getElementById('driverControls').style.display = 'block';
+                else document.getElementById('subControls').style.display = 'block';
             } else {
                 document.getElementById('optionCar').classList.add('active');
                 document.getElementById('driverControls').style.display = 'none';
@@ -1116,8 +1097,18 @@
             }
         }
 
-        // ========== PULSO DRIVER ==========
-        function playSinglePulse() {
+        // ========== PULSO DRIVER (COM ÁUDIO EXTERNO) ==========
+        function playExternalPulse() {
+            if (!externalAudio) return false;
+            externalAudio.currentTime = 0;
+            externalAudio.play().catch(e => {
+                console.log('Erro no áudio externo, usando fallback:', e);
+                playInternalPulse();
+            });
+            return true;
+        }
+
+        function playInternalPulse() {
             if (!audioCtx) return false;
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
@@ -1133,9 +1124,17 @@
             return true;
         }
 
+        function playSinglePulse() {
+            if (useExternalAudio && audioLoaded && externalAudio) {
+                return playExternalPulse();
+            } else {
+                return playInternalPulse();
+            }
+        }
+
         function playPulse() {
             if (currentSource !== 'phone' || currentTestMode !== 'driver') return;
-            if (!audioCtx) {
+            if (!audioCtx && !useExternalAudio) {
                 alert('Clique em qualquer lugar para ativar o áudio.');
                 return;
             }
@@ -1150,9 +1149,13 @@
             if (isLoopEnabled) {
                 if (pulseInterval) clearInterval(pulseInterval);
                 playSinglePulse();
-                pulseInterval = setInterval(() => {
-                    if (isPulsePlaying) playSinglePulse();
-                }, 800);
+                if (useExternalAudio && externalAudio) {
+                    externalAudio.loop = true;
+                } else {
+                    pulseInterval = setInterval(() => {
+                        if (isPulsePlaying) playInternalPulse();
+                    }, 800);
+                }
             } else {
                 playSinglePulse();
                 if (currentPulseTimeout) clearTimeout(currentPulseTimeout);
@@ -1166,6 +1169,11 @@
             isPulsePlaying = false;
             if (pulseInterval) clearInterval(pulseInterval);
             if (currentPulseTimeout) clearTimeout(currentPulseTimeout);
+            if (externalAudio) {
+                externalAudio.pause();
+                externalAudio.currentTime = 0;
+                externalAudio.loop = false;
+            }
             updatePulseUI();
         }
 
@@ -1181,6 +1189,7 @@
                 }
             } else {
                 loopBtn.classList.remove('active');
+                if (externalAudio) externalAudio.loop = false;
                 if (isPulsePlaying && pulseInterval) stopPulse();
             }
         }
@@ -1189,10 +1198,10 @@
             const statusDiv = document.getElementById('pulseStatus');
             if (isPulsePlaying) {
                 if (isLoopEnabled) {
-                    statusDiv.innerHTML = '🔁 Reproduzindo em LOOP (1kHz)';
+                    statusDiv.innerHTML = useExternalAudio ? '🔁 Reproduzindo em LOOP (áudio externo)' : '🔁 Reproduzindo em LOOP (1kHz)';
                     statusDiv.style.color = 'var(--green)';
                 } else {
-                    statusDiv.innerHTML = '▶ Reproduzindo (pulso único 1kHz)';
+                    statusDiv.innerHTML = useExternalAudio ? '▶ Reproduzindo (pulso único - áudio externo)' : '▶ Reproduzindo (pulso único 1kHz)';
                     statusDiv.style.color = 'var(--gold)';
                 }
             } else {
@@ -1206,20 +1215,14 @@
             currentSubFreq = parseInt(value);
             document.getElementById('subFreqSlider').value = currentSubFreq;
             document.getElementById('subFreqValue').innerHTML = currentSubFreq + ' Hz';
-            if (isSubPlaying && subOscillator) {
-                subOscillator.frequency.value = currentSubFreq;
-            }
+            if (isSubPlaying && subOscillator) subOscillator.frequency.value = currentSubFreq;
         }
 
-        function setSubFreq(freq) {
-            updateSubFreq(freq);
-        }
+        function setSubFreq(freq) { updateSubFreq(freq); }
 
         function startSubTone() {
             if (!audioCtx) return false;
-            if (subOscillator) {
-                try { subOscillator.stop(); } catch(e) {}
-            }
+            if (subOscillator) try { subOscillator.stop(); } catch(e) {}
             subOscillator = audioCtx.createOscillator();
             subGain = audioCtx.createGain();
             subOscillator.type = 'sine';
@@ -1232,22 +1235,14 @@
         }
 
         function stopSubTone() {
-            if (subOscillator) {
-                try { subOscillator.stop(); } catch(e) {}
-                subOscillator = null;
-            }
+            if (subOscillator) try { subOscillator.stop(); } catch(e) {}
+            subOscillator = null;
         }
 
         function playSubPulse() {
             if (currentSource !== 'phone' || currentTestMode !== 'sub') return;
-            if (!audioCtx) {
-                alert('Clique em qualquer lugar para ativar o áudio.');
-                return;
-            }
-            if (isSubPlaying && isSubLoopEnabled) {
-                stopSubPulse();
-                return;
-            }
+            if (!audioCtx) { alert('Clique em qualquer lugar para ativar o áudio.'); return; }
+            if (isSubPlaying && isSubLoopEnabled) { stopSubPulse(); return; }
             isSubPlaying = true;
             updateSubUI();
             if (isSubLoopEnabled) {
@@ -1256,9 +1251,7 @@
             } else {
                 startSubTone();
                 if (currentPulseTimeout) clearTimeout(currentPulseTimeout);
-                currentPulseTimeout = setTimeout(() => {
-                    if (!isSubLoopEnabled) stopSubPulse();
-                }, 800);
+                currentPulseTimeout = setTimeout(() => { if (!isSubLoopEnabled) stopSubPulse(); }, 800);
             }
         }
 
@@ -1276,10 +1269,7 @@
             const loopBtn = document.getElementById('loopSubBtn');
             if (isSubLoopEnabled) {
                 loopBtn.classList.add('active');
-                if (isSubPlaying) {
-                    stopSubPulse();
-                    playSubPulse();
-                }
+                if (isSubPlaying) { stopSubPulse(); playSubPulse(); }
             } else {
                 loopBtn.classList.remove('active');
                 if (isSubPlaying && subInterval) stopSubPulse();
@@ -1309,9 +1299,7 @@
         }
 
         // ========== EVENTOS ==========
-        document.getElementById('micSelect').addEventListener('change', (e) => {
-            changeMic(e.target.value);
-        });
+        document.getElementById('micSelect').addEventListener('change', (e) => changeMic(e.target.value));
         
         function generateAudioFile() {
             const blob = new Blob(["-- Áudio de teste --"], {type: 'audio/wav'});
@@ -1325,6 +1313,9 @@
         updateSensitivity(25);
         updateSubFreq(60);
         updateMicList();
+        
+        // Carregar áudio externo
+        loadExternalAudio();
         
         document.body.addEventListener('click', () => {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
