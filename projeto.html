@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagnóstico Pro | AudioBase</title>
+    <title>Engenharia de Sistema | AudioBase Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #0a0d14; color: #c9d1d9; font-family: system-ui, sans-serif; }
@@ -11,179 +11,183 @@
         input, select { background: #0a0d14 !important; border: 1px solid #30363d !important; color: white !important; font-weight: bold; transition: 0.3s; }
         input:focus, select:focus { border-color: #06b6d4 !important; box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
         .report-item { border-left: 2px solid #30363d; padding-left: 12px; margin-bottom: 12px; }
-        .badge-mode { padding: 2px 8px; border-radius: 6px; font-size: 9px; font-weight: 900; text-transform: uppercase; }
+        .badge-info { padding: 2px 8px; border-radius: 6px; font-size: 9px; font-weight: 900; text-transform: uppercase; background: #1f2937; color: #9ca3af; }
     </style>
 </head>
 <body class="p-4 pb-20">
     <div class="max-w-md mx-auto space-y-4">
         <header class="flex justify-between items-center py-2">
-            <a href="index.html" class="text-cyan-500 text-[10px] font-black uppercase tracking-widest">← Menu</a>
-            <h1 class="text-white font-black text-xs tracking-widest uppercase italic">Projeto de Sistema</h1>
+            <a href="index.html" class="text-cyan-500 text-[10px] font-black uppercase tracking-widest">← Menu Principal</a>
+            <h1 class="text-white font-black text-xs tracking-widest uppercase italic text-right">Cálculo de Canais</h1>
         </header>
 
-        <!-- ENTRADA DE DADOS -->
-        <div class="card p-6 space-y-4 shadow-xl">
-            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-                <h3 class="text-[10px] font-black text-cyan-500 uppercase tracking-widest italic">🔊 Set de Alto-Falantes</h3>
-                <span class="text-[10px] text-gray-500 font-bold" id="totalSpeakers">2 Vias</span>
+        <!-- 1. CONFIGURAÇÃO DO AMPLIFICADOR -->
+        <div class="card p-6 space-y-4 shadow-xl border-t-4 border-t-purple-600">
+            <div class="flex items-center justify-between">
+                <h3 class="text-[10px] font-black text-purple-500 uppercase tracking-widest italic">🔌 O Amplificador</h3>
+                <span class="badge-info" id="ampSummary">4 Canais</span>
             </div>
             
             <div class="grid grid-cols-2 gap-4">
-                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1 italic">Quantidade</label><input type="number" id="qty" value="2" class="w-full p-3 rounded-xl outline-none"></div>
-                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1 italic">Ohms (Cada)</label><input type="number" id="imp" value="4" class="w-full p-3 rounded-xl outline-none"></div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1 italic">RMS (Cada)</label><input type="number" id="pwr" value="500" class="w-full p-3 rounded-xl outline-none"></div>
-                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1 italic">Ligação</label><select id="conn" class="w-full p-3 rounded-xl outline-none"><option value="par">Paralelo</option><option value="ser">Série</option></select></div>
-            </div>
-
-            <div class="pt-4 border-t border-gray-800">
-                <h3 class="text-[10px] font-black text-purple-500 uppercase tracking-widest mb-4 italic">🔌 Dados do Amplificador</h3>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1 italic">Potência RMS</label><input type="number" id="ampPwr" value="1200" class="w-full p-3 rounded-xl outline-none"></div>
-                    <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1 italic">Ω Mínimo (Canal)</label><input type="number" id="ampImp" value="2" class="w-full p-3 rounded-xl outline-none"></div>
+                <div>
+                    <label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Nº de Canais</label>
+                    <select id="ampChannels" class="w-full p-3 rounded-xl outline-none">
+                        <option value="1">1 Canal (Mono)</option>
+                        <option value="2">2 Canais (Stereo)</option>
+                        <option value="4" selected>4 Canais (Quad)</option>
+                    </select>
                 </div>
                 <div>
-                    <label class="text-[9px] font-black text-purple-400 uppercase block mb-1 italic">Modo de Operação</label>
-                    <select id="ampMode" class="w-full p-4 rounded-xl outline-none border-purple-900/30">
-                        <option value="stereo">STEREO (Canais Individuais)</option>
-                        <option value="bridge">BRIDGE (Mono / Canais Somados)</option>
+                    <label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Watts (Por Canal)</label>
+                    <input type="number" id="ampPwrPerCh" value="300" class="w-full p-3 rounded-xl outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Ω Mín. (Canal)</label>
+                    <input type="number" id="ampImpPerCh" value="2" class="w-full p-3 rounded-xl outline-none">
+                </div>
+                <div>
+                    <label class="text-[9px] font-bold text-purple-400 uppercase block mb-1 italic">Modo de Saída</label>
+                    <select id="ampMode" class="w-full p-3 rounded-xl outline-none border-purple-900/30">
+                        <option value="stereo">STEREO (Normal)</option>
+                        <option value="bridge">BRIDGE (Ponte)</option>
                     </select>
                 </div>
             </div>
         </div>
 
-        <!-- STATUS RÁPIDO -->
-        <div id="statusCard" class="card p-5 border-l-4 transition-all duration-500">
-            <div class="flex justify-between items-center mb-4">
-                <div>
-                    <p id="matchTitle" class="font-black text-xs uppercase italic">Calculando...</p>
-                    <p id="matchSub" class="text-[9px] text-gray-500 font-bold uppercase">Verificando compatibilidade</p>
-                </div>
-                <div id="resBadge" class="badge-mode bg-gray-800 text-white">Stereo</div>
-            </div>
+        <!-- 2. CONFIGURAÇÃO DA CARGA (O QUE VAI SER LIGADO) -->
+        <div class="card p-6 space-y-4 shadow-xl border-t-4 border-t-cyan-600">
+            <h3 class="text-[10px] font-black text-cyan-500 uppercase tracking-widest italic">🔊 Carga por Saída</h3>
+            <p class="text-[8px] text-gray-500 font-bold uppercase -mt-2">O cálculo abaixo aplica-se a cada saída (Canal ou Bridge)</p>
             
             <div class="grid grid-cols-2 gap-4">
-                <div class="bg-black/40 p-3 rounded-xl text-center border border-white/5">
-                    <p class="text-[8px] font-bold text-gray-500 uppercase">Imp. Final Set</p>
-                    <p id="resImp" class="text-xl font-black italic">--</p>
-                </div>
-                <div class="bg-black/40 p-3 rounded-xl text-center border border-white/5">
-                    <p class="text-[8px] font-bold text-gray-500 uppercase">Ajuste Vrms</p>
-                    <p id="resVrms" class="text-xl font-black text-cyan-500 italic">--</p>
-                </div>
+                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Qtd Falantes</label><input type="number" id="spkQty" value="1" class="w-full p-3 rounded-xl outline-none"></div>
+                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Ohms (Cada)</label><input type="number" id="spkImp" value="4" class="w-full p-3 rounded-xl outline-none"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Watts RMS (Cada)</label><input type="number" id="spkPwr" value="250" class="w-full p-3 rounded-xl outline-none"></div>
+                <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Ligação</label><select id="conn" class="w-full p-3 rounded-xl outline-none"><option value="par">Paralelo</option><option value="ser">Série</option></select></div>
             </div>
         </div>
 
-        <!-- RELATÓRIO AUTOMÁTICO -->
+        <!-- RESULTADOS -->
+        <div id="statusCard" class="card p-5 border-l-4 transition-all duration-500">
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <div class="text-center bg-black/40 p-2 rounded-lg border border-white/5">
+                    <p class="text-[7px] font-bold text-gray-500 uppercase">Impedância Final</p>
+                    <p id="resImp" class="text-sm font-black italic">--</p>
+                </div>
+                <div class="text-center bg-black/40 p-2 rounded-lg border border-white/5">
+                    <p class="text-[7px] font-bold text-gray-500 uppercase">Potência Amp/Saída</p>
+                    <p id="resAmpPwr" class="text-sm font-black text-purple-400">--</p>
+                </div>
+                <div class="text-center bg-black/40 p-2 rounded-lg border border-white/5">
+                    <p class="text-[7px] font-bold text-gray-500 uppercase">Vrms Limiter</p>
+                    <p id="resVrms" class="text-sm font-black text-cyan-500 italic">--</p>
+                </div>
+            </div>
+            <div class="flex justify-between items-center px-1">
+                <p id="matchTitle" class="text-[11px] font-black uppercase italic">Calculando...</p>
+                <p id="totalSystemPwr" class="text-[10px] font-bold text-gray-400 uppercase">Total: 0W RMS</p>
+            </div>
+        </div>
+
+        <!-- RELATÓRIO TÉCNICO AUTOMÁTICO -->
         <div class="card p-6 shadow-2xl">
-            <h2 class="text-xs font-black text-white uppercase tracking-[0.2em] mb-6 border-b border-gray-800 pb-3 italic">📋 Relatório de Ajuste Técnico</h2>
-            
-            <div id="reportBox" class="space-y-4">
-                <!-- Injetado via JS -->
-            </div>
+            <h2 class="text-xs font-black text-white uppercase tracking-[0.2em] mb-4 border-b border-gray-800 pb-2 italic">📋 Diagnóstico do Especialista</h2>
+            <div id="reportBox" class="space-y-4"></div>
         </div>
 
-        <!-- DICA PARA LEIGOS -->
-        <div class="card p-6 bg-amber-500/5 border-amber-500/20">
-            <h3 class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-4 italic">💡 O que é Stereo e Bridge?</h3>
-            <div class="space-y-4 text-[11px] text-gray-400 leading-relaxed">
-                <p><b>Stereo:</b> É quando o falante toca em um canal sozinho. É o modo padrão. Ele aceita impedâncias menores (geralmente 2Ω).</p>
-                <p><b>Bridge:</b> Você soma dois canais para ter muito mais força. <b>Atenção:</b> No Bridge, o amplificador fica sensível. Se ele é 2Ω em Stereo, ele vira 4Ω em Bridge. Se colocar 2Ω no Bridge, o módulo <b>QUEIMA</b>.</p>
+        <!-- GUIA PARA LEIGOS -->
+        <div class="card p-5 bg-amber-500/5 border-amber-500/20">
+            <h3 class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-3 italic">💡 Como funciona com Canais?</h3>
+            <div class="space-y-3 text-[10px] text-gray-400 leading-relaxed">
+                <p><b>Stereo:</b> Se você tem um Amp de 4 canais, cada canal toca de forma independente. Você pode ligar 1 falante em cada um (Total de 4 falantes).</p>
+                <p><b>Bridge:</b> Você une dois canais para virar um só (Mono). Um Amp de 4 canais vira 2 canais muito mais fortes. É ideal para <b>Subwoofers</b>.</p>
+                <p class="bg-black/40 p-2 rounded text-amber-200"><b>Dica:</b> No Bridge, a impedância mínima dobra! Se o canal é 2 Ohms, o Bridge é obrigatoriamente 4 Ohms.</p>
             </div>
         </div>
     </div>
 
     <script>
         function calculate() {
-            // Entradas
-            const qty = parseFloat(document.getElementById('qty').value) || 1;
-            const imp = parseFloat(document.getElementById('imp').value) || 4;
-            const pwr = parseFloat(document.getElementById('pwr').value) || 0;
-            const conn = document.getElementById('conn').value;
-            const ampPwr = parseFloat(document.getElementById('ampPwr').value) || 0;
-            const ampImp = parseFloat(document.getElementById('ampImp').value) || 2;
+            // Dados do Amp
+            const numCh = parseInt(document.getElementById('ampChannels').value);
+            const pwrPerCh = parseFloat(document.getElementById('ampPwrPerCh').value) || 0;
+            const impPerCh = parseFloat(document.getElementById('ampImpPerCh').value) || 0;
             const ampMode = document.getElementById('ampMode').value;
 
-            // Cálculos Técnicos
-            const finalImpSet = conn === 'par' ? (imp / qty) : (imp * qty);
-            const totalSpeakerPwr = pwr * qty;
-            const vrms = Math.sqrt(totalSpeakerPwr * finalImpSet);
-            const amps = vrms / finalImpSet || 0;
+            // Dados dos Falantes (por saída)
+            const spkQty = parseFloat(document.getElementById('spkQty').value) || 1;
+            const spkImp = parseFloat(document.getElementById('spkImp').value) || 4;
+            const spkPwr = parseFloat(document.getElementById('spkPwr').value) || 0;
+            const conn = document.getElementById('conn').value;
 
-            // Determinar Impedância Mínima Real do Amp baseado no modo
-            const realMinImp = ampMode === 'bridge' ? (ampImp * 2) : ampImp;
+            // Cálculos da Carga (Falantes)
+            const finalImpSet = conn === 'par' ? (spkImp / spkQty) : (spkImp * spkQty);
+            const totalSpkPwrPerOutput = spkPwr * spkQty;
+            const vrms = Math.sqrt(totalSpkPwrPerOutput * finalImpSet);
 
-            // Atualizar UI Básica
+            // Cálculos do Amplificador
+            let realMinImp, ampPwrAvailable, outputsAvailable;
+
+            if (ampMode === 'bridge') {
+                realMinImp = impPerCh * 2;
+                ampPwrAvailable = pwrPerCh * 2; // Estimativa de Bridge
+                outputsAvailable = numCh / 2;
+                if (numCh === 1) outputsAvailable = 1; // Mono não faz bridge
+            } else {
+                realMinImp = impPerCh;
+                ampPwrAvailable = pwrPerCh;
+                outputsAvailable = numCh;
+            }
+
+            const totalSystemPwr = ampPwrAvailable * outputsAvailable;
+
+            // Atualizar UI
+            document.getElementById('ampSummary').innerText = `${numCh} Canais | ${ampMode}`;
             document.getElementById('resImp').innerText = finalImpSet.toFixed(1) + " Ω";
+            document.getElementById('resAmpPwr').innerText = ampPwrAvailable.toFixed(0) + " W";
             document.getElementById('resVrms').innerText = vrms.toFixed(1) + " V";
-            document.getElementById('resBadge').innerText = ampMode;
-            document.getElementById('resBadge').style.background = ampMode === 'bridge' ? '#a855f7' : '#1f2937';
+            document.getElementById('totalSystemPwr').innerText = `Total Sistema: ${totalSystemPwr.toFixed(0)}W`;
 
-            // Lógica do Relatório e Status
+            // Lógica de Diagnóstico
             const reportBox = document.getElementById('reportBox');
             const statusCard = document.getElementById('statusCard');
             const mTitle = document.getElementById('matchTitle');
-            const mSub = document.getElementById('matchSub');
             let html = "";
 
-            // 1. Verificação de Impedância (O MAIS IMPORTANTE)
+            // Verificação de Impedância
             if (finalImpSet < realMinImp) {
                 statusCard.style.borderColor = "#ef4444";
-                mTitle.innerText = "🚨 RISCO DE QUEIMA";
+                mTitle.innerText = "🚨 IMPEDÂNCIA PERIGOSA";
                 mTitle.style.color = "#ef4444";
-                mSub.innerText = "Impedância abaixo do permitido";
-                
-                html += `
-                    <div class="report-item border-red-500">
-                        <p class="text-red-500 font-black text-[10px] uppercase italic mb-1">🔴 ALERTA DE IMPEDÂNCIA</p>
-                        <p class="text-[11px] text-gray-300">No modo <b>${ampMode.toUpperCase()}</b>, seu amp exige no mínimo <b>${realMinImp}Ω</b>. Seu set está em <b>${finalImpSet.toFixed(1)}Ω</b>. O amplificador vai desarmar ou queimar os transistores de saída.</p>
-                    </div>`;
+                html += `<div class="report-item border-red-500"><p class="text-red-500 font-black text-[10px] uppercase italic">ERRO CRÍTICO</p><p class="text-[10px] text-gray-300">Você está ligando ${finalImpSet.toFixed(1)}Ω em uma saída que suporta no mínimo ${realMinImp}Ω. O amplificador vai queimar!</p></div>`;
             } else {
                 statusCard.style.borderColor = "#22c55e";
-                mTitle.innerText = "✅ SISTEMA SEGURO";
+                mTitle.innerText = "✅ CASAMENTO PERFEITO";
                 mTitle.style.color = "#22c55e";
-                mSub.innerText = "Casamento de Ohms perfeito";
-                
-                html += `
-                    <div class="report-item border-green-500">
-                        <p class="text-green-500 font-black text-[10px] uppercase italic mb-1">🟢 IMPEDÂNCIA CASADA</p>
-                        <p class="text-[11px] text-gray-300">Tudo certo! A impedância de ${finalImpSet.toFixed(1)}Ω é compatível com o modo ${ampMode}.</p>
-                    </div>`;
+                html += `<div class="report-item border-green-500"><p class="text-green-500 font-black text-[10px] uppercase italic">OHMS OK</p><p class="text-[10px] text-gray-300">A carga está segura para o modo ${ampMode}.</p></div>`;
             }
 
-            // 2. Verificação de Potência (Headroom / Clipping)
-            if (ampPwr < totalSpeakerPwr) {
-                html += `
-                    <div class="report-item border-amber-500">
-                        <p class="text-amber-500 font-black text-[10px] uppercase italic mb-1">⚠️ AVISO DE POTÊNCIA</p>
-                        <p class="text-[11px] text-gray-300">O Amp (${ampPwr}W) é mais fraco que os falantes (${totalSpeakerPwr}W). Evite tocar no máximo para não gerar <b>clipping</b> (distorção), que é a causa nº 1 de queima de falantes.</p>
-                    </div>`;
+            // Verificação de Potência
+            const headroom = ((ampPwrAvailable / totalSpkPwrPerOutput) - 1) * 100;
+            if (headroom < 0) {
+                html += `<div class="report-item border-amber-500"><p class="text-amber-500 font-black text-[10px] uppercase italic">⚠️ FALTA POTÊNCIA</p><p class="text-[10px] text-gray-300">Seu amplificador entrega ${ampPwrAvailable}W mas os falantes suportam ${totalSpkPwrPerOutput}W. Cuidado com a distorção (Clipping).</p></div>`;
             } else {
-                const headroom = ((ampPwr / totalSpeakerPwr) - 1) * 100;
-                html += `
-                    <div class="report-item border-cyan-500">
-                        <p class="text-cyan-500 font-black text-[10px] uppercase italic mb-1">💎 QUALIDADE SONORA</p>
-                        <p class="text-[11px] text-gray-300">Ótima folga de potência (Headroom de ${Math.round(headroom)}%). O som terá dinâmica e graves bem definidos.</p>
-                    </div>`;
+                html += `<div class="report-item border-cyan-500"><p class="text-cyan-500 font-black text-[10px] uppercase italic">💎 HEADROOM: ${Math.round(headroom)}%</p><p class="text-[10px] text-gray-300">Excelente! Você tem folga de potência para cada canal.</p></div>`;
             }
 
-            // 3. Ajuste do Limiter
-            html += `
-                <div class="bg-cyan-500/10 p-4 rounded-xl border border-cyan-500/20">
-                    <p class="text-cyan-400 font-black text-[10px] uppercase italic mb-2 italic">🛠️ COMO AJUSTAR O SOM?</p>
-                    <p class="text-[10px] text-gray-400 leading-relaxed">Com um multímetro na saída do módulo, toque um tom de teste e suba o volume até chegar em <b>${vrms.toFixed(1)} Volts</b>. Esse é o limite seguro para não queimar nada.</p>
-                </div>`;
+            // Sugestão de Limiter
+            html += `<div class="bg-black/40 p-3 rounded-xl border border-gray-800"><p class="text-white font-black text-[9px] uppercase mb-1">🛠️ AJUSTE DE LIMITE</p><p class="text-[9px] text-gray-400">Configure o Limiter em <b>${vrms.toFixed(1)} Volts</b> para cada saída do processador.</p></div>`;
 
             reportBox.innerHTML = html;
         }
 
-        // Listeners
-        document.querySelectorAll('input, select').forEach(el => {
-            el.addEventListener('input', calculate);
-        });
-
-        // Iniciar
+        document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', calculate));
         calculate();
     </script>
 </body>
