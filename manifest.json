@@ -1,10 +1,10 @@
 {
-  "name": "AudioBase Polaridade",
+  "name": "AudioBase Pro",
   "short_name": "AudioBase",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#0a0d14",
-  "theme_color": "#a855f7",
+  "theme_color": "#0a0d14",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/727/727218.png",
