@@ -10,6 +10,7 @@
             --bg-color: #0a0e14;
             --card-bg: #161b22;
             --accent-purple: #a370f7;
+            --accent-orange: #ff9800;
             --text-main: #ffffff;
             --success: #00ff00;
             --danger: #ff3333;
@@ -20,181 +21,203 @@
         .btn-back { color: white; text-decoration: none; padding: 10px; background: #1a1a1a; border-radius: 12px; border: 1px solid #333; }
         .container { width: 92%; max-width: 450px; text-align: center; }
 
-        /* Seletor de 3 Vias */
-        .pa-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
-        .pa-btn { padding: 15px 5px; border-radius: 12px; border: 1px solid #333; background: #0d1117; color: #777; cursor: pointer; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; transition: 0.2s; }
-        .pa-btn i { display: block; font-size: 1.2rem; margin-bottom: 5px; }
-        .pa-btn.active { background: var(--accent-purple); color: #000; border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(163, 112, 247, 0.3); }
-
         /* Monitor de Onda */
-        .scope-box { background: #000; border: 1px solid #333; border-radius: 20px; height: 110px; margin-bottom: 10px; overflow: hidden; position: relative; }
+        .scope-box { background: #000; border: 1px solid #333; border-radius: 20px; height: 100px; margin-bottom: 20px; overflow: hidden; position: relative; }
         canvas { width: 100%; height: 100%; }
 
-        .vu-meter { width: 100%; height: 8px; background: #222; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
-        #vu-fill { width: 0%; height: 100%; background: var(--accent-purple); transition: 0.1s; }
-
-        /* Resultado */
-        .res-card {
-            background: var(--card-bg);
-            border: 4px solid #333;
-            border-radius: 30px;
-            padding: 35px 20px;
-            margin-bottom: 25px;
-            transition: 0.3s;
+        /* GERADOR DE SINAL (Sempre Ativo) */
+        .section-label { font-size: 0.6rem; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; }
+        .pa-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .pa-card { 
+            background: #0d1117; border: 1px solid #333; border-radius: 15px; padding: 20px 10px; 
+            cursor: pointer; transition: 0.3s;
         }
-        .res-card.pos { border-color: var(--success); box-shadow: 0 0 30px rgba(0, 255, 0, 0.2); }
-        .res-card.neg { border-color: var(--danger); box-shadow: 0 0 30px rgba(255, 0, 0, 0.2); }
-        .res-main { font-size: 2.4rem; font-weight: bold; margin: 0; }
-        .log { font-size: 0.75rem; color: var(--accent-purple); margin-top: 10px; height: 15px; font-family: monospace; }
+        .pa-card i { font-size: 1.8rem; color: var(--accent-orange); margin-bottom: 10px; display: block; }
+        .pa-card span { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; color: #777; }
+        
+        .pa-card.playing { border-color: var(--accent-orange); background: rgba(255, 152, 0, 0.1); box-shadow: 0 0 15px rgba(255, 152, 0, 0.2); }
+        .pa-card.playing i { color: #fff; animation: pulse 1s infinite; }
+        .pa-card.playing span { color: #fff; }
 
-        .btn-main {
-            width: 100%; padding: 22px; border-radius: 20px; border: none;
-            background: var(--accent-purple); font-size: 1.1rem; font-weight: bold; cursor: pointer;
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* ANALISADOR (Microfone) */
+        .res-display {
+            background: var(--card-bg); border: 3px solid #333; border-radius: 25px; 
+            padding: 30px 15px; margin-bottom: 25px; transition: 0.3s;
         }
-        .btn-main.stop { background: #ff3333; color: white; }
+        .res-display.pos { border-color: var(--success); box-shadow: 0 0 20px rgba(0,255,0,0.1); }
+        .res-display.neg { border-color: var(--danger); box-shadow: 0 0 20px rgba(255,0,0,0.1); }
+        .res-main { font-size: 2.2rem; font-weight: bold; margin: 0; }
+
+        .btn-mic {
+            width: 100%; padding: 20px; border-radius: 20px; border: none;
+            background: #1a1a1a; color: var(--accent-purple); font-size: 1rem; font-weight: bold; 
+            cursor: pointer; border: 1px solid var(--accent-purple); transition: 0.3s;
+        }
+        .btn-mic.active { background: var(--accent-purple); color: #000; }
+
+        .log { font-size: 0.7rem; color: #555; margin-top: 10px; font-family: monospace; }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
         <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i></a>
-        <span style="font-size: 0.7rem; letter-spacing: 3px; font-weight: bold;">ENGINEERING PHASE SCAN</span>
+        <span style="font-size: 0.8rem; letter-spacing: 2px;">SCANNER PRO</span>
         <div style="width:40px"></div>
     </div>
 
     <div class="container">
-        <!-- SELETOR DE VIA -->
-        <div class="pa-selector">
-            <button class="pa-btn active" onclick="setVia('sub', this)">
-                <i class="fas fa-bullseye"></i> SUB
-            </button>
-            <button class="pa-btn" onclick="setVia('medio', this)">
-                <i class="fas fa-volume-down"></i> MÉDIO
-            </button>
-            <button class="pa-btn" onclick="setVia('agudo', this)">
-                <i class="fas fa-bullhorn"></i> AGUDO
-            </button>
-        </div>
-
+        
         <div class="scope-box">
             <canvas id="scope"></canvas>
         </div>
 
-        <div class="vu-meter">
-            <div id="vu-fill"></div>
+        <span class="section-label">Injetar Sinal (Output)</span>
+        <div class="pa-grid">
+            <div id="btn-sub" class="pa-card" onclick="togglePulse('sub')">
+                <i class="fas fa-bullseye"></i>
+                <span>SUB</span>
+            </div>
+            <div id="btn-medio" class="pa-card" onclick="togglePulse('medio')">
+                <i class="fas fa-volume-down"></i>
+                <span>MÉDIO</span>
+            </div>
+            <div id="btn-agudo" class="pa-card" onclick="togglePulse('agudo')">
+                <i class="fas fa-bullhorn"></i>
+                <span>AGUDO</span>
+            </div>
         </div>
 
-        <div id="res-card" class="res-card">
+        <span class="section-label">Análise de Fase (Input)</span>
+        <div id="res-card" class="res-display">
             <div id="res-main" class="res-main">---</div>
-            <div id="status-log" class="log">Aguardando Início...</div>
+            <div id="status-log" class="log">Analisador desligado</div>
         </div>
 
-        <button id="btn-toggle" class="btn-main" onclick="toggleScanner()">
-            <i class="fas fa-play"></i> INICIAR TESTE
+        <button id="btn-mic" class="btn-mic" onclick="toggleMic()">
+            <i class="fas fa-microphone"></i> LIGAR MICROFONE
         </button>
+
     </div>
 
     <script>
-        let audioCtx, analyser, source, isRunning = false;
-        let currentVia = 'sub';
+        let audioCtx, analyser, source, micActive = false;
+        let activePulse = null;
         let pulseTimer;
         const canvas = document.getElementById('scope');
         const ctx = canvas.getContext('2d');
 
-        function setVia(via, btn) {
-            currentVia = via;
-            document.querySelectorAll('.pa-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('status-log').innerText = "Via " + via.toUpperCase() + " selecionada";
+        // Inicializa o contexto de áudio no primeiro clique (Exigência dos navegadores)
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
         }
 
-        async function toggleScanner() {
-            if (isRunning) { location.reload(); return; }
+        async function toggleMic() {
+            initAudioContext();
+            if (micActive) {
+                location.reload(); // Reseta para desligar o mic de vez
+                return;
+            }
 
             try {
-                // Desativa filtros nativos do celular para captar o pulso puro
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } 
                 });
 
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 source = audioCtx.createMediaStreamSource(stream);
                 analyser = audioCtx.createAnalyser();
                 analyser.fftSize = 1024;
                 source.connect(analyser);
 
-                isRunning = true;
-                document.getElementById('btn-toggle').innerHTML = '<i class="fas fa-stop"></i> PARAR';
-                document.getElementById('btn-toggle').classList.add('stop');
+                micActive = true;
+                document.getElementById('btn-mic').innerHTML = '<i class="fas fa-stop"></i> DESLIGAR MICROFONE';
+                document.getElementById('btn-mic').classList.add('active');
+                document.getElementById('status-log').innerText = "Ouvindo...";
                 
                 draw();
-                emitPulse();
                 monitor();
             } catch (err) {
-                alert("Erro ao iniciar microfone.");
+                alert("Erro: Permita o uso do microfone para analisar.");
             }
         }
 
-        function emitPulse() {
-            if (!isRunning) return;
-            
+        function togglePulse(via) {
+            initAudioContext();
+            const card = document.getElementById(`btn-${via}`);
+
+            if (activePulse === via) {
+                stopPulse();
+            } else {
+                stopPulse();
+                activePulse = via;
+                card.classList.add('playing');
+                loopPulse();
+            }
+        }
+
+        function stopPulse() {
+            clearTimeout(pulseTimer);
+            document.querySelectorAll('.pa-card').forEach(c => c.classList.remove('playing'));
+            activePulse = null;
+        }
+
+        function loopPulse() {
+            if (!activePulse) return;
+
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            
-            // CONFIGURAÇÃO TÉCNICA POR VIA
-            if (currentVia === 'sub') {
+
+            if (activePulse === 'sub') {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(45, audioCtx.currentTime); // 45Hz para mover cone pesado
-            } else if (currentVia === 'medio') {
+                osc.frequency.setValueAtTime(45, audioCtx.currentTime);
+            } else if (activePulse === 'medio') {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime); // 800Hz para ataque médio
-            } else {
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            } else if (activePulse === 'agudo') {
                 osc.type = 'square';
-                osc.frequency.setValueAtTime(6000, audioCtx.currentTime); // 6kHz para tweeter/driver
+                osc.frequency.setValueAtTime(6000, audioCtx.currentTime);
             }
-            
-            // Ataque Assimétrico (O cone DEVE ir para frente primeiro)
+
             gain.gain.setValueAtTime(0, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(1.0, audioCtx.currentTime + 0.001); 
-            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.015); 
+            gain.gain.linearRampToValueAtTime(1.0, audioCtx.currentTime + 0.001);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.015);
 
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            
             osc.start();
             osc.stop(audioCtx.currentTime + 0.03);
 
-            pulseTimer = setTimeout(emitPulse, 1000); // 1 pulso por segundo
+            pulseTimer = setTimeout(loopPulse, 1000);
         }
 
         function monitor() {
-            if (!isRunning) return;
+            if (!micActive) return;
 
             const data = new Float32Array(analyser.fftSize);
             analyser.getFloatTimeDomainData(data);
 
             let pPos = 0, pNeg = 0, max = 0;
-
             for (let i = 0; i < data.length; i++) {
                 if (data[i] > pPos) pPos = data[i];
                 if (data[i] < pNeg) pNeg = data[i];
                 if (Math.abs(data[i]) > max) max = Math.abs(data[i]);
             }
 
-            // Barra de Volume (VU)
-            document.getElementById('vu-fill').style.width = Math.min(100, (max * 300)) + "%";
-
-            // Se o sinal for forte o suficiente
+            // Analisa se o som captado for forte (estalo vindo de outro PC ou deste dispositivo)
             if (max > 0.07) {
                 const card = document.getElementById('res-card');
                 const main = document.getElementById('res-main');
                 
                 if (pPos > Math.abs(pNeg)) {
-                    card.className = "res-card pos";
+                    card.className = "res-display pos";
                     main.innerText = "NORMAL (+)";
                     main.style.color = "var(--success)";
                 } else {
-                    card.className = "res-card neg";
+                    card.className = "res-display neg";
                     main.innerText = "INVERTIDA (-)";
                     main.style.color = "var(--danger)";
                 }
@@ -203,7 +226,7 @@
         }
 
         function draw() {
-            if (!isRunning) return;
+            if (!micActive) return;
             const data = new Uint8Array(analyser.frequencyBinCount);
             analyser.getByteTimeDomainData(data);
             ctx.fillStyle = '#000';
