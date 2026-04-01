@@ -3,74 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AudioBase Pro | Delay Calc</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Delay / TA - AudioBase Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0a0d14; color: #c9d1d9; }
-        .card { background: #161b22; border: 1px solid #30363d; border-radius: 1.5rem; }
-        input { background: #0a0d14 !important; border: 1px solid #30363d !important; color: white !important; outline: none; }
+        :root {
+            --bg-color: #0a0e14;
+            --card-bg: #161b22;
+            --accent-orange: #ff9800;
+            --text-main: #ffffff;
+            --text-dim: #8b949e;
+            --border: #30363d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 50px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+
+        .btn-back {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1.2rem;
+            background: var(--card-bg);
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        /* Container Principal */
+        .container {
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .header-page {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .header-page i { color: var(--accent-orange); font-size: 2rem; margin-bottom: 10px; }
+        .header-page h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Card de Resultado */
+        .display-card {
+            background: linear-gradient(145deg, #1e2329, #161b22);
+            border: 1px solid var(--accent-orange);
+            border-radius: 30px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(255, 152, 0, 0.1);
+        }
+
+        .display-card .label { color: var(--accent-orange); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
+        .display-card .value { font-size: 4rem; font-weight: bold; margin: 10px 0; font-family: 'Courier New', monospace; }
+        .display-card .unit { color: var(--text-dim); font-size: 1.2rem; }
+
+        /* Controles */
+        .control-group {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .control-label span { color: var(--text-main); font-weight: bold; }
+
+        input[type=range] {
+            width: 100%;
+            accent-color: var(--accent-orange);
+            margin: 10px 0;
+        }
+
+        .manual-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .manual-input input {
+            flex: 1;
+            background: #0d1117;
+            border: 1px solid var(--border);
+            color: var(--accent-orange);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        /* Botões de ajuste fino */
+        .fine-tune {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            gap: 10px;
+        }
+
+        .btn-tune {
+            flex: 1;
+            background: #1c2128;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-tune:active { background: var(--accent-orange); }
+
+        /* Botão Automático */
+        .btn-auto {
+            width: 100%;
+            background: var(--accent-orange);
+            color: #000;
+            border: none;
+            padding: 20px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .btn-auto:hover { opacity: 0.9; }
+
     </style>
 </head>
-<body class="p-4">
-    <div class="max-w-md mx-auto space-y-4">
-        <header class="flex justify-between items-center py-2">
-            <a href="index.html" class="text-cyan-500 text-[10px] font-black uppercase tracking-widest">← Menu</a>
-            <h1 class="text-white font-black text-xs tracking-widest uppercase">Time Alignment</h1>
-        </header>
+<body>
 
-        <div class="card p-6 space-y-6">
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="text-[9px] font-black text-gray-500 uppercase block mb-1">Referência Longe (m)</label>
-                    <input type="number" id="long" value="5.0" step="0.1" class="w-full p-4 rounded-xl font-black text-lg">
-                </div>
-                <div>
-                    <label class="text-[9px] font-black text-gray-500 uppercase block mb-1">Referência Perto (m)</label>
-                    <input type="number" id="near" value="1.0" step="0.1" class="w-full p-4 rounded-xl font-black text-lg">
-                </div>
-            </div>
-            <div>
-                <div class="flex justify-between text-[9px] font-black text-gray-500 mb-2">
-                    <span>🌡️ TEMPERATURA AMBIENTE</span>
-                    <span id="tempVal">25°C</span>
-                </div>
-                <input type="range" id="temp" min="0" max="50" value="25" class="w-full h-1 bg-gray-700 rounded-lg appearance-none accent-amber-500">
-            </div>
-        </div>
-
-        <div class="card p-8 bg-gradient-to-br from-amber-500/10 to-transparent border-amber-500/20 text-center">
-            <p class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-2">Valor de Atraso (Delay)</p>
-            <h2 id="resMs" class="text-6xl font-black text-white italic">11.6</h2>
-            <p class="text-[10px] font-bold text-white mt-1 uppercase tracking-widest">Milisegundos (ms)</p>
-        </div>
-
-        <div class="card p-5 bg-amber-500/5 border-amber-500/20">
-            <h3 class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-3">🎯 Pro Alignment Tips</h3>
-            <ul class="space-y-3 text-[10px] text-gray-400 font-medium uppercase leading-relaxed">
-                <li class="flex gap-2">
-                    <span class="text-amber-500">●</span>
-                    <span><strong>Regra:</strong> O delay deve ser aplicado SEMPRE na via que está MAIS PRÓXIMA do ouvinte.</span>
-                </li>
-                <li class="flex gap-2">
-                    <span class="text-amber-500">●</span>
-                    <span><strong>Centro:</strong> Meça a distância da bobina do falante, não da tela frontal da caixa.</span>
-                </li>
-                <li class="flex gap-2">
-                    <span class="text-amber-500">●</span>
-                    <span><strong>Clima:</strong> A velocidade do som varia com a temperatura. Recalcule se o clima mudar drasticamente.</span>
-                </li>
-            </ul>
-        </div>
+    <div class="top-bar">
+        <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i></a>
+        <div style="color: var(--text-dim); font-size: 0.8rem;">ENGINEERING MODE</div>
+        <div style="width: 40px;"></div>
     </div>
+
+    <div class="container">
+        <div class="header-page">
+            <i class="fas fa-stopwatch"></i>
+            <h1>Delay / TA</h1>
+        </div>
+
+        <!-- RESULTADO -->
+        <div class="display-card">
+            <div class="label">Tempo de Atraso</div>
+            <div class="value" id="res-ms">0.00</div>
+            <div class="unit">ms (Milissegundos)</div>
+        </div>
+
+        <!-- INPUT DISTANCIA -->
+        <div class="control-group">
+            <div class="control-label">Distância Física <span id="val-dist">1.00 m</span></div>
+            <div class="manual-input">
+                <input type="number" id="input-dist" value="1.00" step="0.01" oninput="atualizarPorInput()">
+            </div>
+            <div class="fine-tune">
+                <button class="btn-tune" onclick="ajustar(-0.1)">-10cm</button>
+                <button class="btn-tune" onclick="ajustar(-0.01)">-1cm</button>
+                <button class="btn-tune" onclick="ajustar(0.01)">+1cm</button>
+                <button class="btn-tune" onclick="ajustar(0.1)">+10cm</button>
+            </div>
+        </div>
+
+        <!-- TEMPERATURA -->
+        <div class="control-group">
+            <div class="control-label">Temperatura Ambiente <span id="val-temp">25°C</span></div>
+            <input type="range" id="input-temp" min="0" max="50" value="25" oninput="calcular()">
+        </div>
+
+        <button class="btn-auto" onclick="alert('Funcionalidade de microfone será implementada no próximo passo!')">
+            <i class="fas fa-microphone"></i> MEDIÇÃO AUTOMÁTICA
+        </button>
+    </div>
+
     <script>
-        function calc() {
-            const long = parseFloat(document.getElementById('long').value) || 0, near = parseFloat(document.getElementById('near').value) || 0, temp = parseFloat(document.getElementById('temp').value);
-            document.getElementById('tempVal').innerText = temp + "°C";
-            const speed = 331.3 + (0.606 * temp), dist = Math.abs(long - near), delay = (dist / speed) * 1000;
-            document.getElementById('resMs').innerText = delay.toFixed(1);
+        const inputDist = document.getElementById('input-dist');
+        const inputTemp = document.getElementById('input-temp');
+        const resMs = document.getElementById('res-ms');
+        const valDist = document.getElementById('val-dist');
+        const valTemp = document.getElementById('val-temp');
+
+        function calcular() {
+            let dist = parseFloat(inputDist.value);
+            let temp = parseFloat(inputTemp.value);
+
+            // Atualiza labels visuais
+            valDist.innerText = dist.toFixed(2) + " m";
+            valTemp.innerText = temp + "°C";
+
+            // Cálculo da velocidade do som
+            let v = 331.4 + (0.6 * temp);
+            
+            // Cálculo do delay em ms
+            let delay = (dist / v) * 1000;
+
+            resMs.innerText = delay.toFixed(2);
         }
-        document.querySelectorAll('input').forEach(el => el.oninput = calc);
-        calc();
+
+        function ajustar(valor) {
+            let atual = parseFloat(inputDist.value);
+            inputDist.value = (atual + valor).toFixed(2);
+            calcular();
+        }
+
+        function atualizarPorInput() {
+            calcular();
+        }
+
+        // Inicia calculando
+        calcular();
     </script>
+
 </body>
 </html>
