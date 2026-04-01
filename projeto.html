@@ -20,21 +20,24 @@
         }
 
         body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
+        
+        /* BARRA SUPERIOR PADRONIZADA */
         .top-bar { width: 100%; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
         .btn-back { color: var(--text-main); text-decoration: none; font-size: 1.2rem; background: var(--card-bg); padding: 10px 15px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; box-sizing: border-box; }
 
         .container { width: 90%; max-width: 500px; }
-        .header-page { text-align: center; margin: 20px 0; }
+        .header-page { text-align: center; margin: 15px 0; }
         .header-page i { color: var(--accent-cyan); font-size: 2rem; margin-bottom: 10px; }
         .header-page h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* TOP RESULTS PADRONIZADO */
+        /* TOP RESULTS (3 Cards) */
         .results-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 25px; }
         .res-card-small { background: var(--card-bg); border: 1px solid var(--border); border-radius: 15px; padding: 15px 5px; text-align: center; }
         .res-card-small.active { border-color: var(--accent-cyan); box-shadow: 0 0 15px rgba(0, 210, 255, 0.1); }
         .res-card-small .label { color: var(--text-dim); font-size: 0.6rem; text-transform: uppercase; margin-bottom: 8px; display: block; }
         .res-card-small .val { color: var(--accent-cyan); font-size: 1rem; font-weight: bold; }
 
+        /* GRUPOS DE CONTROLE */
         .control-group { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
         .section-label { color: var(--accent-purple); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: block; border-left: 3px solid var(--accent-purple); padding-left: 10px; }
         
@@ -43,42 +46,39 @@
         label { display: block; color: var(--text-dim); font-size: 0.65rem; text-transform: uppercase; margin-bottom: 8px; }
         select, input { width: 100%; background: #0d1117; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 10px; font-size: 0.9rem; box-sizing: border-box; outline: none; }
 
-        /* ANALISADOR DE RODAPÉ */
+        /* CARD DE ANÁLISE (FOOTER) */
         .analysis-card { background: #11151c; border: 2px solid var(--border); border-radius: 25px; padding: 25px; margin-top: 10px; transition: 0.3s; }
+        .analysis-header { display: flex; justify-content: space-around; text-align: center; margin-bottom: 15px; }
+        .analysis-header .col-res .lab { color: var(--text-dim); font-size: 0.65rem; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .analysis-header .col-res .val { color: var(--accent-cyan); font-size: 1.4rem; font-weight: bold; }
+        .analysis-divider { border-top: 1px dashed #333; margin: 15px 0; }
         .status-title { font-size: 1.1rem; font-weight: bold; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .status-desc { color: var(--text-dim); font-size: 0.85rem; line-height: 1.4; }
+
         .border-danger { border-color: var(--danger) !important; }
         .border-success { border-color: var(--success) !important; }
+        .border-warning { border-color: var(--warning) !important; }
     </style>
 </head>
 <body>
     <div class="top-bar">
         <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i></a>
-        <div style="color: var(--text-dim); font-size: 0.8rem;">SYSTEM DESIGNER</div>
-        <div style="width: 45px;"></div>
     </div>
 
     <div class="container">
         <div class="header-page">
-            <i class="fas fa-microchip"></i>
+            <i class="fas fa-layer-group"></i>
             <h1>Projeto Sistema</h1>
         </div>
 
+        <!-- TOP RESULTS -->
         <div class="results-grid">
-            <div class="res-card-small">
-                <span class="label">Impedância</span>
-                <span class="val" id="res-imp">4.0Ω</span>
-            </div>
-            <div class="res-card-small active">
-                <span class="label">Vrms Limiter</span>
-                <span class="val" id="res-vrms">31.6V</span>
-            </div>
-            <div class="res-card-small">
-                <span class="label">Pot. Total</span>
-                <span class="val" id="res-pot">500W</span>
-            </div>
+            <div class="res-card-small"><span class="label">Impedância</span><span class="val" id="res-imp">0.0Ω</span></div>
+            <div class="res-card-small active"><span class="label">Vrms Limiter</span><span class="val" id="res-vrms">0.0V</span></div>
+            <div class="res-card-small"><span class="label">Pot. Carga</span><span class="val" id="res-pot-total">0W</span></div>
         </div>
 
+        <!-- 1. AMPLIFICADOR -->
         <div class="control-group">
             <span class="section-label">1. Amplificador</span>
             <div class="row">
@@ -89,45 +89,64 @@
                     </select>
                 </div>
                 <div class="col">
-                    <label>Watts / Canal</label>
-                    <input type="number" id="amp-watts" value="1200" oninput="calcular()">
+                    <label>Modo Saída</label>
+                    <select id="amp-modo" onchange="calcular()">
+                        <option value="stereo">STEREO</option><option value="bridge">BRIDGE</option>
+                    </select>
                 </div>
             </div>
             <div class="row">
                 <div class="col">
                     <label>Ω Mín. Canal</label>
                     <select id="amp-min-imp" onchange="calcular()">
-                        <option value="1">1 Ω</option><option value="2" selected>2 Ω</option><option value="4">4 Ω</option>
+                        <option value="0.5">0.5 Ω</option><option value="1">1 Ω</option><option value="2" selected>2 Ω</option><option value="4">4 Ω</option>
                     </select>
                 </div>
                 <div class="col">
-                    <label>Modo</label>
-                    <select id="amp-modo" onchange="calcular()">
-                        <option value="stereo">STEREO</option><option value="bridge">BRIDGE</option>
-                    </select>
+                    <label>Watts / Canal</label>
+                    <input type="number" id="amp-watts" value="1200" oninput="calcular()">
                 </div>
             </div>
         </div>
 
+        <!-- 2. CARGA -->
         <div class="control-group" style="border-color: var(--accent-cyan);">
-            <span class="section-label" style="color: var(--accent-cyan); border-color: var(--accent-cyan);">2. Carga por Saída</span>
+            <span class="section-label" style="color: var(--accent-cyan); border-color: var(--accent-cyan);">2. Carga (Alto-falantes)</span>
             <div class="row">
                 <div class="col">
-                    <label>Qtd Falantes</label>
-                    <input type="number" id="qtd" value="2" oninput="calcular()">
+                    <label>Qtd Falantes (Real)</label>
+                    <input type="number" id="qtd" value="2" min="1" oninput="calcular()">
                 </div>
                 <div class="col">
                     <label>Ohms Unit.</label>
                     <select id="imp-cada" onchange="calcular()">
-                        <option value="2">2 Ω</option><option value="4">4 Ω</option><option value="8" selected>8 Ω</option>
+                        <option value="1">1 Ω</option><option value="2">2 Ω</option><option value="4" selected>4 Ω</option><option value="8">8 Ω</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Watts RMS (Cada)</label>
+                    <input type="number" id="pot-cada" value="500" oninput="calcular()">
+                </div>
+                <div class="col">
+                    <label>Ligação</label>
+                    <select id="tipo-ligacao" onchange="calcular()">
+                        <option value="paralelo">Paralelo</option><option value="serie">Série</option>
                     </select>
                 </div>
             </div>
         </div>
 
+        <!-- ANÁLISE FINAL -->
         <div id="status-card" class="analysis-card">
+            <div class="analysis-header">
+                <div class="col-res"><span class="lab">Carga Total</span><span class="val" id="footer-imp">0.0 Ω</span></div>
+                <div class="col-res"><span class="lab">Pot. Necessária</span><span class="val" id="footer-pot">0 W</span></div>
+            </div>
+            <div class="analysis-divider"></div>
             <div id="status-title" class="status-title"><i class="fas fa-check-circle"></i> SISTEMA OK</div>
-            <div id="status-desc" class="status-desc">Aguardando dados...</div>
+            <div id="status-desc" class="status-desc">Analise os dados acima.</div>
         </div>
     </div>
 
@@ -138,24 +157,44 @@
             const ampModo = document.getElementById('amp-modo').value;
             const qtd = parseInt(document.getElementById('qtd').value) || 1;
             const impCada = parseFloat(document.getElementById('imp-cada').value);
-            let impTotal = (impCada / qtd);
-            let vrms = Math.sqrt((ampWatts) * impTotal);
+            const potCada = parseFloat(document.getElementById('pot-cada').value) || 0;
+            const tipoLigacao = document.getElementById('tipo-ligacao').value;
+
+            let impTotalCarga = (tipoLigacao === 'paralelo') ? (impCada / qtd) : (impCada * qtd);
+            let potTotalCarga = potCada * qtd;
+            let vrms = Math.sqrt(potTotalCarga * impTotalCarga);
+            
+            let ampPotDisp = (ampModo === 'bridge') ? ampWatts * 2 : ampWatts;
             let impMinReal = (ampModo === 'bridge') ? ampMinImp * 2 : ampMinImp;
 
-            document.getElementById('res-imp').innerText = impTotal.toFixed(1) + "Ω";
+            // Update Top
+            document.getElementById('res-imp').innerText = impTotalCarga.toFixed(1) + "Ω";
             document.getElementById('res-vrms').innerText = vrms.toFixed(1) + "V";
-            document.getElementById('res-pot').innerText = (ampWatts) + "W";
+            document.getElementById('res-pot-total').innerText = potTotalCarga + "W";
+
+            // Update Footer
+            document.getElementById('footer-imp').innerText = impTotalCarga.toFixed(2) + " Ω";
+            document.getElementById('footer-pot').innerText = potTotalCarga + " W";
 
             const card = document.getElementById('status-card');
             const title = document.getElementById('status-title');
-            if (impTotal < impMinReal) {
+            const desc = document.getElementById('status-desc');
+
+            if (impTotalCarga < impMinReal) {
                 card.className = "analysis-card border-danger";
                 title.style.color = "var(--danger)";
-                title.innerHTML = '<i class="fas fa-times-circle"></i> IMPEDÂNCIA BAIXA';
+                title.innerHTML = '<i class="fas fa-times-circle"></i> PERIGO: IMPEDÂNCIA BAIXA';
+                desc.innerHTML = `O amp em ${ampModo} não suporta ${impTotalCarga.toFixed(2)}Ω. Mínimo: ${impMinReal}Ω.`;
+            } else if (ampPotDisp < potTotalCarga) {
+                card.className = "analysis-card border-warning";
+                title.style.color = "var(--warning)";
+                title.innerHTML = '<i class="fas fa-exclamation-triangle"></i> POUCA POTÊNCIA';
+                desc.innerHTML = `O amp em ${ampModo} fornece ${ampPotDisp}W, mas os falantes pedem ${potTotalCarga}W.`;
             } else {
                 card.className = "analysis-card border-success";
                 title.style.color = "var(--success)";
-                title.innerHTML = '<i class="fas fa-check-circle"></i> SISTEMA OK';
+                title.innerHTML = '<i class="fas fa-check-circle"></i> SISTEMA COMPATÍVEL';
+                desc.innerHTML = `Configuração segura. Vrms Limiter ideal: ${vrms.toFixed(1)}V.`;
             }
         }
         calcular();
