@@ -2,117 +2,253 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Diagnóstico Pro | AudioBase</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto Sistema - AudioBase Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #0a0d14; color: #c9d1d9; }
-        .card { background: #161b22; border: 1px solid #30363d; border-radius: 1.5rem; height: 100%; }
-        input, select { background: #0a0d14 !important; border: 1px solid #30363d !important; color: white !important; font-size: 14px !important; }
+        :root {
+            --bg-color: #0a0e14;
+            --card-bg: #161b22;
+            --accent-cyan: #00d2ff;
+            --accent-purple: #a370f7;
+            --text-main: #ffffff;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --success: #44ff44;
+            --danger: #ff4d4d;
+            --warning: #ffcc00;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
+        .top-bar { width: 100%; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
+        .btn-back { color: var(--text-main); text-decoration: none; font-size: 1.2rem; background: var(--card-bg); padding: 10px 15px; border-radius: 12px; border: 1px solid var(--border); }
+        .container { width: 90%; max-width: 500px; }
+        
+        /* TOP RESULTS */
+        .results-grid { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 10px; margin-bottom: 25px; margin-top: 10px; }
+        .res-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 15px; padding: 15px 5px; text-align: center; }
+        .res-card.active { border-color: var(--accent-cyan); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
+        .res-card .label { color: var(--text-dim); font-size: 0.6rem; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .res-card .val { color: var(--accent-cyan); font-size: 1.1rem; font-weight: bold; }
+        .res-card.active .val { font-size: 1.3rem; }
+
+        .control-group { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
+        .group-title { color: var(--accent-purple); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: block; border-left: 3px solid var(--accent-purple); padding-left: 10px; }
+        
+        .row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .col { flex: 1; }
+        
+        label { display: block; color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase; margin-bottom: 8px; }
+        select, input { width: 100%; background: #0d1117; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 10px; font-size: 0.95rem; box-sizing: border-box; outline: none; }
+
+        /* CARD DE ANÁLISE */
+        .analysis-card { background: #11151c; border: 2px solid var(--border); border-radius: 25px; padding: 25px; margin-top: 10px; transition: 0.3s; }
+        .analysis-header { display: flex; justify-content: space-around; text-align: center; margin-bottom: 15px; }
+        .analysis-header .col-res .lab { color: var(--text-dim); font-size: 0.65rem; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .analysis-header .col-res .val { color: var(--accent-cyan); font-size: 1.4rem; font-weight: bold; }
+        .analysis-divider { border-top: 1px dashed #333; margin: 15px 0; }
+        .analysis-status { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; }
+        .analysis-desc { color: var(--text-dim); font-size: 0.85rem; line-height: 1.4; }
+
+        .border-danger { border-color: var(--danger) !important; }
+        .border-success { border-color: var(--success) !important; }
+        .border-warning { border-color: var(--warning) !important; }
+
+        /* Badge para o modo Bridge */
+        #bridge-badge { display: none; background: var(--accent-purple); color: black; font-size: 0.6rem; font-weight: bold; padding: 2px 8px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
     </style>
 </head>
-<body class="p-4 md:p-10">
-    <div class="max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-8">
-            <a href="index.html" class="text-cyan-500 text-[10px] font-black uppercase tracking-widest">← Voltar ao Menu</a>
-            <h1 class="text-white font-black text-xs md:text-sm tracking-widest uppercase italic">Engenharia de Canais</h1>
-        </header>
+<body>
 
-        <!-- Grid Principal: 1 col mobile, 2 col no PC -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            
-            <!-- COLUNA 1: ENTRADAS -->
-            <div class="space-y-6">
-                <div class="card p-6 space-y-4 shadow-xl">
-                    <h3 class="text-[10px] font-black text-purple-500 uppercase tracking-widest italic border-b border-gray-800 pb-2">1. Amplificador</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Canais</label>
-                            <select id="ampChannels" class="w-full p-3 rounded-xl outline-none"><option value="1">1 Canal</option><option value="2">2 Canais</option><option value="4" selected>4 Canais</option></select>
-                        </div>
-                        <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Watts/Canal</label><input type="number" id="ampPwrPerCh" value="300" class="w-full p-3 rounded-xl outline-none"></div>
-                        <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Ω Mín. Canal</label><input type="number" id="ampImpPerCh" value="2" class="w-full p-3 rounded-xl outline-none"></div>
-                        <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Modo Saída</label>
-                            <select id="ampMode" class="w-full p-3 rounded-xl outline-none"><option value="stereo">STEREO</option><option value="bridge">BRIDGE</option></select>
-                        </div>
-                    </div>
+    <div class="top-bar">
+        <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i></a>
+        <div style="color: var(--text-dim); font-size: 0.8rem;">AUDIOBASE PRO</div>
+        <div style="width: 40px;"></div>
+    </div>
+
+    <div class="container">
+        <!-- TOP RESULTS -->
+        <div class="results-grid">
+            <div class="res-card">
+                <span class="label">Impedância</span>
+                <span class="val" id="res-imp">4.0Ω</span>
+            </div>
+            <div class="res-card active">
+                <span class="label">Vrms Limiter</span>
+                <span class="val" id="res-vrms">31.6V</span>
+            </div>
+            <div class="res-card">
+                <span class="label">Pot. Canal</span>
+                <span class="val" id="res-pot">300W</span>
+            </div>
+        </div>
+
+        <!-- 1. AMPLIFICADOR -->
+        <div class="control-group">
+            <span class="group-title">1. Amplificador <span id="bridge-badge">MODO PONTE (MONO)</span></span>
+            <div class="row">
+                <div class="col">
+                    <label>Canais</label>
+                    <select id="amp-canais" onchange="verificarCanais(); calcular();">
+                        <option value="1">1 Canal (Mono)</option>
+                        <option value="2">2 Canais</option>
+                        <option value="4" selected>4 Canais</option>
+                    </select>
                 </div>
-
-                <div class="card p-6 space-y-4 shadow-xl">
-                    <h3 class="text-[10px] font-black text-cyan-500 uppercase tracking-widest italic border-b border-gray-800 pb-2">2. Carga por Saída</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Qtd Falantes</label><input type="number" id="spkQty" value="1" class="w-full p-3 rounded-xl outline-none"></div>
-                        <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Ohms Unit.</label><input type="number" id="spkImp" value="4" class="w-full p-3 rounded-xl outline-none"></div>
-                        <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Watts (Cada)</label><input type="number" id="spkPwr" value="250" class="w-full p-3 rounded-xl outline-none"></div>
-                        <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-1">Ligação</label>
-                            <select id="conn" class="w-full p-3 rounded-xl outline-none"><option value="par">Paralelo</option><option value="ser">Série</option></select>
-                        </div>
-                    </div>
+                <div class="col">
+                    <label>Modo Saída</label>
+                    <select id="amp-modo" onchange="calcular()">
+                        <option value="stereo">STEREO</option>
+                        <option value="bridge">BRIDGE</option>
+                    </select>
                 </div>
             </div>
-
-            <!-- COLUNA 2: RESULTADOS E RELATÓRIO -->
-            <div class="space-y-6">
-                <div id="statusCard" class="card p-6 border-l-4 border-l-green-500 shadow-2xl">
-                    <div class="grid grid-cols-3 gap-2 mb-6">
-                        <div class="text-center bg-black/40 p-4 rounded-2xl"><p class="text-[7px] font-bold text-gray-500 uppercase">Impedância</p><p id="resImp" class="text-xl font-black">--</p></div>
-                        <div class="text-center bg-black/40 p-4 rounded-2xl"><p class="text-[7px] font-bold text-gray-500 uppercase">Vrms Limiter</p><p id="resVrms" class="text-xl font-black text-cyan-500">--</p></div>
-                        <div class="text-center bg-black/40 p-4 rounded-2xl"><p class="text-[7px] font-bold text-gray-500 uppercase">Pot. Canal</p><p id="resAmpPwr" class="text-xl font-black">--</p></div>
-                    </div>
-                    <div id="reportBox" class="space-y-4"></div>
+            <div class="row">
+                <div class="col">
+                    <label>Ω Mín. Canal</label>
+                    <select id="amp-min-imp" onchange="calcular()">
+                        <option value="0.5">0.5 Ω</option>
+                        <option value="1">1.0 Ω</option>
+                        <option value="2" selected>2.0 Ω</option>
+                        <option value="4">4.0 Ω</option>
+                    </select>
                 </div>
-
-                <div class="card p-6 bg-amber-500/5 border-amber-500/20">
-                    <h3 class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-4 italic">💡 Dicas Rápidas</h3>
-                    <div class="text-[11px] text-gray-400 space-y-4">
-                        <p><b>Ohms:</b> Nunca use falantes que resultem em Ohms menores que o mínimo do amplificador. <b>Bridge:</b> No Bridge, a impedância mínima dobra.</p>
-                        <div class="bg-black/40 p-4 rounded-xl border border-white/5 space-y-2">
-                            <p class="text-white font-bold uppercase text-[9px]">Tabela de Cabos:</p>
-                            <div class="flex justify-between border-b border-gray-800 pb-1"><span>Até 15A</span><span class="text-cyan-500">12 AWG</span></div>
-                            <div class="flex justify-between border-b border-gray-800 pb-1"><span>Até 30A</span><span class="text-cyan-500">10 AWG</span></div>
-                        </div>
-                    </div>
+                <div class="col">
+                    <label>Watts / Canal</label>
+                    <input type="number" id="amp-watts" value="300" oninput="calcular()">
                 </div>
+            </div>
+        </div>
+
+        <!-- 2. CARGA -->
+        <div class="control-group">
+            <span class="group-title" style="color: var(--accent-cyan); border-color: var(--accent-cyan);">2. Carga por Saída</span>
+            <div class="row">
+                <div class="col">
+                    <label>Qtd Falantes</label>
+                    <input type="number" id="qtd" value="1" min="1" oninput="calcular()">
+                </div>
+                <div class="col">
+                    <label>Ohms Unit.</label>
+                    <select id="imp-cada" onchange="calcular()">
+                        <option value="2">2 Ω</option>
+                        <option value="4" selected>4 Ω</option>
+                        <option value="8">8 Ω</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Watts RMS (Cada)</label>
+                    <input type="number" id="pot-cada" value="250" oninput="calcular()">
+                </div>
+                <div class="col">
+                    <label>Ligação</label>
+                    <select id="tipo-ligacao" onchange="calcular()">
+                        <option value="paralelo" selected>Paralelo</option>
+                        <option value="serie">Série</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANÁLISE FINAL -->
+        <div id="status-card" class="analysis-card">
+            <div class="analysis-header">
+                <div class="col-res">
+                    <span class="lab">Carga Total</span>
+                    <span class="val" id="footer-imp">4.0 Ω</span>
+                </div>
+                <div class="col-res">
+                    <span class="lab">Pot. Necessária</span>
+                    <span class="val" id="footer-pot">250 W</span>
+                </div>
+            </div>
+            <div class="analysis-divider"></div>
+            <div id="status-title" class="analysis-status">
+                <i class="fas fa-check-circle"></i> SISTEMA OK
+            </div>
+            <div id="status-desc" class="analysis-desc">
+                Analisando compatibilidade...
             </div>
         </div>
     </div>
 
     <script>
-        function calculate() {
-            const numCh = parseInt(document.getElementById('ampChannels').value);
-            const pwrPerCh = parseFloat(document.getElementById('ampPwrPerCh').value) || 0;
-            const impPerCh = parseFloat(document.getElementById('ampImpPerCh').value) || 0;
-            const ampMode = document.getElementById('ampMode').value;
-            const spkQty = parseFloat(document.getElementById('spkQty').value) || 1;
-            const spkImp = parseFloat(document.getElementById('spkImp').value) || 4;
-            const spkPwr = parseFloat(document.getElementById('spkPwr').value) || 0;
-            const conn = document.getElementById('conn').value;
-
-            const finalImpSet = conn === 'par' ? (spkImp / spkQty) : (spkImp * spkQty);
-            const totalSpkPwr = spkPwr * spkQty;
-            const vrms = Math.sqrt(totalSpkPwr * finalImpSet);
-
-            let realMinImp = ampMode === 'bridge' ? (impPerCh * 2) : impPerCh;
-            let ampPwrAvailable = ampMode === 'bridge' ? (pwrPerCh * 2) : pwrPerCh;
-
-            document.getElementById('resImp').innerText = finalImpSet.toFixed(1) + "Ω";
-            document.getElementById('resVrms').innerText = vrms.toFixed(1) + "V";
-            document.getElementById('resAmpPwr').innerText = ampPwrAvailable.toFixed(0) + "W";
-
-            const rBox = document.getElementById('reportBox');
-            const sCard = document.getElementById('statusCard');
-            let html = "";
-
-            if (finalImpSet < realMinImp) {
-                sCard.style.borderColor = "#ef4444";
-                html = `<p class="text-red-500 font-black text-[10px] uppercase">🚨 IMPEDÂNCIA BAIXA!</p><p class="text-[11px] text-gray-400 italic">O Amp exige min ${realMinImp}Ω no modo ${ampMode}. Seu set está em ${finalImpSet.toFixed(1)}Ω. Risco de queima!</p>`;
+        function verificarCanais() {
+            const canais = document.getElementById('amp-canais').value;
+            const modoSelect = document.getElementById('amp-modo');
+            if (canais == "1") {
+                modoSelect.value = "stereo";
+                modoSelect.disabled = true;
             } else {
-                sCard.style.borderColor = "#22c55e";
-                html = `<p class="text-green-500 font-black text-[10px] uppercase">✅ OHMS COMPATÍVEL</p><p class="text-[11px] text-gray-400 italic">Sistema seguro para operar em ${ampMode}.</p>`;
+                modoSelect.disabled = false;
             }
-            rBox.innerHTML = html;
         }
-        document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', calculate));
-        calculate();
+
+        function calcular() {
+            const ampWatts = parseFloat(document.getElementById('amp-watts').value) || 0;
+            const ampMinImp = parseFloat(document.getElementById('amp-min-imp').value);
+            const ampModo = document.getElementById('amp-modo').value;
+            const ampCanais = document.getElementById('amp-canais').value;
+
+            const qtd = parseInt(document.getElementById('qtd').value) || 1;
+            const impCada = parseFloat(document.getElementById('imp-cada').value);
+            const potCada = parseFloat(document.getElementById('pot-cada').value) || 0;
+            const tipoLigacao = document.getElementById('tipo-ligacao').value;
+
+            // --- Lógica de Bridge Inteligente ---
+            let ampPotenciaFinal = ampWatts;
+            let ampImpMinimaFinal = ampMinImp;
+            const badge = document.getElementById('bridge-badge');
+
+            if (ampModo === 'bridge' && ampCanais != "1") {
+                ampPotenciaFinal = ampWatts * 2;
+                ampImpMinimaFinal = ampMinImp * 2;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            // --- Cálculos de Carga ---
+            let impTotalCarga = (tipoLigacao === 'paralelo') ? (impCada / qtd) : (impCada * qtd);
+            let potTotalCarga = potCada * qtd;
+            let vrms = Math.sqrt(potTotalCarga * impTotalCarga);
+
+            // --- Atualiza Topo ---
+            document.getElementById('res-imp').innerText = impTotalCarga.toFixed(1) + "Ω";
+            document.getElementById('res-vrms').innerText = vrms.toFixed(1) + "V";
+            document.getElementById('res-pot').innerText = ampPotenciaFinal + "W";
+
+            // --- Atualiza Footer ---
+            document.getElementById('footer-imp').innerText = impTotalCarga.toFixed(2) + " Ω";
+            document.getElementById('footer-pot').innerText = potTotalCarga + " W";
+
+            const card = document.getElementById('status-card');
+            const title = document.getElementById('status-title');
+            const desc = document.getElementById('status-desc');
+
+            // --- Análise de Erros ---
+            if (impTotalCarga < ampImpMinimaFinal) {
+                card.className = "analysis-card border-danger";
+                title.style.color = "var(--danger)";
+                title.innerHTML = `<i class="fas fa-exclamation-triangle"></i> PERIGO: IMPEDÂNCIA`;
+                desc.innerHTML = `O amp em ${ampModo} exige no mínimo <strong>${ampImpMinimaFinal}Ω</strong>. Sua carga é ${impTotalCarga.toFixed(2)}Ω.`;
+            } else if (ampPotenciaFinal < potTotalCarga) {
+                card.className = "analysis-card border-warning";
+                title.style.color = "var(--warning)";
+                title.innerHTML = `<i class="fas fa-exclamation-circle"></i> POUCA POTÊNCIA`;
+                desc.innerHTML = `A saída fornece ${ampPotenciaFinal}W, mas os falantes pedem ${potTotalCarga}W.`;
+            } else {
+                card.className = "analysis-card border-success";
+                title.style.color = "var(--success)";
+                title.innerHTML = `<i class="fas fa-check-circle"></i> SISTEMA COMPATÍVEL`;
+                desc.innerHTML = `Tudo certo! Limiter sugerido em ${vrms.toFixed(1)}V para proteção.`;
+            }
+        }
+
+        verificarCanais();
+        calcular();
     </script>
 </body>
 </html>
