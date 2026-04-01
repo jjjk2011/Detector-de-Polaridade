@@ -2,52 +2,54 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AudioBase Pro | Suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0d14">
+    <link rel="manifest" href="manifest.json">
+    <title>AudioBase Pro | Engineering Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #0a0d14; color: #c9d1d9; font-family: system-ui, sans-serif; }
-        .nav-card { background: #161b22; border: 1px solid #30363d; transition: 0.3s; height: 100%; }
-        .nav-card:hover { border-color: #06b6d4; transform: translateY(-5px); }
+        body { background-color: #0a0d14; color: #c9d1d9; font-family: system-ui, sans-serif; }
+        .nav-card { background: #161b22; border: 1px solid #30363d; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-card:hover { transform: translateY(-5px); border-color: #06b6d4; box-shadow: 0 10px 20px rgba(6, 182, 212, 0.1); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 md:p-10">
-    <div class="w-full max-w-6xl">
+<body class="min-h-screen flex flex-col items-center justify-center p-6">
+    <div class="max-w-md w-full">
         <header class="text-center mb-12">
-            <h1 class="text-3xl md:text-5xl font-black text-white italic tracking-tighter uppercase">AudioBase <span class="text-cyan-500">Pro</span></h1>
-            <p class="text-[10px] md:text-xs text-gray-500 uppercase tracking-[0.4em] font-bold mt-2">Engineering & Sound System Suite</p>
+            <h1 class="text-4xl font-black text-white tracking-tighter italic">AUDIOBASE <span class="text-cyan-500 text-not-italic">PRO</span></h1>
+            <p class="text-[10px] text-gray-500 uppercase tracking-[0.3em] mt-2 font-bold">Acoustic Engineering Suite • v14.0</p>
         </header>
 
-        <!-- Grid Responsivo: 1 col no mobile, 3 col no PC (md:) -->
-        <nav class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a href="delay.html" class="nav-card p-8 rounded-3xl flex flex-col items-center text-center gap-4">
-                <span class="text-4xl md:text-5xl">⏱️</span>
+        <nav class="space-y-4">
+            <a href="delay.html" class="nav-card p-6 rounded-2xl flex items-center gap-5 block">
+                <div class="text-3xl">⏱️</div>
                 <div>
-                    <h2 class="text-amber-500 font-black text-lg md:text-xl uppercase">Delay / TA</h2>
-                    <p class="text-[10px] text-gray-500 font-bold uppercase mt-1">Alinhamento de Tempo</p>
+                    <h2 class="text-amber-500 font-black text-lg uppercase tracking-tight">Delay / TA</h2>
+                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Time Alignment Calculator</p>
                 </div>
             </a>
 
-            <a href="projeto.html" class="nav-card p-8 rounded-3xl flex flex-col items-center text-center gap-4">
-                <span class="text-4xl md:text-5xl">📊</span>
+            <a href="projeto.html" class="nav-card p-6 rounded-2xl flex items-center gap-5 block">
+                <div class="text-3xl">📊</div>
                 <div>
-                    <h2 class="text-cyan-500 font-black text-lg md:text-xl uppercase">Projeto RMS</h2>
-                    <p class="text-[10px] text-gray-500 font-bold uppercase mt-1">Cálculo de Canais e Carga</p>
+                    <h2 class="text-cyan-500 font-black text-lg uppercase tracking-tight">Power RMS</h2>
+                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Limiter • Vrms • Impedance</p>
                 </div>
             </a>
 
-            <a href="fase.html" class="nav-card p-8 rounded-3xl flex flex-col items-center text-center gap-4 border-b-4 border-b-purple-600">
-                <span class="text-4xl md:text-5xl">🔊</span>
+            <a href="fase.html" class="nav-card p-6 rounded-2xl flex items-center gap-5 block border-l-4 border-l-purple-600">
+                <div class="text-3xl">🔊</div>
                 <div>
-                    <h2 class="text-purple-500 font-black text-lg md:text-xl uppercase">Polarity Scan</h2>
-                    <p class="text-[10px] text-gray-500 font-bold uppercase mt-1">Detector de Fase Real-time</p>
+                    <h2 class="text-purple-500 font-black text-lg uppercase tracking-tight">Polarity Scan</h2>
+                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Real-time Phase Detector</p>
                 </div>
             </a>
         </nav>
 
-        <footer class="mt-16 text-center text-[9px] text-gray-600 uppercase tracking-widest font-bold">
-            Versão 14.0 • PWA Ready • Professional Engineering
+        <footer class="mt-16 text-center text-[9px] text-gray-500 uppercase tracking-widest font-bold">
+            Professional Engineering Tool • PWA Ready
         </footer>
     </div>
+    <script>if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }</script>
 </body>
 </html>
