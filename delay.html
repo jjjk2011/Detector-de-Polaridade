@@ -15,72 +15,60 @@
     <div class="max-w-md mx-auto space-y-4">
         <header class="flex justify-between items-center py-2">
             <a href="index.html" class="text-cyan-500 text-[10px] font-black uppercase tracking-widest">← Menu</a>
-            <h1 class="text-white font-black text-xs tracking-widest uppercase text-right">Time Alignment</h1>
+            <h1 class="text-white font-black text-xs tracking-widest uppercase">Time Alignment</h1>
         </header>
 
         <div class="card p-6 space-y-6">
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[9px] font-black text-gray-500 uppercase block mb-1">Caixa Longe (m)</label>
+                    <label class="text-[9px] font-black text-gray-500 uppercase block mb-1">Referência Longe (m)</label>
                     <input type="number" id="long" value="5.0" step="0.1" class="w-full p-4 rounded-xl font-black text-lg">
                 </div>
                 <div>
-                    <label class="text-[9px] font-black text-gray-500 uppercase block mb-1">Caixa Perto (m)</label>
+                    <label class="text-[9px] font-black text-gray-500 uppercase block mb-1">Referência Perto (m)</label>
                     <input type="number" id="near" value="1.0" step="0.1" class="w-full p-4 rounded-xl font-black text-lg">
                 </div>
             </div>
-
             <div>
                 <div class="flex justify-between text-[9px] font-black text-gray-500 mb-2">
                     <span>🌡️ TEMPERATURA AMBIENTE</span>
                     <span id="tempVal">25°C</span>
                 </div>
-                <input type="range" id="temp" min="0" max="50" value="25" class="w-full h-1 bg-gray-700 rounded-lg appearance-none accent-cyan-500">
+                <input type="range" id="temp" min="0" max="50" value="25" class="w-full h-1 bg-gray-700 rounded-lg appearance-none accent-amber-500">
             </div>
         </div>
 
         <div class="card p-8 bg-gradient-to-br from-amber-500/10 to-transparent border-amber-500/20 text-center">
-            <p class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-2">Atraso Necessário</p>
-            <h2 id="resMs" class="text-6xl font-black text-white">11.6</h2>
-            <p class="text-[12px] font-bold text-white mt-1">Milisegundos (ms)</p>
-            
-            <div class="mt-6 pt-6 border-t border-white/5 grid grid-cols-2 gap-4">
-                <div>
-                    <p class="text-[8px] font-black text-gray-500 uppercase">Velocidade Som</p>
-                    <p id="resSpeed" class="text-xs font-bold">346 m/s</p>
-                </div>
-                <div>
-                    <p class="text-[8px] font-black text-gray-500 uppercase">Distância Relativa</p>
-                    <p id="resDist" class="text-xs font-bold">4.0 m</p>
-                </div>
-            </div>
+            <p class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-2">Valor de Atraso (Delay)</p>
+            <h2 id="resMs" class="text-6xl font-black text-white italic">11.6</h2>
+            <p class="text-[10px] font-bold text-white mt-1 uppercase tracking-widest">Milisegundos (ms)</p>
         </div>
 
-        <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
-            <p class="text-[9px] text-gray-500 leading-relaxed uppercase font-medium">
-                Dica: O atraso (delay) deve ser aplicado na via que está **mais próxima** do ouvinte para que o som chegue ao mesmo tempo que a via mais distante.
-            </p>
+        <div class="card p-5 bg-amber-500/5 border-amber-500/20">
+            <h3 class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-3">🎯 Pro Alignment Tips</h3>
+            <ul class="space-y-3 text-[10px] text-gray-400 font-medium uppercase leading-relaxed">
+                <li class="flex gap-2">
+                    <span class="text-amber-500">●</span>
+                    <span><strong>Regra:</strong> O delay deve ser aplicado SEMPRE na via que está MAIS PRÓXIMA do ouvinte.</span>
+                </li>
+                <li class="flex gap-2">
+                    <span class="text-amber-500">●</span>
+                    <span><strong>Centro:</strong> Meça a distância da bobina do falante, não da tela frontal da caixa.</span>
+                </li>
+                <li class="flex gap-2">
+                    <span class="text-amber-500">●</span>
+                    <span><strong>Clima:</strong> A velocidade do som varia com a temperatura. Recalcule se o clima mudar drasticamente.</span>
+                </li>
+            </ul>
         </div>
     </div>
-
     <script>
         function calc() {
-            const long = parseFloat(document.getElementById('long').value) || 0;
-            const near = parseFloat(document.getElementById('near').value) || 0;
-            const temp = parseFloat(document.getElementById('temp').value);
-            
+            const long = parseFloat(document.getElementById('long').value) || 0, near = parseFloat(document.getElementById('near').value) || 0, temp = parseFloat(document.getElementById('temp').value);
             document.getElementById('tempVal').innerText = temp + "°C";
-
-            // Velocidade do som: v = 331.3 + 0.606 * T
-            const speed = 331.3 + (0.606 * temp);
-            const dist = Math.abs(long - near);
-            const delay = (dist / speed) * 1000;
-
+            const speed = 331.3 + (0.606 * temp), dist = Math.abs(long - near), delay = (dist / speed) * 1000;
             document.getElementById('resMs').innerText = delay.toFixed(1);
-            document.getElementById('resSpeed').innerText = speed.toFixed(0) + " m/s";
-            document.getElementById('resDist').innerText = dist.toFixed(1) + " m";
         }
-
         document.querySelectorAll('input').forEach(el => el.oninput = calc);
         calc();
     </script>
