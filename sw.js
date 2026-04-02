@@ -1,16 +1,8 @@
-const CACHE_NAME = 'audiobase-pro-v14';
-const ASSETS = [
-  './',
-  './index.html',
-  './fase.html',
-  './projeto.html',
-  './delay.html',
-  './manifest.json',
-  'https://cdn.tailwindcss.com'
-];
+const cacheName = 'audiobase-v1';
+const assets = ['./', './index.html', './delay.html', './projeto.html', './fase.html', './gerador.html'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
+  e.waitUntil(caches.open(cacheName).then(cache => cache.addAll(assets)));
 });
 
 self.addEventListener('fetch', e => {
