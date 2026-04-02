@@ -3,13 +3,9 @@
   "short_name": "AudioBase",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0a0d14",
-  "theme_color": "#0a0d14",
+  "background_color": "#0a0e14",
+  "theme_color": "#161b22",
   "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/727/727218.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "https://cdn-icons-png.flaticon.com/512/3659/3659898.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
