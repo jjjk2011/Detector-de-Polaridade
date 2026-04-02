@@ -44,21 +44,72 @@
         <div class="control-group"><label class="group-label">Frequência: <span id="val-hz" style="color:var(--accent)">1000</span>Hz</label><input type="range" id="slider" min="20" max="20000" value="1000" oninput="update()"></div>
     </div>
     <script>
-        let audioCtx, osc, noise;
-        function init() { if(!audioCtx) audioCtx = new AudioContext(); }
-        function start(t) {
-            init(); stop();
+        let audioCtx, osc, noiseNode;
+        function init() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        
+        function startSignal(type) {
+            init(); stopAll();
             document.querySelectorAll('.btn-gen').forEach(b => b.classList.remove('active'));
-            if(t==='sine'){ osc=audioCtx.createOscillator(); osc.frequency.value=document.getElementById('slider').value; osc.connect(audioCtx.destination); osc.start(); document.getElementById('btn-sine').classList.add('active'); document.getElementById('display').innerText = osc.frequency.value+" Hz"; }
-            else { playNoise(t); document.getElementById('btn-'+t).classList.add('active'); document.getElementById('display').innerText = t.toUpperCase(); }
+            if(type === 'sine') {
+                osc = audioCtx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.value = document.getElementById('freq-slider').value;
+                osc.connect(audioCtx.destination);
+                osc.start();
+                document.getElementById('btn-sine').classList.add('active');
+                document.getElementById('freq-display').innerText = osc.frequency.value + " Hz";
+            } else if(type === 'pink') {
+                playPink();
+                document.getElementById('btn-pink').classList.add('active');
+                document.getElementById('freq-display').innerText = "PINK NOISE";
+            } else if(type === 'white') {
+                playWhite();
+                document.getElementById('btn-white').classList.add('active');
+                document.getElementById('freq-display').innerText = "WHITE NOISE";
+            }
         }
-        function playNoise(t) {
-            const b = audioCtx.createBuffer(1, audioCtx.sampleRate*2, audioCtx.sampleRate), d = b.getChannelData(0);
-            for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-            noise = audioCtx.createBufferSource(); noise.buffer = b; noise.loop = true; noise.connect(audioCtx.destination); noise.start();
+
+        function playWhite() {
+            const size = 2 * audioCtx.sampleRate;
+            const buffer = audioCtx.createBuffer(1, size, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
+            noiseNode = audioCtx.createBufferSource();
+            noiseNode.buffer = buffer; noiseNode.loop = true;
+            noiseNode.connect(audioCtx.destination); noiseNode.start();
         }
-        function update() { let f = document.getElementById('slider').value; document.getElementById('val-hz').innerText = f; if(osc) { osc.frequency.value=f; document.getElementById('display').innerText = f+" Hz"; } }
-        function stop() { if(osc) osc.stop(); if(noise) noise.stop(); osc=null; noise=null; document.getElementById('display').innerText="OFF"; document.querySelectorAll('.btn-gen').forEach(b => b.classList.remove('active'));}
+
+        function playPink() {
+            const size = 2 * audioCtx.sampleRate;
+            const buffer = audioCtx.createBuffer(1, size, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            let b0, b1, b2, b3, b4, b5, b6;
+            b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+            for (let i = 0; i < size; i++) {
+                const white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179; b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520; b3 = 0.86650 * b3 + white * 0.3104856;
+                b4 = 0.55000 * b4 + white * 0.5329522; b5 = -0.7616 * b5 - white * 0.0168980;
+                data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362; data[i] *= 0.11;
+                b6 = white * 0.115926;
+            }
+            noiseNode = audioCtx.createBufferSource();
+            noiseNode.buffer = buffer; noiseNode.loop = true;
+            noiseNode.connect(audioCtx.destination); noiseNode.start();
+        }
+
+        function updateFreq() {
+            let f = document.getElementById('freq-slider').value;
+            document.getElementById('val-hz').innerText = f;
+            if(osc) { osc.frequency.value = f; document.getElementById('freq-display').innerText = f + " Hz"; }
+        }
+
+        function stopAll() {
+            if(osc) { osc.stop(); osc = null; }
+            if(noiseNode) { noiseNode.stop(); noiseNode = null; }
+            document.getElementById('freq-display').innerText = "OFF";
+            document.querySelectorAll('.btn-gen').forEach(b => b.classList.remove('active'));
+        }
     </script>
 </body>
 </html>
