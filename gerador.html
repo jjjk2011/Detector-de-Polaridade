@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador Sinais - AudioBase Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --bg: #0a0e14; --card: #161b22; --text: #fff; --dim: #8b949e; --border: #30363d; --accent: #44ff44; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
+        .top-bar { width: 100%; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
+        .btn-back { color: var(--text); text-decoration: none; background: var(--card); border: 1px solid var(--border); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .container { width: 90%; max-width: 500px; }
+        .header-page { text-align: center; margin: 10px 0 20px; }
+        .header-page i { color: var(--accent); font-size: 2rem; margin-bottom: 10px; }
+        .header-page h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
+
+        .res-display { background: var(--card); border: 2px solid var(--accent); border-radius: 25px; padding: 40px 10px; margin-bottom: 25px; text-align: center; }
+        .res-main { font-size: 2.5rem; font-weight: bold; color: var(--accent); font-family: monospace; }
+
+        .control-group { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
+        .group-label { color: var(--dim); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: block; }
+        
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-gen { background: #0d1117; border: 1px solid var(--border); color: white; padding: 15px; border-radius: 15px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; }
+        .btn-gen.active { background: var(--accent); color: black; }
+        input[type=range] { width: 100%; accent-color: var(--accent); margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="top-bar"><a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i></a><div style="color:var(--dim); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Signal Generator</div><div style="width: 45px;"></div></div>
+    <div class="container">
+        <div class="header-page"><i class="fas fa-wave-square"></i><h1>Gerador Sinais</h1></div>
+        <div class="res-display"><div class="res-main" id="display">OFF</div></div>
+        <div class="control-group">
+            <span class="group-label">Tipo de Sinal</span>
+            <div class="btn-grid">
+                <button class="btn-gen" id="btn-sine" onclick="start('sine')">Senoide</button>
+                <button class="btn-gen" id="btn-pink" onclick="start('pink')">Rosa</button>
+                <button class="btn-gen" id="btn-white" onclick="start('white')">Branco</button>
+                <button class="btn-gen" style="color:#ff4d4d" onclick="stop()">Parar</button>
+            </div>
+        </div>
+        <div class="control-group"><label class="group-label">Frequência: <span id="val-hz" style="color:var(--accent)">1000</span>Hz</label><input type="range" id="slider" min="20" max="20000" value="1000" oninput="update()"></div>
+    </div>
+    <script>
+        let audioCtx, osc, noise;
+        function init() { if(!audioCtx) audioCtx = new AudioContext(); }
+        function start(t) {
+            init(); stop();
+            document.querySelectorAll('.btn-gen').forEach(b => b.classList.remove('active'));
+            if(t==='sine'){ osc=audioCtx.createOscillator(); osc.frequency.value=document.getElementById('slider').value; osc.connect(audioCtx.destination); osc.start(); document.getElementById('btn-sine').classList.add('active'); document.getElementById('display').innerText = osc.frequency.value+" Hz"; }
+            else { playNoise(t); document.getElementById('btn-'+t).classList.add('active'); document.getElementById('display').innerText = t.toUpperCase(); }
+        }
+        function playNoise(t) {
+            const b = audioCtx.createBuffer(1, audioCtx.sampleRate*2, audioCtx.sampleRate), d = b.getChannelData(0);
+            for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+            noise = audioCtx.createBufferSource(); noise.buffer = b; noise.loop = true; noise.connect(audioCtx.destination); noise.start();
+        }
+        function update() { let f = document.getElementById('slider').value; document.getElementById('val-hz').innerText = f; if(osc) { osc.frequency.value=f; document.getElementById('display').innerText = f+" Hz"; } }
+        function stop() { if(osc) osc.stop(); if(noise) noise.stop(); osc=null; noise=null; document.getElementById('display').innerText="OFF"; document.querySelectorAll('.btn-gen').forEach(b => b.classList.remove('active'));}
+    </script>
+</body>
+</html>
