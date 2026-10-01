@@ -2,301 +2,473 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e14">
     <title>Scanner de Fase - AudioBase Pro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root {
-            --bg-color: #0a0e14;
-            --card-bg: #161b22;
-            --accent-purple: #a370f7;
-            --accent-orange: #ff9800;
-            --text-main: #ffffff;
-            --text-dim: #8b949e;
-            --border: #30363d;
-            --success: #44ff44;
-            --danger: #ff4d4d;
+        /* Osciloscópios */
+        .scope-box {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            height: 120px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            position: relative;
         }
-
-        body { 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding-bottom: 50px; 
+        .scope-box.small { height: 90px; margin-bottom: 20px; }
+        .scope-tag {
+            position: absolute; top: 8px; left: 12px;
+            color: var(--dim); font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase;
         }
+        canvas { width: 100%; height: 100%; display: block; }
 
-        /* BARRA SUPERIOR PADRONIZADA */
-        .top-bar { 
-            width: 100%; 
-            padding: 20px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            box-sizing: border-box; 
+        /* Medidor de nível */
+        .meter { height: 6px; background: #000; border-radius: 3px; overflow: hidden; margin-bottom: 20px; border: 1px solid var(--border); }
+        .meter-fill { height: 100%; width: 0%; background: var(--success); transition: width 0.05s linear; }
+        .meter-fill.hot { background: var(--danger); }
+
+        /* Botões de pulso (laranja = saída de sinal) */
+        .pa-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .pa-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 15px;
+            padding: 18px 5px; cursor: pointer; text-align: center; transition: 0.2s; color: inherit;
         }
+        .pa-card i { font-size: 1.5rem; color: var(--orange); margin-bottom: 8px; display: block; }
+        .pa-card span { font-size: 0.7rem; font-weight: bold; color: var(--dim); text-transform: uppercase; display: block; }
+        .pa-card small { font-size: 0.6rem; color: var(--dim); }
+        .pa-card.playing { border-color: var(--orange); background: rgba(255,152,0,0.1); box-shadow: 0 0 15px rgba(255,152,0,0.2); }
+        .pa-card.playing i, .pa-card.playing span { color: #fff; }
 
-        .btn-back { 
-            color: var(--text-main); 
-            text-decoration: none; 
-            font-size: 1.2rem; 
-            background: var(--card-bg); 
-            padding: 10px 15px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border); 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 45px;
-            height: 45px;
-            box-sizing: border-box;
-        }
+        /* Resultado */
+        #res-card { border-color: var(--border); }
+        #res-card.pos { border-color: var(--success); box-shadow: 0 0 20px rgba(68,255,68,0.12); }
+        #res-card.neg { border-color: var(--danger); box-shadow: 0 0 20px rgba(255,77,77,0.12); }
+        #res-card.unk { border-color: var(--warning); }
+        #res-main { color: var(--text); font-size: 2.1rem; }
+        .history { display: flex; justify-content: center; gap: 5px; margin-top: 14px; min-height: 12px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+        .dot.p { background: var(--success); }
+        .dot.n { background: var(--danger); }
 
-        .container { width: 90%; max-width: 500px; }
+        .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 15px; }
+        .toggle-row span { color: var(--dim); font-size: 0.8rem; }
+        .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; inset: 0; background: var(--field); border: 1px solid var(--border); border-radius: 26px; cursor: pointer; transition: 0.2s; }
+        .slider::before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: var(--dim); border-radius: 50%; transition: 0.2s; }
+        .switch input:checked + .slider { background: var(--accent); border-color: var(--accent); }
+        .switch input:checked + .slider::before { transform: translateX(20px); background: #000; }
 
-        .header-page { text-align: center; margin: 20px 0; }
-        .header-page i { color: var(--accent-purple); font-size: 2rem; margin-bottom: 10px; }
-        .header-page h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
-
-        /* OSCILOSCÓPIO */
-        .scope-box { 
-            background: #000; 
-            border: 1px solid var(--border); 
-            border-radius: 20px; 
-            height: 120px; 
-            margin-bottom: 20px; 
-            overflow: hidden; 
-            position: relative; 
-        }
-        canvas { width: 100%; height: 100%; }
-
-        /* SEÇÃO DE SINAL (LARANJA) */
-        .section-label { 
-            color: var(--text-dim); 
-            font-size: 0.7rem; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            margin-bottom: 15px; 
-            display: block; 
-            text-align: left;
-        }
-
-        .pa-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; 
-            gap: 10px; 
-            margin-bottom: 25px; 
-        }
-
-        .pa-card { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border); 
-            border-radius: 15px; 
-            padding: 20px 5px; 
-            cursor: pointer; 
-            text-align: center;
-            transition: 0.3s;
-        }
-
-        .pa-card i { font-size: 1.5rem; color: var(--accent-orange); margin-bottom: 8px; display: block; }
-        .pa-card span { font-size: 0.7rem; font-weight: bold; color: var(--text-dim); text-transform: uppercase; }
-
-        .pa-card.playing { 
-            border-color: var(--accent-orange); 
-            background: rgba(255, 152, 0, 0.1); 
-            box-shadow: 0 0 15px rgba(255, 152, 0, 0.2);
-        }
-        .pa-card.playing i { color: #fff; }
-        .pa-card.playing span { color: #fff; }
-
-        /* RESULTADO (ESTILO DISPLAY CARDS) */
-        .res-display {
-            background: var(--card-bg); 
-            border: 2px solid var(--border); 
-            border-radius: 30px; 
-            padding: 40px 10px; 
-            margin-bottom: 25px; 
-            text-align: center;
-            transition: 0.2s;
-        }
-        .res-display.pos { border-color: var(--success); box-shadow: 0 0 20px rgba(68, 255, 68, 0.1); }
-        .res-display.neg { border-color: var(--danger); box-shadow: 0 0 20px rgba(255, 77, 77, 0.1); }
-        .res-main { font-size: 2.2rem; font-weight: bold; margin: 0; }
-
-        /* BOTÃO MICROFONE (ROXO) */
-        .btn-action {
-            width: 100%; 
-            padding: 20px; 
-            border-radius: 20px; 
-            border: 2px solid var(--accent-purple);
-            background: transparent; 
-            color: var(--accent-purple); 
-            font-size: 1rem; 
-            font-weight: bold; 
-            cursor: pointer; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-action.active { 
-            background: var(--accent-purple); 
-            color: #000; 
-        }
-
+        #mic-error { display: none; }
+        .download { color: var(--accent); }
     </style>
 </head>
-<body>
+<body class="theme-purple">
 
     <div class="top-bar">
-        <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i></a>
+        <a href="index.html" class="btn-back" aria-label="Voltar"><i class="fas fa-arrow-left"></i></a>
     </div>
 
     <div class="container">
-        
+
         <div class="header-page">
             <i class="fas fa-wave-square"></i>
             <h1>Scanner de Fase</h1>
+            <p>Um aparelho emite o pulso, outro (ou o mesmo) escuta com o microfone.</p>
         </div>
 
-        <div class="scope-box">
-            <canvas id="scope"></canvas>
-        </div>
-
+        <!-- ===== EMISSOR ===== -->
         <span class="section-label">Gerador de Pulso</span>
         <div class="pa-grid">
-            <div id="btn-sub" class="pa-card" onclick="togglePulse('sub')">
-                <i class="fas fa-bullseye"></i>
-                <span>Sub</span>
-            </div>
-            <div id="btn-medio" class="pa-card" onclick="togglePulse('medio')">
-                <i class="fas fa-volume-down"></i>
-                <span>Médio</span>
-            </div>
-            <div id="btn-agudo" class="pa-card" onclick="togglePulse('agudo')">
-                <i class="fas fa-bullhorn"></i>
-                <span>Agudo</span>
+            <button id="btn-sub" class="pa-card" onclick="togglePulse('sub')">
+                <i class="fas fa-bullseye"></i><span>Sub</span><small>~60 Hz</small>
+            </button>
+            <button id="btn-medio" class="pa-card" onclick="togglePulse('medio')">
+                <i class="fas fa-volume-down"></i><span>Médio</span><small>~800 Hz</small>
+            </button>
+            <button id="btn-agudo" class="pa-card" onclick="togglePulse('agudo')">
+                <i class="fas fa-bullhorn"></i><span>Agudo</span><small>~3 kHz</small>
+            </button>
+        </div>
+        <div class="control-group">
+            <label>Volume do pulso: <span id="vol-val" style="color:var(--orange)">-12</span> dBFS</label>
+            <input type="range" id="vol" min="-40" max="0" value="-12" step="1" style="accent-color:var(--orange)">
+            <div class="note">
+                <i class="fas fa-download"></i> Sem outro aparelho? Toque o arquivo
+                <a class="download" href="audio/pulso_polaridade.wav" download>pulso_polaridade.wav</a>
+                (pulsos positivos de sub, médio e agudo) no sistema de som.
             </div>
         </div>
+
+        <!-- ===== RECEPTOR ===== -->
+        <span class="section-label">Analisador</span>
+
+        <div class="scope-box"><span class="scope-tag">Microfone (ao vivo)</span><canvas id="scope"></canvas></div>
+        <div class="meter"><div id="meter" class="meter-fill"></div></div>
+
+        <div class="scope-box small"><span class="scope-tag">Último pulso capturado</span><canvas id="snap"></canvas></div>
 
         <div id="res-card" class="res-display">
             <div id="res-main" class="res-main">---</div>
+            <div id="res-sub" class="res-unit">Ligue o analisador</div>
+            <div id="history" class="history"></div>
         </div>
+
+        <div id="mic-error" class="warn-box"></div>
 
         <button id="btn-mic" class="btn-action" onclick="toggleMic()">
             <i class="fas fa-microphone"></i> Ligar Analisador
         </button>
 
+        <div class="control-group" style="margin-top:15px">
+            <label>Sensibilidade: <span id="sens-val" style="color:var(--accent)">média</span></label>
+            <input type="range" id="sens" min="1" max="5" value="3" step="1">
+
+            <div class="toggle-row">
+                <span>Inverter referência do microfone<br><small>Use se uma caixa sabidamente correta aparecer como invertida.</small></span>
+                <label class="switch" style="margin:0"><input type="checkbox" id="mic-invert"><span class="slider"></span></label>
+            </div>
+
+            <button class="btn-small" style="width:100%;margin-top:15px" onclick="clearHistory()">
+                <i class="fas fa-eraser"></i> Limpar leituras
+            </button>
+
+            <div class="note">
+                <i class="fas fa-info-circle"></i> O resultado só é considerado confiável depois de algumas leituras iguais.
+                Microfones de celular podem ter polaridade própria, então calibre primeiro com uma caixa de referência
+                e use a chave acima se precisar. Posicione o microfone perto (30 a 50 cm) e no eixo do falante testado.
+            </div>
+        </div>
     </div>
 
     <script>
-        let audioCtx, analyser, source, micActive = false;
-        let activePulse = null, pulseTimer;
-        const canvas = document.getElementById('scope'), ctx = canvas.getContext('2d');
+        // ==========================================================
+        // CONFIGURAÇÃO
+        // ==========================================================
+        // Cada pulso é um "morrinho" positivo (meia janela de Hann).
+        // Como ele só vai para cima, o falante deve empurrar o ar para
+        // fora primeiro. Se o microfone enxergar o primeiro lobo negativo,
+        // a via está com a polaridade invertida.
+        const PULSES = {
+            sub:   { freq: 60,   label: 'Sub' },
+            medio: { freq: 800,  label: 'Médio' },
+            agudo: { freq: 3000, label: 'Agudo' }
+        };
+        const PULSE_INTERVAL_MS = 1000;   // um pulso por segundo
+        const HISTORY_SIZE = 10;          // quantas leituras usamos para decidir
+        const DEAD_TIME_S = 0.25;         // ignora ecos até 250 ms depois de um pulso
+        const SENS_LABELS = ['muito baixa', 'baixa', 'média', 'alta', 'muito alta'];
+        const SENS_MIN_LEVEL = [0.12, 0.06, 0.03, 0.015, 0.008]; // limiar mínimo absoluto
 
-        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        // ==========================================================
+        // ESTADO
+        // ==========================================================
+        let audioCtx = null;
+        let micStream = null, micSource = null, hpFilter = null, analyser = null;
+        let micActive = false;
+        let activePulse = null, pulseTimer = null;
+        let lastOnsetTime = -1;
+        let history = [];          // +1 ou -1
+        let lastSnapshot = null;   // { data, onset, sign }
+        let rafId = null;
 
-        async function toggleMic() {
-            initAudio();
-            if (micActive) { location.reload(); return; }
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } 
-                });
-                source = audioCtx.createMediaStreamSource(stream);
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 2048;
-                source.connect(analyser);
-                micActive = true;
-                document.getElementById('btn-mic').classList.add('active');
-                document.getElementById('btn-mic').innerHTML = '<i class="fas fa-stop"></i> Desligar Analisador';
-                draw();
-                monitor();
-            } catch (err) { alert("Permita o uso do microfone."); }
+        const $ = id => document.getElementById(id);
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // ==========================================================
+        // EMISSOR DE PULSO
+        // ==========================================================
+        function makePulseBuffer(freq) {
+            const sr = audioCtx.sampleRate;
+            const len = Math.max(4, Math.round(sr / (2 * freq))); // meio período
+            const buf = audioCtx.createBuffer(1, len, sr);
+            const d = buf.getChannelData(0);
+            for (let i = 0; i < len; i++) {
+                d[i] = Math.sin(Math.PI * (i + 0.5) / len) ** 2; // Hann, sempre >= 0
+            }
+            return buf;
+        }
+
+        function dbToGain(db) { return Math.pow(10, db / 20); }
+
+        function firePulse() {
+            if (!activePulse) return;
+            const src = audioCtx.createBufferSource();
+            src.buffer = makePulseBuffer(PULSES[activePulse].freq);
+            const g = audioCtx.createGain();
+            g.gain.value = dbToGain(parseFloat($('vol').value));
+            src.connect(g).connect(audioCtx.destination);
+            src.start();
         }
 
         function togglePulse(via) {
             initAudio();
-            if (activePulse === via) { stopPulse(); } 
-            else { 
-                stopPulse(); 
-                activePulse = via; 
-                document.getElementById(`btn-${via}`).classList.add('playing'); 
-                loopPulse(); 
-            }
+            const wasActive = activePulse === via;
+            stopPulse();
+            if (wasActive) return;
+            activePulse = via;
+            $(`btn-${via}`).classList.add('playing');
+            firePulse();
+            pulseTimer = setInterval(firePulse, PULSE_INTERVAL_MS);
         }
 
         function stopPulse() {
-            clearTimeout(pulseTimer);
-            document.querySelectorAll('.pa-card').forEach(c => c.classList.remove('playing'));
+            clearInterval(pulseTimer);
+            pulseTimer = null;
             activePulse = null;
+            document.querySelectorAll('.pa-card').forEach(c => c.classList.remove('playing'));
         }
 
-        function loopPulse() {
-            if (!activePulse) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            if (activePulse === 'sub') { osc.type = 'sawtooth'; osc.frequency.value = 40; }
-            else if (activePulse === 'medio') { osc.type = 'triangle'; osc.frequency.value = 500; }
-            else { osc.type = 'square'; osc.frequency.value = 5000; }
+        $('vol').addEventListener('input', () => $('vol-val').textContent = $('vol').value);
 
-            gain.gain.setValueAtTime(0, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(1.0, audioCtx.currentTime + 0.001);
-            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.01);
+        // ==========================================================
+        // MICROFONE
+        // ==========================================================
+        async function toggleMic() {
+            initAudio();
+            if (micActive) { stopMic(); return; }
+            $('mic-error').style.display = 'none';
 
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.02);
-            pulseTimer = setTimeout(loopPulse, 1000);
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showMicError('Este navegador não dá acesso ao microfone. Abra a página por HTTPS (ex.: GitHub Pages) num navegador atualizado.');
+                return;
+            }
+            try {
+                micStream = await navigator.mediaDevices.getUserMedia({
+                    // Sem processamento: cancelamento de eco e AGC estragam a forma de onda
+                    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+                });
+            } catch (err) {
+                const msg = err && err.name === 'NotAllowedError'
+                    ? 'Permissão do microfone negada. Libere o microfone nas configurações do navegador para este site.'
+                    : 'Não foi possível abrir o microfone (' + (err && err.name || 'erro') + ').';
+                showMicError(msg);
+                return;
+            }
+
+            micSource = audioCtx.createMediaStreamSource(micStream);
+            // Passa-altas em 20 Hz: tira offset DC e vento sem mexer na polaridade das vias
+            hpFilter = audioCtx.createBiquadFilter();
+            hpFilter.type = 'highpass';
+            hpFilter.frequency.value = 20;
+            hpFilter.Q.value = 0.5;
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 8192; // ~170 ms a 48 kHz
+            micSource.connect(hpFilter).connect(analyser);
+
+            micActive = true;
+            lastOnsetTime = -1;
+            $('btn-mic').classList.add('active');
+            $('btn-mic').innerHTML = '<i class="fas fa-stop"></i> Desligar Analisador';
+            $('res-sub').textContent = 'Aguardando pulso...';
+            loop();
         }
 
-        function monitor() {
+        function stopMic() {
+            micActive = false;
+            cancelAnimationFrame(rafId);
+            if (micStream) micStream.getTracks().forEach(t => t.stop());
+            if (micSource) micSource.disconnect();
+            micStream = micSource = hpFilter = analyser = null;
+            $('btn-mic').classList.remove('active');
+            $('btn-mic').innerHTML = '<i class="fas fa-microphone"></i> Ligar Analisador';
+            $('meter').style.width = '0%';
+            $('res-sub').textContent = 'Analisador desligado';
+        }
+
+        function showMicError(msg) {
+            $('mic-error').textContent = msg;
+            $('mic-error').style.display = 'block';
+        }
+
+        // ==========================================================
+        // DETECÇÃO
+        // ==========================================================
+        let buf = null;
+
+        function loop() {
             if (!micActive) return;
-            const data = new Float32Array(analyser.fftSize);
-            analyser.getFloatTimeDomainData(data);
-            let firstPeakValue = 0, threshold = 0.15;
+            if (!buf || buf.length !== analyser.fftSize) buf = new Float32Array(analyser.fftSize);
+            analyser.getFloatTimeDomainData(buf);
 
-            for (let i = 0; i < data.length; i++) {
-                if (Math.abs(data[i]) > threshold) { firstPeakValue = data[i]; break; }
-            }
+            drawWave($('scope'), buf, 0, buf.length, '#a370f7');
+            updateMeter(buf);
+            detect(buf);
 
-            if (firstPeakValue !== 0) {
-                const card = document.getElementById('res-card');
-                const main = document.getElementById('res-main');
-                if (firstPeakValue > 0) {
-                    card.className = "res-display pos";
-                    main.innerText = "NORMAL (+)";
-                    main.style.color = "var(--success)";
-                } else {
-                    card.className = "res-display neg";
-                    main.innerText = "INVERTIDA (-)";
-                    main.style.color = "var(--danger)";
-                }
-            }
-            requestAnimationFrame(monitor);
+            rafId = requestAnimationFrame(loop);
         }
 
-        function draw() {
-            if (!micActive) return;
-            const data = new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteTimeDomainData(data);
-            ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.lineWidth = 2; ctx.strokeStyle = '#a370f7'; ctx.beginPath();
-            let x = 0; const slice = canvas.width / data.length;
-            for (let i = 0; i < data.length; i++) {
-                const v = data[i] / 128.0; const y = v * canvas.height / 2;
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-                x += slice;
-            }
-            ctx.stroke(); requestAnimationFrame(draw);
+        function updateMeter(d) {
+            let peak = 0;
+            for (let i = 0; i < d.length; i++) { const a = Math.abs(d[i]); if (a > peak) peak = a; }
+            const m = $('meter');
+            m.style.width = Math.min(100, peak * 100) + '%';
+            m.classList.toggle('hot', peak > 0.98);
         }
+
+        // Estimativa robusta do ruído de fundo: mediana de |x|.
+        // Um pulso ocupa poucos ms do buffer, então não contamina a mediana.
+        function noiseFloor(d) {
+            const step = 4; // amostragem esparsa para economizar CPU
+            const tmp = [];
+            for (let i = 0; i < d.length; i += step) tmp.push(Math.abs(d[i]));
+            tmp.sort((a, b) => a - b);
+            return tmp[tmp.length >> 1] * 1.4826; // mediana -> desvio padrão aproximado
+        }
+
+        function detect(d) {
+            const sr = audioCtx.sampleRate;
+            const sensIdx = parseInt($('sens').value) - 1;
+            const sigma = noiseFloor(d);
+            const threshold = Math.max(SENS_MIN_LEVEL[sensIdx], sigma * 8);
+            const win = Math.round(0.012 * sr);   // analisa 12 ms após o início
+            const pre = Math.round(0.002 * sr);   // e guarda 2 ms antes para o desenho
+
+            // 1) Início do evento: primeira amostra acima do limiar
+            let onset = -1;
+            for (let i = 0; i < d.length; i++) {
+                if (Math.abs(d[i]) > threshold) { onset = i; break; }
+            }
+            if (onset < 0) return;
+            if (onset + win >= d.length) return; // pulso ainda chegando; espera o próximo quadro
+
+            // 2) Evita contar o mesmo pulso várias vezes (os quadros se sobrepõem)
+            const onsetTime = audioCtx.currentTime - (d.length - onset) / sr;
+            if (lastOnsetTime >= 0 && Math.abs(onsetTime - lastOnsetTime) < DEAD_TIME_S) return;
+            if (lastOnsetTime >= 0 && onsetTime < lastOnsetTime) return;
+            lastOnsetTime = onsetTime;
+
+            // 3) Pico máximo na janela e primeiro lobo significativo (>= 50% do pico)
+            let peak = 0;
+            for (let i = onset; i < onset + win; i++) peak = Math.max(peak, Math.abs(d[i]));
+            let sign = 0;
+            for (let i = onset; i < onset + win; i++) {
+                if (Math.abs(d[i]) >= 0.5 * peak) { sign = Math.sign(d[i]); break; }
+            }
+            if (!sign) return;
+            if ($('mic-invert').checked) sign = -sign;
+
+            const start = Math.max(0, onset - pre);
+            lastSnapshot = { data: d.slice(start, onset + win), onset: onset - start, sign };
+            drawSnapshot();
+
+            const clipped = peak > 0.98;
+            addReading(sign, peak / Math.max(sigma, 1e-6), clipped);
+        }
+
+        function addReading(sign, snr, clipped) {
+            history.push(sign);
+            if (history.length > HISTORY_SIZE) history.shift();
+            renderResult(clipped, snr);
+        }
+
+        function clearHistory() {
+            history = [];
+            lastSnapshot = null;
+            clearCanvas($('snap'));
+            renderResult(false, 0);
+        }
+
+        function renderResult(clipped, snr) {
+            const card = $('res-card'), main = $('res-main'), sub = $('res-sub');
+            const n = history.length;
+            $('history').innerHTML = history.map(s => `<span class="dot ${s > 0 ? 'p' : 'n'}"></span>`).join('');
+
+            if (n === 0) {
+                card.className = 'res-display';
+                main.textContent = '---';
+                sub.textContent = micActive ? 'Aguardando pulso...' : 'Ligue o analisador';
+                return;
+            }
+
+            const pos = history.filter(s => s > 0).length;
+            const ratio = pos / n;
+            let extra = clipped ? ' • SINAL SATURADO, afaste o microfone' : '';
+            if (n < 3) {
+                card.className = 'res-display unk';
+                main.textContent = history[n - 1] > 0 ? 'NORMAL (+)?' : 'INVERTIDA (-)?';
+                sub.textContent = `Confirmando... ${n} de 3 leituras${extra}`;
+            } else if (ratio >= 0.7) {
+                card.className = 'res-display pos';
+                main.textContent = 'NORMAL (+)';
+                sub.textContent = `${pos} de ${n} leituras positivas${extra}`;
+            } else if (ratio <= 0.3) {
+                card.className = 'res-display neg';
+                main.textContent = 'INVERTIDA (-)';
+                sub.textContent = `${n - pos} de ${n} leituras negativas${extra}`;
+            } else {
+                card.className = 'res-display unk';
+                main.textContent = 'INCONCLUSIVO';
+                sub.textContent = 'Leituras misturadas: aproxime o mic ou reduza o ruído' + extra;
+            }
+        }
+
+        $('sens').addEventListener('input', () => $('sens-val').textContent = SENS_LABELS[$('sens').value - 1]);
+
+        // ==========================================================
+        // DESENHO
+        // ==========================================================
+        // Ajusta a resolução do canvas à tela (fica nítido no Retina)
+        function fitCanvas(c) {
+            const dpr = window.devicePixelRatio || 1;
+            const w = Math.round(c.clientWidth * dpr), h = Math.round(c.clientHeight * dpr);
+            if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+            return c.getContext('2d');
+        }
+
+        function clearCanvas(c) {
+            const ctx = fitCanvas(c);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, c.width, c.height);
+            ctx.strokeStyle = '#30363d';
+            ctx.beginPath(); ctx.moveTo(0, c.height / 2); ctx.lineTo(c.width, c.height / 2); ctx.stroke();
+            return ctx;
+        }
+
+        function drawWave(c, d, from, to, color, scale = 1) {
+            const ctx = clearCanvas(c);
+            const n = to - from;
+            ctx.lineWidth = 2 * (window.devicePixelRatio || 1);
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            for (let i = 0; i < n; i++) {
+                const x = (i / (n - 1)) * c.width;
+                const y = c.height / 2 - d[from + i] * scale * (c.height / 2) * 0.9;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            return ctx;
+        }
+
+        function drawSnapshot() {
+            if (!lastSnapshot) return;
+            const { data, onset, sign } = lastSnapshot;
+            let peak = 1e-6;
+            for (const v of data) peak = Math.max(peak, Math.abs(v));
+            const c = $('snap');
+            const ctx = drawWave(c, data, 0, data.length, sign > 0 ? '#44ff44' : '#ff4d4d', 1 / peak);
+            const x = (onset / (data.length - 1)) * c.width;
+            ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, c.height); ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        window.addEventListener('resize', () => {
+            clearCanvas($('scope'));
+            if (lastSnapshot) drawSnapshot(); else clearCanvas($('snap'));
+        });
+        clearCanvas($('scope'));
+        clearCanvas($('snap'));
     </script>
 </body>
 </html>

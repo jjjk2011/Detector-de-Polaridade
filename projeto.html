@@ -2,536 +2,286 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projeto Sistema - AudioBase Pro + Série/Paralelo</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e14">
+    <title>Projeto do Sistema - AudioBase Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root { 
-            --bg: #0a0e14; --card: #161b22; --text: #fff; --dim: #8b949e; --border: #30363d; 
-            --accent: #00d2ff; --purple: #a370f7; --success: #44ff44; --danger: #ff4d4d; --warning: #ffcc00;
-        }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
-        
-        .top-bar { width: 100%; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
-        .btn-back { color: var(--text); text-decoration: none; background: var(--card); border: 1px solid var(--border); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-
-        .container { width: 90%; max-width: 600px; }
-        .header-page { text-align: center; margin: 10px 0 25px; }
-        .header-page i { color: var(--accent); font-size: 2rem; margin-bottom: 10px; }
-        .header-page h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
-
         .results-grid { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 10px; margin-bottom: 20px; }
         .res-item { background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 15px 5px; text-align: center; }
         .res-item.active { border-color: var(--accent); box-shadow: 0 0 15px rgba(0,210,255,0.2); }
         .res-item .lab { color: var(--dim); font-size: 0.55rem; text-transform: uppercase; display: block; margin-bottom: 8px; letter-spacing: 1px; }
-        .res-item .val { color: var(--accent); font-size: 1.1rem; font-weight: bold; }
+        .res-item .val { color: var(--accent); font-size: 1.1rem; font-weight: bold; font-variant-numeric: tabular-nums; }
+        .res-item .sub { color: var(--dim); font-size: 0.6rem; display: block; margin-top: 4px; }
 
-        .control-group { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
-        .group-title { color: var(--purple); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; border-left: 3px solid var(--purple); padding-left: 10px; }
-        
-        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-        label { display: block; color: var(--dim); font-size: 0.65rem; text-transform: uppercase; margin-bottom: 8px; font-weight: bold; }
-        select, input { width: 100%; background: #0d1117; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 10px; font-size: 0.95rem; outline: none; box-sizing: border-box; }
-        
-        .bridge-badge { background: var(--purple); color: #000; font-size: 0.6rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; display: none; }
+        .group-title {
+            color: var(--purple); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;
+            border-left: 3px solid var(--purple); padding-left: 10px;
+        }
+        .group-title.cyan { color: var(--accent); border-color: var(--accent); }
+        .bridge-badge { background: var(--purple); color: #000; font-size: 0.6rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; display: none; letter-spacing: 0; }
 
-        .analysis-card { background: #11151c; border: 2px solid var(--border); border-radius: 25px; padding: 25px; transition: 0.3s ease; }
+        .config-preview {
+            background: #1a2330; padding: 10px 12px; border-radius: 10px; margin-top: 12px;
+            font-family: ui-monospace, Menlo, monospace; font-size: 0.85rem; line-height: 1.5; white-space: pre-line;
+        }
+        .config-preview.bad { color: var(--warning); }
+
+        .analysis-card { background: #11151c; border: 2px solid var(--border); border-radius: 25px; padding: 25px; transition: border-color 0.3s ease; margin-bottom: 15px; }
         .status-title { font-size: 1rem; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
         .status-desc { color: var(--dim); font-size: 0.85rem; line-height: 1.5; }
-        b { color: #fff; }
+        .status-desc b { color: #fff; }
 
-        /* NOVO BLOCO: CALCULADORA DE SÉRIE/PARALELO */
-        .serie-paralelo-card {
-            background: #0f141c;
-            border: 2px solid var(--accent);
-            border-radius: 25px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-        .sp-title {
-            color: var(--accent);
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-        }
-        .sp-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: flex-end;
-            margin-bottom: 20px;
-        }
-        .sp-input {
-            flex: 1 1 100px;
-        }
-        .sp-result {
-            background: #0a0e14;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            border: 1px dashed var(--border);
-        }
-        .sp-result .big-val {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: var(--accent);
-        }
-        .btn-calc {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.9rem;
-        }
-        .btn-calc:hover { opacity: 0.8; }
-        .sp-note {
-            font-size: 0.75rem;
-            color: var(--dim);
-            margin-top: 15px;
-        }
-        .transfer-btn {
-            margin-top: 15px;
-            background: transparent;
-            border: 1px solid var(--purple);
-            color: var(--purple);
-            padding: 10px 15px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            width: 100%;
-        }
-        .transfer-btn i { margin-right: 8px; }
-        .config-preview {
-            background: #1a2330;
-            padding: 10px;
-            border-radius: 10px;
-            margin: 10px 0;
-            font-family: monospace;
-            font-size: 0.9rem;
-        }
+        .details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px; font-size: 0.8rem; }
+        .details span { color: var(--dim); }
+        .details b { text-align: right; font-variant-numeric: tabular-nums; }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body>
+<body class="theme-cyan">
 
     <div class="top-bar">
-        <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i></a>
-        <div style="width: 45px;"></div>
+        <a href="index.html" class="btn-back" aria-label="Voltar"><i class="fas fa-arrow-left"></i></a>
     </div>
 
     <div class="container">
-        <div class="header-page"><i class="fas fa-microchip"></i><h1>Projeto Sistema</h1></div>
-        
-        <!-- Cards de Resultados Rápidos -->
+        <div class="header-page"><i class="fas fa-microchip"></i><h1>Projeto do Sistema</h1></div>
+
+        <!-- Resultados rápidos -->
         <div class="results-grid">
-            <div class="res-item"><span class="lab">Impedância</span><span class="val" id="res-imp">0.0Ω</span></div>
-            <div class="res-item active"><span class="lab">Vrms Limiter</span><span class="val" id="res-vrms">0.0V</span></div>
-            <div class="res-item"><span class="lab">Pot. Canal</span><span class="val" id="res-pot">0W</span></div>
+            <div class="res-item"><span class="lab">Impedância</span><span class="val" id="res-imp">0Ω</span></div>
+            <div class="res-item active"><span class="lab">Vrms Limiter</span><span class="val" id="res-vrms">0V</span><span class="sub" id="res-vpk">pico 0V</span></div>
+            <div class="res-item"><span class="lab">Amp nesta carga</span><span class="val" id="res-pot">0W</span></div>
         </div>
 
-        <!-- 🔥 NOVO: CALCULADORA AVANÇADA SÉRIE/PARALELO -->
-        <div class="serie-paralelo-card">
-            <div class="sp-title">
-                <i class="fas fa-calculator"></i> 
-                CONFIGURADOR DE CARGA (SÉRIE/PARALELO)
-                <span style="margin-left: auto; font-size: 0.7rem; background: #1e2a3a; padding: 4px 10px; border-radius: 20px;">Ex: 16x 8Ω 200W</span>
-            </div>
-            <div class="sp-row">
-                <div class="sp-input">
-                    <label><i class="fas fa-box"></i> Qtd. Drivers</label>
-                    <input type="number" id="sp-qtd" value="16" min="1" step="1">
-                </div>
-                <div class="sp-input">
-                    <label><i class="fas fa-ohm"></i> Imp. Unitária</label>
-                    <select id="sp-ohm">
-                        <option value="2">2 Ω</option>
-                        <option value="4">4 Ω</option>
-                        <option value="8" selected>8 Ω</option>
-                    </select>
-                </div>
-                <div class="sp-input">
-                    <label><i class="fas fa-bolt"></i> Pot. Unit. (W)</label>
-                    <input type="number" id="sp-watt" value="200" min="1">
-                </div>
-                <button class="btn-calc" onclick="calcularConfiguracaoManual()"><i class="fas fa-sync-alt"></i> Calcular</button>
-            </div>
-            <div class="sp-row" style="margin-bottom: 5px;">
-                <div class="sp-input">
-                    <label>🔗 Série de (grupos)</label>
-                    <input type="number" id="sp-serie" value="2" min="1" step="1" placeholder="Ex: 2 em série">
-                </div>
-                <div class="sp-input">
-                    <label>🔀 Ramos em paralelo</label>
-                    <input type="number" id="sp-paralelo" value="8" min="1" step="1" placeholder="Ex: 8 grupos paralelo">
-                </div>
-            </div>
-            <div class="config-preview" id="sp-preview">
-                ⚡ 2 em série → 8 grupos paralelo = 16 drivers
-            </div>
-            <div class="sp-result">
-                <div style="display: flex; justify-content: space-around; align-items: center;">
-                    <div>
-                        <span style="color: var(--dim); font-size: 0.7rem;">IMPEDÂNCIA FINAL</span>
-                        <div class="big-val" id="sp-imp-final">2.0 Ω</div>
-                    </div>
-                    <div style="width:1px; height:40px; background: var(--border);"></div>
-                    <div>
-                        <span style="color: var(--dim); font-size: 0.7rem;">POTÊNCIA TOTAL</span>
-                        <div class="big-val" id="sp-pot-final">3200 W</div>
-                    </div>
-                </div>
-                <div style="margin-top: 10px; color: var(--dim); font-size:0.8rem;">
-                    <i class="fas fa-microchip"></i> Cada driver: <span id="sp-pot-por-driver">200W</span> | Vrms esperado: <span id="sp-vrms-calc">80.0V</span>
-                </div>
-            </div>
-            <button class="transfer-btn" onclick="transferirParaProjeto()">
-                <i class="fas fa-arrow-right-to-bracket"></i> USAR ESTA CONFIGURAÇÃO NO PROJETO PRINCIPAL
-            </button>
-            <div class="sp-note">
-                <i class="fas fa-info-circle"></i> Ajuste Série e Paralelo. O total de drivers deve ser = Série × Paralelo. 
-                Para seu caso (16x 8Ω 200W): 2 em série (16Ω) com 8 grupos paralelo = 2Ω / 3200W.
-            </div>
+        <!-- Análise -->
+        <div id="status-card" class="analysis-card">
+            <div id="status-title" class="status-title">ANÁLISE</div>
+            <div id="status-desc" class="status-desc">Preencha os dados para analisar o cenário.</div>
         </div>
 
-        <!-- 1. Dados do Amplificador -->
+        <!-- 1. Amplificador -->
         <div class="control-group">
             <span class="group-title">1. Amplificador <span id="bridge-badge" class="bridge-badge">MODO PONTE</span></span>
             <div class="row">
-                <div class="col">
-                    <label>Canais</label>
-                    <select id="a-ch" onchange="checkMono(); calc();">
+                <div>
+                    <label for="a-ch">Canais</label>
+                    <select id="a-ch">
                         <option value="1">1 Canal (Mono)</option>
                         <option value="2">2 Canais</option>
                         <option value="4" selected>4 Canais</option>
                     </select>
                 </div>
-                <div class="col">
-                    <label>Modo Saída</label>
-                    <select id="a-mo" onchange="calc()">
+                <div>
+                    <label for="a-mo">Modo Saída</label>
+                    <select id="a-mo">
                         <option value="st">STEREO</option>
                         <option value="br">BRIDGE</option>
                     </select>
                 </div>
             </div>
             <div class="row">
-                <div class="col">
-                    <label>Ω Mín. Canal</label>
-                    <select id="a-min" onchange="calc()">
+                <div>
+                    <label for="a-min">Ω Mín. Canal</label>
+                    <select id="a-min">
                         <option value="0.5">0.5 Ω</option>
                         <option value="1">1.0 Ω</option>
                         <option value="2" selected>2.0 Ω</option>
                         <option value="4">4.0 Ω</option>
+                        <option value="8">8.0 Ω</option>
                     </select>
                 </div>
-                <div class="col">
-                    <label>Watts/Canal</label>
-                    <input type="number" id="a-w" value="3000" oninput="calc()">
+                <div>
+                    <label for="a-w">Watts/Canal no Ω mín.</label>
+                    <input type="number" id="a-w" value="3000" min="0" inputmode="numeric">
                 </div>
             </div>
+            <div class="note"><i class="fas fa-info-circle"></i> Use a potência RMS por canal que o fabricante informa na impedância mínima.</div>
         </div>
 
-        <!-- 2. Dados da Carga (agora pode ser preenchido pela transferência) -->
+        <!-- 2. Carga -->
         <div class="control-group" style="border-color: var(--accent)">
-            <span class="group-title" style="color:var(--accent); border-color:var(--accent)">2. Carga por Saída (Atual)</span>
+            <span class="group-title cyan">2. Carga por Saída</span>
             <div class="row">
-                <div class="col">
-                    <label>Qtd Falantes</label>
-                    <input type="number" id="q" value="16" min="1" oninput="calc()">
+                <div>
+                    <label for="q">Qtd Falantes</label>
+                    <input type="number" id="q" value="16" min="1" step="1" inputmode="numeric">
                 </div>
-                <div class="col">
-                    <label>Ohms Unit.</label>
-                    <select id="f-i" onchange="calc()">
+                <div>
+                    <label for="f-i">Ohms Unit.</label>
+                    <select id="f-i">
                         <option value="2">2 Ω</option>
                         <option value="4">4 Ω</option>
                         <option value="8" selected>8 Ω</option>
+                        <option value="16">16 Ω</option>
                     </select>
                 </div>
             </div>
             <div class="row">
-                <div class="col">
-                    <label>Watts RMS (Cada)</label>
-                    <input type="number" id="f-w" value="200" oninput="calc()">
+                <div>
+                    <label for="f-w">Watts RMS (cada)</label>
+                    <input type="number" id="f-w" value="200" min="0" inputmode="numeric">
                 </div>
-                <div class="col">
-                    <label>Ligação</label>
-                    <select id="t" onchange="calc()">
+                <div>
+                    <label for="t">Ligação</label>
+                    <select id="t">
                         <option value="p">Paralelo</option>
                         <option value="s">Série</option>
+                        <option value="sp" selected>Série-Paralelo</option>
                     </select>
                 </div>
             </div>
-            <div style="font-size:0.75rem; color: var(--dim); margin-top: 5px;">
-                ⚠️ Para configurações complexas use a calculadora acima e clique em "USAR ESTA CONFIGURAÇÃO".
+            <div class="row" id="sp-row">
+                <div>
+                    <label for="n-serie">Falantes em cada série</label>
+                    <input type="number" id="n-serie" value="2" min="1" step="1" inputmode="numeric">
+                </div>
+                <div>
+                    <label>Ramos em paralelo</label>
+                    <input type="text" id="n-ramos" readonly>
+                </div>
             </div>
+            <div class="config-preview" id="preview"></div>
         </div>
 
-        <!-- Painel de Análise -->
-        <div id="status-card" class="analysis-card">
-            <div id="status-title" class="status-title">ANÁLISE</div>
-            <div id="status-desc" class="status-desc">Preencha os dados para analisar o cenário.</div>
+        <!-- Detalhes -->
+        <div class="control-group">
+            <span class="section-label">Detalhes</span>
+            <div class="details" id="details"></div>
         </div>
     </div>
 
     <script>
-        // ---------- FUNÇÕES ORIGINAIS (checkMono + calc) ----------
+        const $ = id => document.getElementById(id);
+        const FIELDS = ['a-ch', 'a-mo', 'a-min', 'a-w', 'q', 'f-i', 'f-w', 't', 'n-serie'];
+        const STORAGE_KEY = 'audiobase-projeto';
+
+        // ---------- helpers ----------
+        const num = (id, def = 0) => { const v = parseFloat($(id).value); return isNaN(v) || v < 0 ? def : v; };
+        const fmtOhm = z => (Math.round(z * 100) / 100) + 'Ω';
+        const fmtW = w => w >= 10000 ? (w / 1000).toFixed(1) + 'kW' : Math.round(w) + 'W';
+
         function checkMono() {
-            const channels = document.getElementById('a-ch').value;
-            const modeSelect = document.getElementById('a-mo');
-            if (channels === "1") { modeSelect.value = "st"; modeSelect.disabled = true; } 
-            else { modeSelect.disabled = false; }
+            const mono = $('a-ch').value === '1';
+            if (mono) $('a-mo').value = 'st';
+            $('a-mo').disabled = mono;
         }
 
+        // ---------- impedância da carga ----------
+        // Retorna { z, ok, texto } para a ligação escolhida
+        function cargaInfo(q, fi, t, nSerie) {
+            if (t === 'p') return { z: fi / q, ok: true, txt: `${q} × ${fi}Ω em paralelo` };
+            if (t === 's') return { z: fi * q, ok: true, txt: `${q} × ${fi}Ω em série` };
+
+            // Série-paralelo: grupos de nSerie falantes em série, ligados em paralelo
+            if (nSerie < 1 || q % nSerie !== 0) {
+                return { z: NaN, ok: false, txt: `${q} falantes não dividem em grupos de ${nSerie}. Escolha um número que divida ${q}.` };
+            }
+            const ramos = q / nSerie;
+            const zGrupo = fi * nSerie;
+            return {
+                z: zGrupo / ramos, ok: true, ramos,
+                txt: `${ramos} ramo(s) de ${nSerie} × ${fi}Ω em série (${zGrupo}Ω cada)\n→ ${ramos} × ${zGrupo}Ω em paralelo = ${fmtOhm(zGrupo / ramos)}`
+            };
+        }
+
+        // ---------- cálculo principal ----------
         function calc() {
-            const aw = parseFloat(document.getElementById('a-w').value) || 0;
-            const am = document.getElementById('a-mo').value;
-            const amin = parseFloat(document.getElementById('a-min').value);
-            const q = parseInt(document.getElementById('q').value) || 1;
-            const fi = parseFloat(document.getElementById('f-i').value);
-            const fw = parseFloat(document.getElementById('f-w').value) || 0;
-            const t = document.getElementById('t').value;
-
-            let it = (t === 'p') ? (fi / q) : (fi * q);
-            let pt = fw * q;
-            let vrms = Math.sqrt(pt * it);
-
-            let ampPotDisp = (am === 'br') ? aw * 2 : aw;
-            let ampMinReal = (am === 'br') ? amin * 2 : amin;
-            let headroom = ampPotDisp / pt;
-            
-            const badge = document.getElementById('bridge-badge');
-            badge.style.display = (am === 'br') ? 'inline-block' : 'none';
-
-            document.getElementById('res-imp').innerText = it.toFixed(2) + "Ω";
-            document.getElementById('res-vrms').innerText = vrms.toFixed(1) + "V";
-            document.getElementById('res-pot').innerText = ampPotDisp + "W";
-
-            const card = document.getElementById('status-card');
-            const title = document.getElementById('status-title');
-            const desc = document.getElementById('status-desc');
-            
-            let sColor = ""; let sTitle = ""; let sDesc = "";
-
-            if (it < ampMinReal) {
-                sColor = "var(--danger)";
-                sTitle = '<i class="fas fa-radiation"></i> PERIGO: IMPEDÂNCIA BAIXA';
-                sDesc = `Sua carga de <b>${it.toFixed(2)}Ω</b> está abaixo do mínimo de ${ampMinReal}Ω. O amplificador vai sobreaquecer e entrar em proteção ou queimar os transistores. <b>Corrija a ligação!</b>`;
-            } 
-            else if (headroom < 1) {
-                sColor = "var(--warning)";
-                sTitle = '<i class="fas fa-exclamation-triangle"></i> ATENÇÃO: RISCO DE CLIPPING';
-                sDesc = `O amplificador fornece apenas ${(headroom * 100).toFixed(0)}% da potência necessária. Ao tentar subir o volume, ele gerará <b>distorção harmônica (onda quadrada)</b>, queima rápida de drivers e tweeters.`;
-            }
-            else if (headroom > 2.5) {
-                sColor = "var(--warning)";
-                sTitle = '<i class="fas fa-exclamation-circle"></i> ATENÇÃO: EXCESSO DE FORÇA';
-                sDesc = `O amplificador é muito potente (${headroom.toFixed(1)}x). Existe alto risco de <b>dano mecânico</b> (pular a bobina ou rasgar o cone). O Limiter em <b>${vrms.toFixed(1)}V</b> é obrigatório!`;
-            }
-            else {
-                sColor = "var(--success)";
-                sTitle = '<i class="fas fa-check-circle"></i> SISTEMA IDEAL';
-                sDesc = `Combinação perfeita! Você tem um headroom de <b>${headroom.toFixed(1)}x</b>, garantindo som limpo e dinâmica. Configure seu Vrms Limiter em <b>${vrms.toFixed(1)}V</b> para proteção total.`;
-            }
-
-            card.style.borderColor = sColor;
-            title.style.color = sColor;
-            title.innerHTML = sTitle;
-            desc.innerHTML = sDesc;
-        }
-
-        // ---------- NOVA FUNÇÃO: CÁLCULO AVANÇADO SÉRIE/PARALELO ----------
-        function calcularConfiguracaoManual() {
-            const qtd = parseInt(document.getElementById('sp-qtd').value) || 16;
-            const ohmUnit = parseFloat(document.getElementById('sp-ohm').value);
-            const wattUnit = parseFloat(document.getElementById('sp-watt').value) || 200;
-            let serie = parseInt(document.getElementById('sp-serie').value) || 2;
-            let paralelo = parseInt(document.getElementById('sp-paralelo').value) || 8;
-
-            // Ajuste automático para manter total coerente se possível
-            if (serie * paralelo !== qtd) {
-                // tenta ajustar paralelo para manter total
-                if (serie > 0) paralelo = Math.round(qtd / serie);
-                if (paralelo * serie !== qtd) {
-                    // se ainda não bater, ajusta série
-                    if (paralelo > 0) serie = Math.round(qtd / paralelo);
-                }
-                document.getElementById('sp-serie').value = serie;
-                document.getElementById('sp-paralelo').value = paralelo;
-            }
-
-            const totalDrivers = serie * paralelo;
-            const impedanciaGrupo = ohmUnit * serie;      // grupo em série
-            const impedanciaFinal = impedanciaGrupo / paralelo;
-            const potenciaTotal = wattUnit * totalDrivers;
-            const potenciaPorDriver = wattUnit; 
-            const vrmsEstimado = Math.sqrt(potenciaTotal * impedanciaFinal);
-
-            document.getElementById('sp-imp-final').innerText = impedanciaFinal.toFixed(2) + ' Ω';
-            document.getElementById('sp-pot-final').innerText = potenciaTotal + ' W';
-            document.getElementById('sp-pot-por-driver').innerText = wattUnit + 'W';
-            document.getElementById('sp-vrms-calc').innerText = vrmsEstimado.toFixed(1) + 'V';
-
-            let previewMsg = `${serie} em série → ${paralelo} grupos paralelo = ${totalDrivers} drivers (${impedanciaFinal.toFixed(2)}Ω)`;
-            if (totalDrivers !== qtd) {
-                previewMsg += ` ⚠️ Total diferente da quantidade (${qtd})`;
-            }
-            document.getElementById('sp-preview').innerHTML = `⚡ ${previewMsg}`;
-
-            // Se o total não bater com qtd, exibe alerta visual
-            if (totalDrivers !== qtd) {
-                document.getElementById('sp-preview').style.color = '#ffaa00';
-            } else {
-                document.getElementById('sp-preview').style.color = 'inherit';
-            }
-        }
-
-        // ---------- TRANSFERIR CONFIGURAÇÃO PARA O PROJETO PRINCIPAL ----------
-        function transferirParaProjeto() {
-            const qtd = parseInt(document.getElementById('sp-qtd').value) || 16;
-            const ohmUnit = parseFloat(document.getElementById('sp-ohm').value);
-            const wattUnit = parseFloat(document.getElementById('sp-watt').value) || 200;
-            let serie = parseInt(document.getElementById('sp-serie').value) || 2;
-            let paralelo = parseInt(document.getElementById('sp-paralelo').value) || 8;
-
-            // Garantir consistência
-            if (serie * paralelo !== qtd) {
-                if (serie > 0) paralelo = Math.round(qtd / serie);
-                if (paralelo * serie !== qtd && paralelo > 0) serie = Math.round(qtd / paralelo);
-            }
-            const total = serie * paralelo;
-            const impedanciaGrupo = ohmUnit * serie;
-            const impedanciaFinal = impedanciaGrupo / paralelo;
-
-            // Atualiza campos principais
-            document.getElementById('q').value = total;
-            // Ohms unitário
-            document.getElementById('f-i').value = ohmUnit;
-            document.getElementById('f-w').value = wattUnit;
-            
-            // Determinar tipo de ligação (aproximação): se impedanciaFinal < ohmUnit, é paralelo-like, senão série.
-            // Mas para o cálculo usamos a fórmula exata. Vamos forçar 'p' se paralelo > 1 e série ==1, mas o cálculo acima já funciona.
-            // Ajuste inteligente: Se série > 1 e paralelo > 1, é misto. O cálculo 'p' ou 's' simples não representa.
-            // Vamos configurar para 'p' (paralelo) e modificar o cálculo para considerar série*paralelo.
-            // Para manter compatibilidade, vamos sobrescrever o cálculo padrão? 
-            // Melhor: definir ligação como 'p' mas a impedância final será calculada corretamente via fórmula customizada? 
-            // Mas a função calc() usa lógica simples. Então vamos ajustar para 'p' e atualizar a quantidade para que fi/q dê a impedância correta? 
-            // Ex: 2 em série de 8Ω = 16Ω grupo, 8 grupos paralelo = 2Ω. Se colocarmos q=16, fi=8, ligação 'p' => 8/16 = 0.5Ω (errado).
-            // Precisamos de um hack: usar uma impedância equivalente unitária.
-            // Solução elegante: calcular impedância equivalente por driver = impedanciaFinal * total? Não.
-            // Vamos criar um campo hidden ou usar o fato de que queremos que o projeto reflita a realidade.
-            // Modificaremos a função calc para usar também uma variável global de "configComplexa", mas para não complicar:
-            // Vamos setar q = total, fi = impedanciaFinal * total (para que fi/q = impedanciaFinal) se ligação 'p'.
-            // Assim: fi_novo = impedanciaFinal * total. Ex: 2Ω * 16 = 32Ω.
-            const fiEquivalente = impedanciaFinal * total;
-            
-            // Atualiza select de ohms para o valor mais próximo (2,4,8). Vamos forçar o valor customizado no input? O select só tem 2,4,8.
-            // Então guardamos o valor real em um atributo data-* e adaptamos o calc? Melhor: criar um campo oculto.
-            // Por simplicidade e robustez, vamos arredondar para o valor mais próximo do select e exibir uma nota.
-            let fiSelect;
-            if (fiEquivalente <= 3) fiSelect = 2;
-            else if (fiEquivalente <= 6) fiSelect = 4;
-            else fiSelect = 8;
-            
-            document.getElementById('f-i').value = fiSelect;
-            document.getElementById('t').value = 'p'; // paralelo
-            
-            // Mas o cálculo real será: fiSelect / total. Precisamos que dê ≈ impedanciaFinal.
-            // Para nosso exemplo 16x8Ω (2Ω final) => fiSelect=32? Não existe. 
-            // Vamos usar um approach: calcular impedância exata e exibir corretamente no resultado, mesmo que o select não bata.
-            // Vamos substituir a lógica de calc para usar uma variável global de impedância customizada se existir.
-            window.customImpedance = impedanciaFinal;
-            window.customTotalDrivers = total;
-            
-            // Força recálculo
-            calc();
-            
-            // Feedback visual
-            alert(`Configuração transferida: ${total} drivers, ${impedanciaFinal.toFixed(2)}Ω / ${wattUnit * total}W. A impedância foi ajustada.`);
-        }
-
-        // Modificar calc() para usar customImpedance se definida
-        const originalCalc = calc;
-        calc = function() {
-            if (window.customImpedance && window.customTotalDrivers) {
-                // Usa valores customizados
-                const aw = parseFloat(document.getElementById('a-w').value) || 0;
-                const am = document.getElementById('a-mo').value;
-                const amin = parseFloat(document.getElementById('a-min').value);
-                const fw = parseFloat(document.getElementById('f-w').value) || 0;
-                const q = window.customTotalDrivers;
-                const it = window.customImpedance;
-                const pt = fw * q;
-                const vrms = Math.sqrt(pt * it);
-                
-                let ampPotDisp = (am === 'br') ? aw * 2 : aw;
-                let ampMinReal = (am === 'br') ? amin * 2 : amin;
-                let headroom = ampPotDisp / pt;
-                
-                document.getElementById('res-imp').innerText = it.toFixed(2) + "Ω";
-                document.getElementById('res-vrms').innerText = vrms.toFixed(1) + "V";
-                document.getElementById('res-pot').innerText = ampPotDisp + "W";
-                
-                // Atualiza análise...
-                const card = document.getElementById('status-card');
-                const title = document.getElementById('status-title');
-                const desc = document.getElementById('status-desc');
-                let sColor, sTitle, sDesc;
-                if (it < ampMinReal) {
-                    sColor = "var(--danger)";
-                    sTitle = '<i class="fas fa-radiation"></i> PERIGO: IMPEDÂNCIA BAIXA';
-                    sDesc = `Carga de <b>${it.toFixed(2)}Ω</b> abaixo do mínimo de ${ampMinReal}Ω.`;
-                } else if (headroom < 1) {
-                    sColor = "var(--warning)";
-                    sTitle = '<i class="fas fa-exclamation-triangle"></i> ATENÇÃO: RISCO DE CLIPPING';
-                    sDesc = `Amplificador fornece ${(headroom*100).toFixed(0)}% da potência necessária.`;
-                } else if (headroom > 2.5) {
-                    sColor = "var(--warning)";
-                    sTitle = '<i class="fas fa-exclamation-circle"></i> ATENÇÃO: EXCESSO DE FORÇA';
-                    sDesc = `Headroom de ${headroom.toFixed(1)}x. Limiter em ${vrms.toFixed(1)}V obrigatório.`;
-                } else {
-                    sColor = "var(--success)";
-                    sTitle = '<i class="fas fa-check-circle"></i> SISTEMA IDEAL';
-                    sDesc = `Headroom ${headroom.toFixed(1)}x. Vrms Limiter: ${vrms.toFixed(1)}V.`;
-                }
-                card.style.borderColor = sColor;
-                title.style.color = sColor;
-                title.innerHTML = sTitle;
-                desc.innerHTML = sDesc;
-                
-                // Atualiza badge bridge
-                document.getElementById('bridge-badge').style.display = (am === 'br') ? 'inline-block' : 'none';
-                return;
-            }
-            // fallback para original
-            originalCalc();
-        };
-
-        // Inicialização e listeners
-        window.onload = function() {
             checkMono();
-            calcularConfiguracaoManual(); // já preenche com 16x8Ω 200W exemplo
-            calc();
-            
-            // Sincroniza eventos da calculadora série/paralelo
-            document.getElementById('sp-serie').addEventListener('input', calcularConfiguracaoManual);
-            document.getElementById('sp-paralelo').addEventListener('input', calcularConfiguracaoManual);
-            document.getElementById('sp-qtd').addEventListener('input', calcularConfiguracaoManual);
-            document.getElementById('sp-ohm').addEventListener('change', calcularConfiguracaoManual);
-            document.getElementById('sp-watt').addEventListener('input', calcularConfiguracaoManual);
-        };
+            const ch = parseInt($('a-ch').value);
+            const bridge = $('a-mo').value === 'br' && ch > 1;
+            const aw = num('a-w');
+            const amin = parseFloat($('a-min').value);
+            const q = Math.max(1, Math.round(num('q', 1)));
+            const fi = parseFloat($('f-i').value);
+            const fw = num('f-w');
+            const t = $('t').value;
+            const nSerie = Math.max(1, Math.round(num('n-serie', 1)));
 
-        // Expor funções globalmente
-        window.calcularConfiguracaoManual = calcularConfiguracaoManual;
-        window.transferirParaProjeto = transferirParaProjeto;
-        window.checkMono = checkMono;
-        window.calc = calc;
+            $('sp-row').classList.toggle('hidden', t !== 'sp');
+            $('bridge-badge').style.display = bridge ? 'inline-block' : 'none';
+
+            const carga = cargaInfo(q, fi, t, nSerie);
+            $('n-ramos').value = carga.ramos ? carga.ramos : '-';
+            $('preview').textContent = carga.txt;
+            $('preview').classList.toggle('bad', !carga.ok);
+            if (!carga.ok) { showStatus('var(--warning)', '<i class="fas fa-circle-question"></i> LIGAÇÃO INVÁLIDA', carga.txt); return; }
+
+            const z = carga.z;
+            const pt = fw * q;                       // potência RMS que os falantes aguentam
+            const vrms = Math.sqrt(pt * z);          // tensão que leva os falantes ao RMS nominal
+            const vpk = vrms * Math.SQRT2;
+
+            // Amplificador modelado como fonte de tensão:
+            // a tensão máxima por canal vem da potência no Ω mínimo (V = √(P·R)).
+            // Em ponte, a tensão dobra e o Ω mínimo também dobra.
+            const vCh = Math.sqrt(aw * amin);
+            const vAmp = bridge ? 2 * vCh : vCh;
+            const zMin = bridge ? 2 * amin : amin;
+            const pAmp = vAmp * vAmp / z;            // potência disponível nesta carga
+            const headroom = pt > 0 ? pAmp / pt : 0;
+            const saidas = bridge ? ch / 2 : ch;
+
+            $('res-imp').textContent = fmtOhm(z);
+            $('res-vrms').textContent = vrms.toFixed(1) + 'V';
+            $('res-vpk').textContent = 'pico ' + vpk.toFixed(1) + 'V';
+            $('res-pot').textContent = fmtW(pAmp);
+
+            $('details').innerHTML = `
+                <span>Potência RMS dos falantes</span><b>${fmtW(pt)}</b>
+                <span>Tensão máx. do amp (${bridge ? 'ponte' : 'canal'})</span><b>${vAmp.toFixed(1)} V</b>
+                <span>Ω mínimo ${bridge ? 'em ponte' : 'por canal'}</span><b>${fmtOhm(zMin)}</b>
+                <span>Saídas disponíveis</span><b>${saidas}</b>
+                <span>Corrente RMS na carga</span><b>${(vrms / z).toFixed(1)} A</b>
+                <span>Sistema completo (${saidas} saídas iguais)</span><b>${q * saidas} falantes • ${fmtW(pt * saidas)}</b>`;
+
+            if (z < zMin) {
+                showStatus('var(--danger)', '<i class="fas fa-radiation"></i> PERIGO: IMPEDÂNCIA BAIXA',
+                    `Sua carga de <b>${fmtOhm(z)}</b> está abaixo do mínimo de <b>${fmtOhm(zMin)}</b>${bridge ? ' em ponte' : ''}. O amplificador vai sobreaquecer, entrar em proteção ou queimar os transistores. <b>Corrija a ligação!</b>`);
+            } else if (headroom < 1) {
+                showStatus('var(--warning)', '<i class="fas fa-exclamation-triangle"></i> ATENÇÃO: RISCO DE CLIPPING',
+                    `Nesta carga o amplificador entrega cerca de <b>${fmtW(pAmp)}</b>, só ${(headroom * 100).toFixed(0)}% dos ${fmtW(pt)} que os falantes aguentam. Ao subir o volume ele vai clipar (onda quadrada), o que esquenta bobinas e queima tweeters.`);
+            } else if (headroom > 2.5) {
+                showStatus('var(--warning)', '<i class="fas fa-exclamation-circle"></i> ATENÇÃO: EXCESSO DE FORÇA',
+                    `O amplificador tem ${headroom.toFixed(1)}x a potência dos falantes. Alto risco de <b>dano mecânico</b> (bobina pulando, cone rasgando). O limiter em <b>${vrms.toFixed(1)} Vrms</b> é obrigatório!`);
+            } else {
+                showStatus('var(--success)', '<i class="fas fa-check-circle"></i> SISTEMA IDEAL',
+                    `Headroom de <b>${headroom.toFixed(1)}x</b> (${fmtW(pAmp)} disponíveis para ${fmtW(pt)} de falantes). Configure o limiter em <b>${vrms.toFixed(1)} Vrms</b> (${vpk.toFixed(1)} V de pico) para proteção.`);
+            }
+        }
+
+        function showStatus(color, title, desc) {
+            $('status-card').style.borderColor = color;
+            $('status-title').style.color = color;
+            $('status-title').innerHTML = title;
+            $('status-desc').innerHTML = desc;
+        }
+
+        // ---------- salvar/restaurar os campos neste aparelho ----------
+        function save() {
+            try {
+                const data = {};
+                FIELDS.forEach(id => data[id] = $(id).value);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (e) { /* armazenamento indisponível: segue sem salvar */ }
+        }
+        function restore() {
+            try {
+                const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                FIELDS.forEach(id => { if (data[id] !== undefined) $(id).value = data[id]; });
+            } catch (e) { /* ignora */ }
+        }
+
+        FIELDS.forEach(id => {
+            $(id).addEventListener('input', () => { calc(); save(); });
+            $(id).addEventListener('change', () => { calc(); save(); });
+        });
+        restore();
+        calc();
     </script>
 </body>
 </html>

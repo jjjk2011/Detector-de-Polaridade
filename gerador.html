@@ -2,116 +2,272 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e14">
     <title>Gerador de Sinais - AudioBase Pro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root { --bg-color: #0a0e14; --card-bg: #161b22; --accent-green: #44ff44; --text-main: #ffffff; --text-dim: #8b949e; --border: #30363d; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
-        .top-bar { width: 100%; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
-        .btn-back { color: var(--text-main); text-decoration: none; font-size: 1.2rem; background: var(--card-bg); padding: 10px 15px; border-radius: 12px; border: 1px solid var(--border); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
-        .container { width: 90%; max-width: 500px; }
-        .header-page { text-align: center; margin: 20px 0; }
-        .header-page i { color: var(--accent-green); font-size: 2rem; }
-        .res-display { background: var(--card-bg); border: 2px solid var(--accent-green); border-radius: 30px; padding: 30px 10px; margin-bottom: 25px; text-align: center; }
-        .res-main { font-size: 2.5rem; font-weight: bold; margin: 0; color: var(--accent-green); }
-        .control-group { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-gen { background: #0d1117; border: 1px solid var(--border); color: white; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
-        .btn-gen.active { background: var(--accent-green); color: black; border-color: var(--accent-green); }
-        input[type=range] { width: 100%; accent-color: var(--accent-green); margin-top: 15px; }
+        .btn-gen {
+            background: var(--field); border: 1px solid var(--border); color: var(--text);
+            padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer;
+            text-transform: uppercase; font-size: 0.8rem;
+        }
+        .btn-gen.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        .btn-stop { border-color: var(--danger); color: var(--danger); }
+        .preset-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .freq-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+        .freq-row input { text-align: center; }
+        .freq-row span { color: var(--dim); font-size: 0.8rem; }
+        #res-display.off .res-main { color: var(--dim); }
     </style>
 </head>
-<body>
-    <div class="top-bar"><a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i></a><div style="width:45px"></div></div>
+<body class="theme-green">
+    <div class="top-bar">
+        <a href="index.html" class="btn-back" aria-label="Voltar"><i class="fas fa-arrow-left"></i></a>
+    </div>
+
     <div class="container">
-        <div class="header-page"><i class="fas fa-wave-square"></i><h1>Gerador Sinais</h1></div>
-        <div class="res-display"><div class="res-main" id="freq-display">OFF</div></div>
+        <div class="header-page"><i class="fas fa-wave-square"></i><h1>Gerador de Sinais</h1></div>
+
+        <div id="res-display" class="res-display off">
+            <div class="res-main" id="freq-display">OFF</div>
+            <div class="res-unit" id="sub-display">Nenhum sinal</div>
+        </div>
+
+        <div class="warn-box">
+            <i class="fas fa-triangle-exclamation"></i>
+            Comece com o volume baixo e suba aos poucos. Ruído e senoide em volume alto queimam tweeters.
+        </div>
+
         <div class="control-group">
-            
-            <span style="color:var(--text-dim);font-size:0.7rem;text-transform:uppercase;letter-spacing:1px">Tipo de Sinal</span>
-            
-            <div class="btn-grid" style="margin-top:15px">
+            <span class="section-label">Tipo de Sinal</span>
+            <div class="btn-grid">
                 <button class="btn-gen" id="btn-sine" onclick="startSignal('sine')">Senoide</button>
+                <button class="btn-gen" id="btn-sweep" onclick="startSignal('sweep')">Varredura</button>
                 <button class="btn-gen" id="btn-pink" onclick="startSignal('pink')">Ruído Rosa</button>
                 <button class="btn-gen" id="btn-white" onclick="startSignal('white')">Ruído Branco</button>
-                <button class="btn-gen" style="color:red" onclick="stopAll()">Parar</button>
             </div>
-
+            <button class="btn-gen btn-stop" style="width:100%;margin-top:10px" onclick="stopAll()">
+                <i class="fas fa-stop"></i> Parar
+            </button>
         </div>
+
+        <div class="control-group">
+            <label>Volume: <span id="vol-val" style="color:var(--accent)">-20</span> dBFS</label>
+            <input type="range" id="vol" min="-60" max="0" value="-20" step="1">
+        </div>
+
+        <div class="control-group">
+            <span class="section-label">Saída</span>
+            <div class="seg">
+                <button class="btn-small" data-pan="-1" onclick="setPan(-1)">Esquerda</button>
+                <button class="btn-small active" data-pan="0" onclick="setPan(0)">Ambos</button>
+                <button class="btn-small" data-pan="1" onclick="setPan(1)">Direita</button>
+            </div>
+        </div>
+
         <div class="control-group" id="freq-control">
-            <label style="font-size:0.7rem;color:var(--text-dim);text-transform:uppercase">Frequência: <span id="val-hz">1000</span> Hz</label>
-            <input type="range" id="freq-slider" min="20" max="20000" value="1000" oninput="updateFreq()">
+            <span class="section-label">Frequência (senoide)</span>
+            <div class="freq-row">
+                <input type="number" id="freq-input" min="20" max="20000" value="1000" step="1">
+                <span>Hz</span>
+            </div>
+            <!-- Slider logarítmico: posição 0..1000 mapeada para 20 Hz..20 kHz -->
+            <input type="range" id="freq-slider" min="0" max="1000" value="500" step="1">
+            <div class="preset-grid">
+                <button class="btn-small" onclick="setFreq(50)">50</button>
+                <button class="btn-small" onclick="setFreq(100)">100</button>
+                <button class="btn-small" onclick="setFreq(250)">250</button>
+                <button class="btn-small" onclick="setFreq(500)">500</button>
+                <button class="btn-small" onclick="setFreq(1000)">1k</button>
+                <button class="btn-small" onclick="setFreq(2000)">2k</button>
+                <button class="btn-small" onclick="setFreq(5000)">5k</button>
+                <button class="btn-small" onclick="setFreq(10000)">10k</button>
+            </div>
+            <div class="note"><i class="fas fa-info-circle"></i> A varredura vai de 20 Hz a 20 kHz em 15 s e repete. Boa para achar vibrações e ressonâncias.</div>
         </div>
     </div>
 
     <script>
-        let audioCtx, osc, noiseNode;
-        function init() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        
+        const F_MIN = 20, F_MAX = 20000;
+        const FADE = 0.03;           // 30 ms de fade para não estalar
+        const SWEEP_SECONDS = 15;
+
+        let audioCtx, master, panner;
+        let src = null;              // fonte tocando agora (oscilador ou buffer)
+        let srcGain = null;          // envelope da fonte atual
+        let current = null;          // 'sine' | 'sweep' | 'pink' | 'white'
+        let sweepTimer = null;
+        const noiseCache = {};
+
+        const $ = id => document.getElementById(id);
+
+        function init() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                // cadeia: fonte -> envelope -> volume geral -> panorâmico -> saída
+                master = audioCtx.createGain();
+                master.gain.value = dbToGain($('vol').value);
+                panner = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
+                if (panner) master.connect(panner).connect(audioCtx.destination);
+                else master.connect(audioCtx.destination);
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function dbToGain(db) { return Math.pow(10, db / 20); }
+
+        // ---------- conversão do slider logarítmico ----------
+        function posToFreq(p) { return F_MIN * Math.pow(F_MAX / F_MIN, p / 1000); }
+        function freqToPos(f) { return 1000 * Math.log(f / F_MIN) / Math.log(F_MAX / F_MIN); }
+        function fmtHz(f) { return f >= 1000 ? (f / 1000).toFixed(f >= 10000 ? 1 : 2).replace(/\.?0+$/, '') + ' kHz' : Math.round(f) + ' Hz'; }
+
+        // ---------- ruídos (gerados uma vez e reaproveitados) ----------
+        function noiseBuffer(type) {
+            if (noiseCache[type]) return noiseCache[type];
+            const sr = audioCtx.sampleRate;
+            const size = 10 * sr; // 10 s para o loop não ficar perceptível
+            const buffer = audioCtx.createBuffer(1, size, sr);
+            const d = buffer.getChannelData(0);
+            if (type === 'white') {
+                for (let i = 0; i < size; i++) d[i] = Math.random() * 2 - 1;
+            } else {
+                // Filtro de Paul Kellet para ruído rosa (-3 dB/oitava)
+                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+                for (let i = 0; i < size; i++) {
+                    const w = Math.random() * 2 - 1;
+                    b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759;
+                    b2 = 0.96900 * b2 + w * 0.1538520; b3 = 0.86650 * b3 + w * 0.3104856;
+                    b4 = 0.55000 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.0168980;
+                    d[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362;
+                    b6 = w * 0.115926;
+                }
+            }
+            // Normaliza para o mesmo nível RMS (-12 dBFS) nos dois ruídos
+            let sum = 0;
+            for (let i = 0; i < size; i++) sum += d[i] * d[i];
+            const k = dbToGain(-12) / Math.sqrt(sum / size);
+            for (let i = 0; i < size; i++) d[i] = Math.max(-1, Math.min(1, d[i] * k));
+            return (noiseCache[type] = buffer);
+        }
+
+        // ---------- iniciar / parar ----------
         function startSignal(type) {
-            init(); stopAll();
+            init();
+            stopAll(true);
+            current = type;
+            const now = audioCtx.currentTime;
+
+            srcGain = audioCtx.createGain();
+            srcGain.gain.setValueAtTime(0, now);
+            srcGain.gain.linearRampToValueAtTime(1, now + FADE);
+            srcGain.connect(master);
+
+            if (type === 'sine' || type === 'sweep') {
+                src = audioCtx.createOscillator();
+                src.type = 'sine';
+                if (type === 'sine') {
+                    src.frequency.setValueAtTime(currentFreq(), now);
+                } else {
+                    scheduleSweep(now);
+                }
+            } else {
+                src = audioCtx.createBufferSource();
+                src.buffer = noiseBuffer(type);
+                src.loop = true;
+            }
+            src.connect(srcGain);
+            src.start(now);
+
+            $('btn-' + type).classList.add('active');
+            $('res-display').classList.remove('off');
+            updateDisplay();
+        }
+
+        function scheduleSweep(t) {
+            src.frequency.setValueAtTime(F_MIN, t);
+            src.frequency.exponentialRampToValueAtTime(F_MAX, t + SWEEP_SECONDS);
+            // Agenda o próximo ciclo e atualiza o display
+            const t0 = t;
+            clearInterval(sweepTimer);
+            sweepTimer = setInterval(() => {
+                if (current !== 'sweep') return;
+                const el = audioCtx.currentTime - t0;
+                if (el >= SWEEP_SECONDS) { scheduleSweep(audioCtx.currentTime); return; }
+                $('freq-display').textContent = fmtHz(F_MIN * Math.pow(F_MAX / F_MIN, el / SWEEP_SECONDS));
+            }, 100);
+        }
+
+        // silent = true quando vamos trocar de sinal logo em seguida
+        function stopAll(silent) {
+            clearInterval(sweepTimer);
+            if (src && audioCtx) {
+                const now = audioCtx.currentTime;
+                const g = srcGain, s = src;
+                g.gain.cancelScheduledValues(now);
+                g.gain.setValueAtTime(g.gain.value, now);
+                g.gain.linearRampToValueAtTime(0, now + FADE);
+                s.stop(now + FADE + 0.01);
+                s.onended = () => g.disconnect();
+            }
+            src = srcGain = null;
+            current = null;
             document.querySelectorAll('.btn-gen').forEach(b => b.classList.remove('active'));
-            if(type === 'sine') {
-                osc = audioCtx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.value = document.getElementById('freq-slider').value;
-                osc.connect(audioCtx.destination);
-                osc.start();
-                document.getElementById('btn-sine').classList.add('active');
-                document.getElementById('freq-display').innerText = osc.frequency.value + " Hz";
-            } else if(type === 'pink') {
-                playPink();
-                document.getElementById('btn-pink').classList.add('active');
-                document.getElementById('freq-display').innerText = "PINK NOISE";
-            } else if(type === 'white') {
-                playWhite();
-                document.getElementById('btn-white').classList.add('active');
-                document.getElementById('freq-display').innerText = "WHITE NOISE";
+            if (!silent) {
+                $('res-display').classList.add('off');
+                $('freq-display').textContent = 'OFF';
+                $('sub-display').textContent = 'Nenhum sinal';
             }
         }
 
-        function playWhite() {
-            const size = 2 * audioCtx.sampleRate;
-            const buffer = audioCtx.createBuffer(1, size, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
-            noiseNode = audioCtx.createBufferSource();
-            noiseNode.buffer = buffer; noiseNode.loop = true;
-            noiseNode.connect(audioCtx.destination); noiseNode.start();
+        function updateDisplay() {
+            const names = { sine: 'Senoide', sweep: 'Varredura 20 Hz a 20 kHz', pink: 'Ruído rosa', white: 'Ruído branco' };
+            $('sub-display').textContent = names[current] + ' • ' + $('vol').value + ' dBFS';
+            if (current === 'sine') $('freq-display').textContent = fmtHz(currentFreq());
+            if (current === 'pink') $('freq-display').textContent = 'PINK';
+            if (current === 'white') $('freq-display').textContent = 'WHITE';
         }
 
-        function playPink() {
-            const size = 2 * audioCtx.sampleRate;
-            const buffer = audioCtx.createBuffer(1, size, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-            let b0, b1, b2, b3, b4, b5, b6;
-            b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
-            for (let i = 0; i < size; i++) {
-                const white = Math.random() * 2 - 1;
-                b0 = 0.99886 * b0 + white * 0.0555179; b1 = 0.99332 * b1 + white * 0.0750759;
-                b2 = 0.96900 * b2 + white * 0.1538520; b3 = 0.86650 * b3 + white * 0.3104856;
-                b4 = 0.55000 * b4 + white * 0.5329522; b5 = -0.7616 * b5 - white * 0.0168980;
-                data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362; data[i] *= 0.11;
-                b6 = white * 0.115926;
+        // ---------- frequência ----------
+        function currentFreq() {
+            const f = parseFloat($('freq-input').value);
+            return Math.min(F_MAX, Math.max(F_MIN, isNaN(f) ? 1000 : f));
+        }
+
+        function setFreq(f, fromSlider) {
+            f = Math.min(F_MAX, Math.max(F_MIN, f));
+            $('freq-input').value = Math.round(f);
+            if (!fromSlider) $('freq-slider').value = freqToPos(f);
+            if (current === 'sine' && src) {
+                // rampa curta evita "zíper" ao arrastar
+                src.frequency.setTargetAtTime(f, audioCtx.currentTime, 0.01);
+                updateDisplay();
             }
-            noiseNode = audioCtx.createBufferSource();
-            noiseNode.buffer = buffer; noiseNode.loop = true;
-            noiseNode.connect(audioCtx.destination); noiseNode.start();
         }
 
-        function updateFreq() {
-            let f = document.getElementById('freq-slider').value;
-            document.getElementById('val-hz').innerText = f;
-            if(osc) { osc.frequency.value = f; document.getElementById('freq-display').innerText = f + " Hz"; }
+        $('freq-slider').addEventListener('input', e => setFreq(posToFreq(+e.target.value), true));
+        $('freq-input').addEventListener('change', () => setFreq(currentFreq()));
+
+        // ---------- volume e saída ----------
+        $('vol').addEventListener('input', e => {
+            $('vol-val').textContent = e.target.value;
+            if (master) master.gain.setTargetAtTime(dbToGain(e.target.value), audioCtx.currentTime, 0.02);
+            if (current) updateDisplay();
+        });
+
+        function setPan(v) {
+            document.querySelectorAll('[data-pan]').forEach(b => b.classList.toggle('active', +b.dataset.pan === v));
+            init();
+            if (panner) panner.pan.setValueAtTime(v, audioCtx.currentTime);
         }
 
-        function stopAll() {
-            if(osc) { osc.stop(); osc = null; }
-            if(noiseNode) { noiseNode.stop(); noiseNode = null; }
-            document.getElementById('freq-display').innerText = "OFF";
-            document.querySelectorAll('.btn-gen').forEach(b => b.classList.remove('active'));
-        }
+        // Para o som se o usuário sair da página
+        window.addEventListener('pagehide', () => stopAll());
     </script>
 </body>
 </html>

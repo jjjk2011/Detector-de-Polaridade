@@ -2,100 +2,158 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e14">
     <title>Delay / TA - AudioBase Pro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root {
-            --bg-color: #0a0e14;
-            --card-bg: #161b22;
-            --accent-orange: #ff9800;
-            --text-main: #ffffff;
-            --text-dim: #8b949e;
-            --border: #30363d;
-            --success: #44ff44;
-        }
-
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
-        .top-bar { width: 100%; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
-        .btn-back { color: var(--text-main); text-decoration: none; font-size: 1.2rem; background: var(--card-bg); padding: 10px 15px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; box-sizing: border-box; }
-
-        .container { width: 90%; max-width: 500px; }
-        .header-page { text-align: center; margin: 20px 0; }
-        .header-page i { color: var(--accent-orange); font-size: 2rem; margin-bottom: 10px; }
-        .header-page h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
-
-        .res-display { background: var(--card-bg); border: 2px solid var(--accent-orange); border-radius: 30px; padding: 40px 10px; margin-bottom: 25px; text-align: center; }
-        .res-main { font-size: 3.5rem; font-weight: bold; margin: 0; font-family: monospace; color: var(--accent-orange); }
-        .res-unit { color: var(--text-dim); font-size: 0.9rem; text-transform: uppercase; }
-
-        .control-group { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
-        .section-label { color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: block; }
-        
-        label { display: block; color: var(--text-dim); font-size: 0.65rem; text-transform: uppercase; margin-bottom: 8px; }
-        input { width: 100%; background: #0d1117; border: 1px solid var(--border); color: white; padding: 12px; border-radius: 10px; font-size: 1.1rem; box-sizing: border-box; outline: none; }
-        input[type=range] { accent-color: var(--accent-orange); margin-top: 10px; }
-
-        .fine-tune { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn-tune { background: #1c2128; border: 1px solid var(--border); color: white; padding: 12px 5px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
-        
-        .btn-auto { width: 100%; padding: 22px; border-radius: 20px; border: 2px solid var(--accent-orange); background: transparent; color: var(--accent-orange); font-size: 1rem; font-weight: bold; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-auto.active { background: var(--accent-orange); color: #000; }
+        .res-main { font-size: 3.2rem; font-family: ui-monospace, Menlo, monospace; }
+        .res-extra { display: flex; justify-content: center; gap: 18px; margin-top: 12px; color: var(--dim); font-size: 0.75rem; flex-wrap: wrap; }
+        .res-extra b { color: var(--text); }
+        .fine-tune { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+        .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .who { margin-top: 12px; font-size: 0.85rem; color: var(--text); text-align: center; }
+        .who b { color: var(--accent); }
+        .hidden { display: none; }
     </style>
 </head>
-<body>
+<body class="theme-orange">
     <div class="top-bar">
-        <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i></a>
+        <a href="index.html" class="btn-back" aria-label="Voltar"><i class="fas fa-arrow-left"></i></a>
     </div>
 
     <div class="container">
         <div class="header-page"><i class="fas fa-stopwatch"></i><h1>Delay / TA</h1></div>
 
-        <div id="display-card" class="res-display">
+        <div class="res-display">
             <div class="res-main" id="res-ms">0.00</div>
-            <div class="res-unit">ms (Milissegundos)</div>
+            <div class="res-unit">ms (milissegundos)</div>
+            <div class="res-extra">
+                <span>@48 kHz: <b id="res-s48">0</b> amostras</span>
+                <span>@96 kHz: <b id="res-s96">0</b> amostras</span>
+            </div>
+            <div class="who hidden" id="who"></div>
         </div>
 
-        <div class="control-group">
-            <span class="section-label">Ajuste Manual</span>
-            <label>Metros (m)</label>
-            <input type="number" id="dist" value="1.00" step="0.01" oninput="calcularManual()">
+        <div class="tabs">
+            <button class="btn-small active" id="tab-dist" onclick="setMode('dist')">Distância</button>
+            <button class="btn-small" id="tab-diff" onclick="setMode('diff')">Alinhar 2 fontes</button>
+        </div>
+
+        <!-- Modo 1: uma distância -->
+        <div class="control-group" id="mode-dist">
+            <span class="section-label">Distância</span>
+            <label for="dist">Metros (m)</label>
+            <input type="number" id="dist" value="1.00" step="0.01" min="0" inputmode="decimal">
             <div class="fine-tune">
-                <button class="btn-tune" onclick="ajustar(-0.1)">-10cm</button>
-                <button class="btn-tune" onclick="ajustar(-0.01)">-1cm</button>
-                <button class="btn-tune" onclick="ajustar(0.01)">+1cm</button>
-                <button class="btn-tune" onclick="ajustar(0.1)">+10cm</button>
+                <button class="btn-small" onclick="ajustar('dist', -0.1)">-10cm</button>
+                <button class="btn-small" onclick="ajustar('dist', -0.01)">-1cm</button>
+                <button class="btn-small" onclick="ajustar('dist', 0.01)">+1cm</button>
+                <button class="btn-small" onclick="ajustar('dist', 0.1)">+10cm</button>
             </div>
+        </div>
+
+        <!-- Modo 2: diferença entre duas caixas até o ponto de escuta -->
+        <div class="control-group hidden" id="mode-diff">
+            <span class="section-label">Distância até o ponto de escuta</span>
+            <div class="row">
+                <div>
+                    <label for="dist-a">Fonte A (ex.: PA) m</label>
+                    <input type="number" id="dist-a" value="20.00" step="0.01" min="0" inputmode="decimal">
+                </div>
+                <div>
+                    <label for="dist-b">Fonte B (ex.: torre/sub) m</label>
+                    <input type="number" id="dist-b" value="8.00" step="0.01" min="0" inputmode="decimal">
+                </div>
+            </div>
+            <div class="note"><i class="fas fa-info-circle"></i> O delay vai na fonte mais próxima, para o som dela chegar junto com o da fonte mais distante.</div>
         </div>
 
         <div class="control-group">
             <span class="section-label">Ambiente</span>
-            <label>Temperatura: <span id="temp-val" style="color: var(--accent-orange);">25</span>°C</label>
-            <input type="range" id="temp" min="0" max="50" value="25" oninput="calcularManual()">
+            <label for="temp">Temperatura: <span id="temp-val" style="color: var(--accent);">25</span>°C • Som a <span id="c-val" style="color: var(--accent);">346.1</span> m/s</label>
+            <input type="range" id="temp" min="-10" max="50" value="25">
+        </div>
+
+        <div class="control-group">
+            <span class="section-label">Converter ms em distância</span>
+            <div class="row">
+                <div>
+                    <label for="ms-in">Tempo (ms)</label>
+                    <input type="number" id="ms-in" value="10" step="0.01" min="0" inputmode="decimal">
+                </div>
+                <div>
+                    <label>Distância</label>
+                    <input type="text" id="ms-out" readonly>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        let audioCtx;
-        function calcularManual() {
-            const dist = parseFloat(document.getElementById('dist').value) || 0;
-            const temp = parseFloat(document.getElementById('temp').value);
-            document.getElementById('temp-val').innerText = temp;
-            let v = 331.4 + (0.6 * temp);
-            let delay = (dist / v) * 1000;
-            document.getElementById('res-ms').innerText = delay.toFixed(2);
+        let mode = 'dist';
+        const $ = id => document.getElementById(id);
+
+        // Velocidade do som no ar (m/s). Fórmula exata para gás ideal:
+        // c = 331.3 * sqrt(1 + T/273.15)
+        function speedOfSound(tempC) {
+            return 331.3 * Math.sqrt(1 + tempC / 273.15);
         }
-        function ajustar(val) {
-            const input = document.getElementById('dist');
-            input.value = (parseFloat(input.value) + val).toFixed(2);
-            calcularManual();
+
+        function num(id) {
+            const v = parseFloat($(id).value);
+            return isNaN(v) || v < 0 ? 0 : v;
         }
-        function toggleAutoMeasure() {
-            alert("Iniciando medição... Aproxime do falante.");
-            // Lógica de áudio aqui (como construído anteriormente)
+
+        function calcular() {
+            const temp = parseFloat($('temp').value);
+            const c = speedOfSound(temp);
+            $('temp-val').textContent = temp;
+            $('c-val').textContent = c.toFixed(1);
+
+            let metros;
+            const who = $('who');
+            if (mode === 'dist') {
+                metros = num('dist');
+                who.classList.add('hidden');
+            } else {
+                const a = num('dist-a'), b = num('dist-b');
+                metros = Math.abs(a - b);
+                who.classList.remove('hidden');
+                if (a === b) who.innerHTML = 'As duas fontes já estão alinhadas.';
+                else who.innerHTML = `Aplique o delay na <b>Fonte ${a > b ? 'B' : 'A'}</b> (a mais próxima).`;
+            }
+
+            const ms = (metros / c) * 1000;
+            $('res-ms').textContent = ms.toFixed(2);
+            $('res-s48').textContent = Math.round(ms * 48);
+            $('res-s96').textContent = Math.round(ms * 96);
+
+            // Conversor inverso
+            const m = num('ms-in') / 1000 * c;
+            $('ms-out').value = m.toFixed(2) + ' m';
         }
-        calcularManual();
-        
+
+        function ajustar(id, val) {
+            const input = $(id);
+            input.value = Math.max(0, (parseFloat(input.value) || 0) + val).toFixed(2);
+            calcular();
+        }
+
+        function setMode(m) {
+            mode = m;
+            $('mode-dist').classList.toggle('hidden', m !== 'dist');
+            $('mode-diff').classList.toggle('hidden', m !== 'diff');
+            $('tab-dist').classList.toggle('active', m === 'dist');
+            $('tab-diff').classList.toggle('active', m === 'diff');
+            calcular();
+        }
+
+        ['dist', 'dist-a', 'dist-b', 'temp', 'ms-in'].forEach(id => $(id).addEventListener('input', calcular));
+        calcular();
     </script>
 </body>
 </html>
